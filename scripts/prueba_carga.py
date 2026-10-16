@@ -150,11 +150,11 @@ async def correr(url: str, n_jovenes: int, semilla: int) -> int:
     for v, n in por_vacante.items():
         if n > vacantes[v]["cupos"]:
             fallas.append(f"Vacante {v}: {n} aprobadas con {vacantes[v]['cupos']} cupos")
-    vivas = Counter(a["vacante_id"] for a in todas if a["aprobada"] is not False)
+    vivas = Counter(a["vacante_id"] for a in todas if a["vigente"] and a["aprobada"] is not False)
     for v, n in vivas.items():
         if n > vacantes[v]["cupos"]:
             fallas.append(f"Vacante {v}: {n} asignaciones vivas con {vacantes[v]['cupos']} cupos")
-    por_joven = Counter(a["joven_id"] for a in todas if a["aprobada"] is not False)
+    por_joven = Counter(a["joven_id"] for a in todas if a["vigente"] and a["aprobada"] is not False)
     fallas += [f"Joven {j} con {n} asignaciones" for j, n in por_joven.items() if n > 1]
     if ok != len(pendientes):
         fallas.append(f"Se aceptaron {ok} decisiones para {len(pendientes)} asignaciones (doble aprobación)")

@@ -33,6 +33,10 @@ decisión importante.
   ni siquiera se le muestran, y el sistema dice por qué.
 - Cuando hay interés mutuo, un solver de optimización asigna respetando los cupos.
 - El orientador aprueba; el sistema agenda la entrevista y avisa por Telegram.
+- **Reacomodo:** si un joven cancela o no se presenta, si la empresa lo retira o si cierra
+  la vacante, el cupo se libera y el solver propone de inmediato al siguiente candidato
+  (o reubica al joven en otra vacante), siempre con aprobación del orientador. Las
+  entrevistas se pueden reprogramar y cada cambio se avisa.
 - Quien no tiene ninguna vacante posible recibe una ruta de cursos que cabe en su horario,
   su presupuesto y su transporte.
 - Un auditor bloquea ofertas discriminatorias y mide si el resultado cambia al cambiar
@@ -170,8 +174,11 @@ La demo no requiere usuario ni contraseña. Las claves son opcionales y van en `
 | `POST` | `/vacantes/{id}/publicar-bloqueada` | El orientador publica una oferta bloqueada, con motivo |
 | `POST` | `/deslizar` | Registra un sí o un no; responde si hay interés mutuo |
 | `POST` | `/matching` | Corre el matching y la ruta de formación |
-| `GET` | `/asignaciones` | Filtra por `pendiente`, `aprobada` o `rechazada` |
+| `GET` | `/asignaciones` | Filtra por `pendiente`, `aprobada`, `rechazada` o `cerrada` |
 | `POST` | `/asignaciones/{joven}/{vacante}/decision` | El orientador aprueba o rechaza |
+| `POST` | `/asignaciones/{joven}/{vacante}/liberar` | Cancelación, inasistencia o retiro: libera el cupo y propone reemplazo |
+| `POST` | `/asignaciones/{joven}/{vacante}/reprogramar` | Mueve la entrevista al siguiente espacio libre |
+| `POST` | `/vacantes/{id}/cerrar` | Cierra la vacante y reubica a los afectados |
 | `GET` | `/trazas` | Qué agente decidió qué, filtrable por agente |
 | `GET` | `/mensajes` | Mensajes enviados o registrados |
 | `GET` | `/salud` | Qué agentes están conectados |
@@ -192,8 +199,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-93 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, la API y la historia de los datos de demostración. Además, cada restricción
+107 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el reacomodo, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de

@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from contrato.modelos import (
     Asignacion, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
-    ResultadoAuditoria, ResultadoMatching, Traslado, Traza, Vacante, Habilidad,
+    ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
 from orquestador import ErrorDeFlujo, NoEncontrado, Orquestador
 from orquestador.arranque import orquestador_desde_entorno
@@ -69,6 +69,22 @@ class RespuestaDeslizamiento(BaseModel):
 class Decision(BaseModel):
     aprobar: bool
     motivo: str = Field(default="", max_length=1000)
+
+
+class Liberacion(BaseModel):
+    tipo: Literal["cancelacion_joven", "inasistencia", "retiro_empresa"]
+    motivo: str = Field(min_length=1, max_length=1000)
+
+
+class ResultadoLiberacion(BaseModel):
+    liberada: Asignacion
+    nuevas: list[Asignacion]   # propuestas de reemplazo, pendientes del orientador
+
+
+class ResultadoCierre(BaseModel):
+    vacante: Vacante
+    afectadas: list[Asignacion]
+    nuevas: list[Asignacion]
 
 
 # ---------- construcción ----------
@@ -188,15 +204,32 @@ def crear_app(orq: Orquestador) -> FastAPI:
         return orq.ejecutar_matching()
 
     @app.get("/asignaciones")
-    def listar_asignaciones(estado: Literal["pendiente", "aprobada", "rechazada"] | None = None
+    def listar_asignaciones(estado: Literal["pendiente", "aprobada", "rechazada", "cerrada"] | None = None
                             ) -> list[Asignacion]:
-        valor = {"pendiente": None, "aprobada": True, "rechazada": False}
-        return [a for a in orq.almacen.listar(Asignacion)
-                if estado is None or a.aprobada is valor[estado]]
+        def estado_de(a: Asignacion) -> str:
+            if not a.vigente:
+                return "cerrada"
+            return {None: "pendiente", True: "aprobada", False: "rechazada"}[a.aprobada]
+        return [a for a in orq.almacen.listar(Asignacion) if estado is None or estado_de(a) == estado]
 
     @app.post("/asignaciones/{joven_id}/{vacante_id}/decision")
     def decidir(joven_id: str, vacante_id: str, decision: Decision) -> Asignacion:
         return orq.orientador_decidir(joven_id, vacante_id, decision.aprobar, decision.motivo)
+
+    # ----- reacomodo -----
+    @app.post("/asignaciones/{joven_id}/{vacante_id}/liberar")
+    def liberar(joven_id: str, vacante_id: str, cuerpo: Liberacion) -> ResultadoLiberacion:
+        liberada, nuevas = orq.liberar(joven_id, vacante_id, TipoCierre(cuerpo.tipo), cuerpo.motivo)
+        return ResultadoLiberacion(liberada=liberada, nuevas=nuevas)
+
+    @app.post("/asignaciones/{joven_id}/{vacante_id}/reprogramar")
+    def reprogramar(joven_id: str, vacante_id: str, cuerpo: Motivo) -> Asignacion:
+        return orq.reprogramar_entrevista(joven_id, vacante_id, cuerpo.motivo)
+
+    @app.post("/vacantes/{vacante_id}/cerrar")
+    def cerrar_vacante(vacante_id: str, cuerpo: Motivo) -> ResultadoCierre:
+        vacante, afectadas, nuevas = orq.cerrar_vacante(vacante_id, cuerpo.motivo)
+        return ResultadoCierre(vacante=vacante, afectadas=afectadas, nuevas=nuevas)
 
     # ----- transparencia -----
     @app.get("/trazas")

@@ -126,6 +126,11 @@ cd frontend && npm install && npm run dev
   - `POST /matching` · `GET /asignaciones?estado=pendiente|aprobada|rechazada`
   - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
   - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
+  - Reacomodo: `POST /asignaciones/{joven_id}/{vacante_id}/liberar`
+    `{tipo: "cancelacion_joven"|"inasistencia"|"retiro_empresa", motivo}` → `{liberada, nuevas}` ·
+    `POST /asignaciones/{joven_id}/{vacante_id}/reprogramar` `{motivo}` ·
+    `POST /vacantes/{id}/cerrar` `{motivo}` → `{vacante, afectadas, nuevas}` ·
+    `GET /asignaciones?estado=cerrada`
   - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos.
 - **Perfil (B):** construye `Joven` + `DatosPersonales` y los manda a `POST /jovenes`.
 - **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
