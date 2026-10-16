@@ -14,11 +14,11 @@ import threading
 from datetime import datetime, timezone
 from typing import Any, Callable
 
-from agentes.formacion import planificar_grupo
+from agentes.formacion import casi_califica, planificar_grupo
 from agentes.matching import MatrizTraslados, asignar, evaluar, ranking_para_joven, ranking_para_vacante
 from contrato.modelos import (
-    Agente, Asignacion, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
-    ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
+    Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad,
+    Joven, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
 )
 
 from .agenda import proxima_entrevista
@@ -364,6 +364,11 @@ class Orquestador:
                     entrada={"joven_id": joven_id, "vacante_id": vacante_id},
                     salida={"entrevista": nueva.isoformat()})
         return a
+
+    def casi_califica(self, joven_id: str) -> list[CasiCalifica]:
+        nombres = {h.codigo: h.nombre for h in self.almacen.listar(Habilidad)}
+        return casi_califica(self._joven(joven_id), self.almacen.listar(Vacante),
+                             self.almacen.listar(Curso), self.matriz(), nombres)
 
     def plan_de(self, joven_id: str) -> PlanFormacion | None:
         return self.almacen.obtener(PlanFormacion, joven_id)

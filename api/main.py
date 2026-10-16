@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from contrato.modelos import (
-    Asignacion, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
+    Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
     ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
 from orquestador import ErrorDeFlujo, NoEncontrado, Orquestador
@@ -192,6 +192,10 @@ def crear_app(orq: Orquestador) -> FastAPI:
         if plan is None:
             raise HTTPException(status_code=404, detail="Este joven no tiene plan de formación")
         return plan
+
+    @app.get("/jovenes/{joven_id}/casi-califica")
+    def casi(joven_id: str) -> list[CasiCalifica]:
+        return orq.casi_califica(joven_id)
 
     @app.post("/deslizar")
     def deslizar(d: Deslizamiento) -> RespuestaDeslizamiento:

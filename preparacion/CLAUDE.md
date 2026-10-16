@@ -120,6 +120,8 @@ cd frontend && npm install && npm run dev
 - **Frontend (B):** solo habla con la API en `http://localhost:8010` (la lista completa
   está en `/docs`). Las principales:
   - `POST /jovenes` `{joven, datos}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
+  - `GET /jovenes/{id}/casi-califica` → vacantes donde le falta una sola cosa:
+    `[{vacante_id, titulo, incumplimiento: {tipo, detalle, faltante, codigo}, sugerencia, cursos}]`
   - `POST /vacantes` (estructurada) · `POST /ofertas` `{texto, empresa_id}` (texto libre, usa Mercado)
   - `GET /vacantes/{id}/tarjetas` (candidatos SIN datos personales)
   - `POST /deslizar` `{actor: "joven"|"empresa", joven_id, vacante_id, le_interesa}` → `{interes_mutuo}`

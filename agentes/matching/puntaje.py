@@ -7,7 +7,9 @@ Auditor usa esta separación en sus pruebas contrafactuales.
 """
 from __future__ import annotations
 
-from contrato.modelos import Desglose, Infactible, Joven, Vacante
+from contrato.modelos import (
+    Desglose, Incumplimiento, Infactible, Joven, TipoIncumplimiento, Vacante,
+)
 
 from .traslados import MatrizTraslados, costo_mensual, costo_semanal
 
@@ -24,31 +26,50 @@ def _niveles(joven: Joven) -> dict[str, int]:
     return niveles
 
 
-def motivos_infactible(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> list[str]:
-    """Lista vacía = el par es factible."""
-    motivos: list[str] = []
+def incumplimientos(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> list[Incumplimiento]:
+    """Restricciones que no se cumplen, con su magnitud. Lista vacía = factible."""
+    fallas: list[Incumplimiento] = []
     viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
     if viaje is None:
-        motivos.append(f"No hay datos de traslado entre {joven.corregimiento} y {vacante.corregimiento}")
+        fallas.append(Incumplimiento(
+            tipo=TipoIncumplimiento.sin_datos,
+            detalle=f"No hay datos de traslado entre {joven.corregimiento} y {vacante.corregimiento}"))
     else:
         if viaje.minutos > joven.max_minutos_traslado:
-            motivos.append(f"El traslado toma {viaje.minutos} min y su límite es {joven.max_minutos_traslado} min")
+            fallas.append(Incumplimiento(
+                tipo=TipoIncumplimiento.traslado, faltante=viaje.minutos - joven.max_minutos_traslado,
+                detalle=f"El traslado toma {viaje.minutos} min y su límite es {joven.max_minutos_traslado} min"))
         semanal = costo_semanal(viaje, vacante.dias_por_semana)
         if semanal > joven.presupuesto_transporte_semanal:
-            motivos.append(f"El transporte cuesta B/.{semanal:.2f} por semana y su presupuesto es "
-                           f"B/.{joven.presupuesto_transporte_semanal:.2f}")
+            fallas.append(Incumplimiento(
+                tipo=TipoIncumplimiento.presupuesto,
+                faltante=round(semanal - joven.presupuesto_transporte_semanal, 2),
+                detalle=f"El transporte cuesta B/.{semanal:.2f} por semana y su presupuesto es "
+                        f"B/.{joven.presupuesto_transporte_semanal:.2f}"))
     faltan_turnos = vacante.turnos - joven.disponibilidad
     if faltan_turnos:
         nombres = ", ".join(sorted(t.value for t in faltan_turnos))
-        motivos.append(f"El horario pide turnos que no tiene disponibles: {nombres}")
+        fallas.append(Incumplimiento(
+            tipo=TipoIncumplimiento.horario, codigo=nombres, faltante=len(faltan_turnos),
+            detalle=f"El horario pide turnos que no tiene disponibles: {nombres}"))
     if vacante.salario_mensual < joven.salario_minimo:
-        motivos.append(f"El salario B/.{vacante.salario_mensual:.2f} es menor que su mínimo "
-                       f"B/.{joven.salario_minimo:.2f}")
+        fallas.append(Incumplimiento(
+            tipo=TipoIncumplimiento.salario, faltante=round(joven.salario_minimo - vacante.salario_mensual, 2),
+            detalle=f"El salario B/.{vacante.salario_mensual:.2f} es menor que su mínimo "
+                    f"B/.{joven.salario_minimo:.2f}"))
     niveles = _niveles(joven)
     for r in vacante.habilidades_requeridas:
         if r.obligatoria and niveles.get(r.codigo, 0) < r.nivel_minimo:
-            motivos.append(f"Falta la habilidad obligatoria {r.codigo} (nivel {r.nivel_minimo})")
-    return motivos
+            fallas.append(Incumplimiento(
+                tipo=TipoIncumplimiento.habilidad, codigo=r.codigo,
+                faltante=r.nivel_minimo - niveles.get(r.codigo, 0),
+                detalle=f"Falta la habilidad obligatoria {r.codigo} (nivel {r.nivel_minimo})"))
+    return fallas
+
+
+def motivos_infactible(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> list[str]:
+    """Lista vacía = el par es factible."""
+    return [f.detalle for f in incumplimientos(joven, vacante, matriz)]
 
 
 def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> Desglose:

@@ -31,6 +31,9 @@ decisión importante.
   traslado, y salario neto del transporte.
 - Las vacantes imposibles para un joven (por distancia, presupuesto, horario o salario)
   ni siquiera se le muestran, y el sistema dice por qué.
+- **Casi califica:** las vacantes donde le falta una sola cosa se le muestran aparte, con
+  cuánto le falta ("le faltan B/.1.00 por semana para el pasaje") y qué hacer; si lo que
+  falta es una habilidad, el curso que la cubre y que cabe en su horario y presupuesto.
 - Cuando hay interés mutuo, un solver de optimización asigna respetando los cupos.
 - El orientador aprueba; el sistema agenda la entrevista y avisa por Telegram.
 - **Reacomodo:** si un joven cancela o no se presenta, si la empresa lo retira o si cierra
@@ -168,6 +171,7 @@ La demo no requiere usuario ni contraseña. Las claves son opcionales y van en `
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
+| `GET` | `/jovenes/{id}/casi-califica` | Vacantes donde le falta una sola cosa, con sugerencia y cursos |
 | `POST` | `/ofertas` | Publica una oferta en texto libre (Mercado → Auditor) |
 | `POST` | `/vacantes` | Publica una vacante estructurada (Auditor) |
 | `GET` | `/vacantes/{id}/tarjetas` | Candidatos factibles, sin datos personales |
@@ -199,8 +203,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-107 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el reacomodo, la API y la historia de los datos de demostración. Además, cada restricción
+121 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el reacomodo, "casi califica", la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de
