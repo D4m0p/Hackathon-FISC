@@ -144,6 +144,32 @@ class Desglose(BaseModel):
     motivos: list[str] = []
 
 
+class TipoIncumplimiento(str, Enum):
+    traslado = "traslado"         # demasiados minutos
+    presupuesto = "presupuesto"   # el pasaje semanal supera su presupuesto
+    horario = "horario"           # turnos que no tiene disponibles
+    salario = "salario"           # paga menos que su mínimo
+    habilidad = "habilidad"       # le falta una habilidad obligatoria
+    sin_datos = "sin_datos"       # no hay datos de traslado
+
+
+class Incumplimiento(BaseModel):
+    """Una restricción que el par joven–vacante no cumple, con su magnitud."""
+    tipo: TipoIncumplimiento
+    detalle: str                  # texto listo para mostrar
+    faltante: float | None = None # minutos de más, B/. que faltan, etc.
+    codigo: str | None = None     # habilidad o turno que falta
+
+
+class CasiCalifica(BaseModel):
+    """Vacante a la que al joven le falta una sola cosa, con qué hacer al respecto."""
+    vacante_id: str
+    titulo: str
+    incumplimiento: Incumplimiento
+    sugerencia: str
+    cursos: list[str] = []        # cursos viables que cubren la habilidad que falta
+
+
 class Infactible(BaseModel):
     joven_id: str
     vacante_id: str
