@@ -41,6 +41,8 @@ En el repositorio no puede quedar **ningún rastro** de las herramientas de IA q
 - Si un commit ajeno toca `contrato/` o algo de lo que el usuario está usando,
   el asistente lo destaca.
 - Antes de empezar cualquier tarea nueva: `scripts/novedades.sh --ya`.
+- **`AVISOS.md`:** al empezar la sesión y después de cada pull, el asistente lee la sección
+  de su integrante y se la dice al usuario. Cuando el aviso se atendió, lo borra.
 
 ### Pull automático (obligatorio)
 
