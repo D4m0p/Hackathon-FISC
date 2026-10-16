@@ -223,9 +223,19 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-145 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+165 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
+
+**Casos aleatorios** (Hypothesis, `tests/test_propiedades.py` y `tests/test_estados.py`):
+miles de mercados, perfiles y cursos generados al azar verifican propiedades que deben
+cumplirse siempre. En instancias pequeñas, el Matching y la Ruta de formación se comparan
+contra una búsqueda exhaustiva de todas las combinaciones: el solver nunca pierde. Una
+máquina de estados inventa recorridos completos (registrar, deslizar, matching, aprobar,
+cancelar, cerrar, reprogramar, editar) y revisa las reglas del negocio después de cada
+paso. Estas pruebas encontraron 6 errores que los ejemplos fijos no veían (por ejemplo,
+una propuesta que seguía viva después de que la empresa cambió su respuesta a "no"); cada
+uno quedó corregido y fijado en `tests/test_regresiones.py`.
 
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de
 1000 peticiones en ráfagas de hasta 378 simultáneas, mezclando registros, deslizamientos,

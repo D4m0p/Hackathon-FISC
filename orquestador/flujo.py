@@ -17,7 +17,9 @@ from typing import Any, Callable
 from pydantic import BaseModel
 
 from agentes.formacion import casi_califica, planificar_grupo
-from agentes.matching import MatrizTraslados, asignar, evaluar, ranking_para_joven, ranking_para_vacante
+from agentes.matching import (
+    MatrizTraslados, asignar, evaluar, motivos_infactible, ranking_para_joven, ranking_para_vacante,
+)
 from contrato.modelos import (
     Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad,
     Joven, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
@@ -109,13 +111,56 @@ class Orquestador:
                     salida={"vacante": vacante})
         return self.publicar_vacante(vacante)
 
+    def _aprobadas_vivas(self, vacante_id: str) -> list[Asignacion]:
+        return [a for a in self.almacen.listar(Asignacion)
+                if a.vacante_id == vacante_id and a.vigente and a.aprobada]
+
+    def _retirar_pendientes(self, motivo: str, joven_id: str | None = None,
+                            vacante_id: str | None = None) -> None:
+        """Una propuesta pendiente se basa en datos que acaban de cambiar: se retira y el
+        próximo matching la recalcula con los datos nuevos."""
+        for a in self.almacen.listar(Asignacion):
+            if (a.vigente and a.aprobada is None
+                    and (joven_id is None or a.joven_id == joven_id)
+                    and (vacante_id is None or a.vacante_id == vacante_id)):
+                self.almacen.borrar(Asignacion, clave_asignacion(a))
+                self._traza(Agente.orquestador, "retirar_propuesta", motivo,
+                            entrada={"joven_id": a.joven_id, "vacante_id": a.vacante_id})
+
     @_exclusivo
     def publicar_vacante(self, vacante: Vacante) -> tuple[Vacante, ResultadoAuditoria]:
-        """Toda vacante pasa por el Auditor antes de publicarse, también al corregirla."""
+        """Toda vacante pasa por el Auditor antes de publicarse, también al corregirla.
+
+        Si ya tiene personas aprobadas, la edición no puede dejarlas mal: se rechaza (y
+        queda la versión anterior) si baja los cupos por debajo de ellas, si alguna deja
+        de cumplir las condiciones o si el Auditor la bloquea.
+        """
+        aprobadas = self._aprobadas_vivas(vacante.id)
+        if aprobadas:
+            if vacante.cupos < len(aprobadas):
+                raise ErrorDeFlujo(f"La vacante ya tiene {len(aprobadas)} persona(s) aprobada(s); "
+                                   f"no puede bajar a {vacante.cupos} cupo(s)")
+            matriz = self.matriz()
+            for a in aprobadas:
+                motivos = motivos_infactible(self._joven(a.joven_id), vacante, matriz)
+                if motivos:
+                    raise ErrorDeFlujo(f"La edición deja sin cumplir condiciones a {a.joven_id}, "
+                                       f"ya aprobado: {'; '.join(motivos)}")
         resultado = self.auditor.auditar_oferta(vacante)
+        if aprobadas and not resultado.aprobado:
+            self._traza(Agente.auditor, "auditar_oferta",
+                        "Edición rechazada (hay personas aprobadas): "
+                        + "; ".join(h.detalle for h in resultado.hallazgos),
+                        entrada={"vacante_id": vacante.id}, salida={"resultado": resultado})
+            raise ErrorDeFlujo("La edición tiene requisitos discriminatorios y la vacante ya tiene "
+                               "personas aprobadas; se mantiene la versión anterior: "
+                               + "; ".join(h.detalle for h in resultado.hallazgos))
         estado = EstadoVacante.publicada if resultado.aprobado else EstadoVacante.bloqueada
+        existia = self.almacen.obtener(Vacante, vacante.id) is not None
         vacante = vacante.model_copy(update={"estado": estado})
         self.almacen.guardar(vacante)
+        if existia:
+            self._retirar_pendientes("La vacante cambió", vacante_id=vacante.id)
         if isinstance(self.auditor, AuditorProvisional):
             motivo = "Auditor provisional: publicada sin auditoría real"
         elif resultado.aprobado:
@@ -144,7 +189,18 @@ class Orquestador:
     def registrar_joven(self, joven: Joven, datos: DatosPersonales | None = None) -> Joven:
         if datos is not None and datos.joven_id != joven.id:
             raise ErrorDeFlujo("Los datos personales no corresponden al joven")
+        existia = self.almacen.obtener(Joven, joven.id) is not None
         self.almacen.guardar(joven)
+        if existia:
+            self._retirar_pendientes("El perfil del joven cambió", joven_id=joven.id)
+            matriz = self.matriz()
+            for a in self.almacen.listar(Asignacion):
+                if a.joven_id == joven.id and a.vigente and a.aprobada:
+                    motivos = motivos_infactible(joven, self._vacante(a.vacante_id), matriz)
+                    if motivos:   # se permite editar, pero el orientador debe enterarse
+                        self._traza(Agente.orquestador, "advertencia",
+                                    f"El perfil nuevo choca con la entrevista aprobada: {'; '.join(motivos)}",
+                                    entrada={"joven_id": joven.id, "vacante_id": a.vacante_id})
         if datos is not None:
             self.almacen.guardar(datos)
         self._traza(Agente.perfil, "registrar_joven",
@@ -174,7 +230,12 @@ class Orquestador:
             raise ErrorDeFlujo("La vacante no está publicada")
         if not isinstance(evaluar(joven, vacante, self.matriz()), Desglose):
             raise ErrorDeFlujo("Ese par no es factible; no aparece en las tarjetas")
+        if any(a.joven_id == joven_id for a in self._aprobadas_vivas(vacante_id)):
+            raise ErrorDeFlujo("Ya hay una entrevista aprobada para este par; para dejarla, cancélela")
         self.almacen.deslizar(actor, joven_id, vacante_id, le_interesa)
+        if not le_interesa:
+            self._retirar_pendientes(f"{actor.capitalize()} cambió su respuesta a no",
+                                     joven_id=joven_id, vacante_id=vacante_id)
         mutuo = (joven_id, vacante_id) in self.almacen.interes_mutuo()
         if mutuo and le_interesa:
             self._traza(Agente.orquestador, "interes_mutuo", "El joven y la empresa dijeron que sí",
@@ -368,6 +429,9 @@ class Orquestador:
         if not a.aprobada or a.entrevista is None:
             raise ErrorDeFlujo("Solo se reprograma una asignación aprobada con entrevista")
         joven, vacante = self._joven(joven_id), self._vacante(vacante_id)
+        if not vacante.turnos & joven.disponibilidad:
+            raise ErrorDeFlujo("Su disponibilidad ya no coincide con el horario de la vacante; "
+                               "actualice su disponibilidad o cancele la entrevista")
         desde = max(a.entrevista, self.reloj())
         nueva = proxima_entrevista(joven, vacante, desde, self._ocupados(vacante_id))
         a = a.model_copy(update={"entrevista": nueva})
