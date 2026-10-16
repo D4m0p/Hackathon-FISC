@@ -39,8 +39,24 @@ En el repositorio no puede quedar **ningún rastro** de las herramientas de IA q
   aparece en el contexto, **el asistente se lo dice al usuario al inicio de su respuesta**:
   quién, qué mensaje y qué archivos, en una o dos líneas por commit.
 - Si un commit ajeno toca `contrato/` o algo de lo que el usuario está usando,
-  el asistente lo destaca y propone `git pull --rebase` antes de seguir.
+  el asistente lo destaca.
 - Antes de empezar cualquier tarea nueva: `scripts/novedades.sh --ya`.
+
+### Pull automático (obligatorio)
+
+El asistente trae los cambios del equipo **solo, sin preguntar**:
+
+- **Antes de cada cambio** (antes de editar o crear un archivo) y **cada vez que el aviso
+  muestre commits nuevos**, corre:
+  ```bash
+  git pull --rebase --autostash
+  ```
+  `--autostash` guarda y vuelve a poner los cambios locales sin commitear, así no se pierde nada.
+- Después del pull, si llegaron cambios que tocan lo que se está usando, corre las pruebas
+  antes de seguir.
+- **Si el pull da conflicto, el asistente se detiene**: no resuelve a ciegas, no usa
+  `--force`, `reset --hard` ni `checkout --` sobre archivos ajenos. Le muestra al usuario
+  qué archivos chocan y lo resuelven juntos (o con el dueño de esa carpeta).
 
 ## 2. Quién es dueño de qué
 
@@ -63,7 +79,7 @@ ajena, se lo pide al dueño (no lo hace él mismo).
 - Una sola rama: `main`. Commits pequeños y frecuentes (cada 30–60 min como mínimo).
 - Mensaje con prefijo del área, en español: `[matching] agrega límite de traslado`,
   `[perfil] ...`, `[frontend] ...`, `[mercado] ...`, `[auditor] ...`, `[evals] ...`, `[docs] ...`.
-- Antes de cada push: `git pull --rebase` y que las pruebas pasen.
+- Antes de cada push: `git pull --rebase --autostash` y que las pruebas pasen.
 - **Nunca** `git push --force` a `main`, nunca `git reset --hard` sobre trabajo ajeno.
 - Nunca se suben secretos: las claves van en `.env` (ignorado); en el repo solo `.env.example`.
 - El tag final es `final-24h` y lo pone A. Todo commit posterior no cuenta.
@@ -93,7 +109,27 @@ Agentes: **Inteligencia de mercado, Perfil, Matching, Ruta de formación, Audito
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn api.main:app --reload --port 8000
+.venv/bin/uvicorn api.main:app --reload --port 8010   # documentación en http://localhost:8010/docs
 .venv/bin/python -m pytest
 cd frontend && npm install && npm run dev
 ```
+
+## 7. Cómo se conecta cada parte
+
+- **Frontend (B):** solo habla con la API en `http://localhost:8010` (la lista completa
+  está en `/docs`). Las principales:
+  - `POST /jovenes` `{joven, datos}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
+  - `POST /vacantes` (estructurada) · `POST /ofertas` `{texto, empresa_id}` (texto libre, usa Mercado)
+  - `GET /vacantes/{id}/tarjetas` (candidatos SIN datos personales)
+  - `POST /deslizar` `{actor: "joven"|"empresa", joven_id, vacante_id, le_interesa}` → `{interes_mutuo}`
+  - `POST /matching` · `GET /asignaciones?estado=pendiente|aprobada|rechazada`
+  - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
+  - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
+  - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos.
+- **Perfil (B):** construye `Joven` + `DatosPersonales` y los manda a `POST /jovenes`.
+- **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
+  la clase `Mercado` en `agentes/mercado/__init__.py` y `Auditor` en `agentes/auditor/__init__.py`.
+  La API las usa sola si existen (constructor sin argumentos); si no, usa las provisionales.
+  `GET /salud` muestra cuál está conectada.
+- **Contrafactuales (C):** el corregimiento solo puede mover los componentes `traslado` y
+  `salario` del `Desglose`; `habilidades` no depende del lugar (ver `agentes/matching/puntaje.py`).

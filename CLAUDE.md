@@ -39,8 +39,24 @@ En el repositorio no puede quedar **ningún rastro** de las herramientas de IA q
   aparece en el contexto, **el asistente se lo dice al usuario al inicio de su respuesta**:
   quién, qué mensaje y qué archivos, en una o dos líneas por commit.
 - Si un commit ajeno toca `contrato/` o algo de lo que el usuario está usando,
-  el asistente lo destaca y propone `git pull --rebase` antes de seguir.
+  el asistente lo destaca.
 - Antes de empezar cualquier tarea nueva: `scripts/novedades.sh --ya`.
+
+### Pull automático (obligatorio)
+
+El asistente trae los cambios del equipo **solo, sin preguntar**:
+
+- **Antes de cada cambio** (antes de editar o crear un archivo) y **cada vez que el aviso
+  muestre commits nuevos**, corre:
+  ```bash
+  git pull --rebase --autostash
+  ```
+  `--autostash` guarda y vuelve a poner los cambios locales sin commitear, así no se pierde nada.
+- Después del pull, si llegaron cambios que tocan lo que se está usando, corre las pruebas
+  antes de seguir.
+- **Si el pull da conflicto, el asistente se detiene**: no resuelve a ciegas, no usa
+  `--force`, `reset --hard` ni `checkout --` sobre archivos ajenos. Le muestra al usuario
+  qué archivos chocan y lo resuelven juntos (o con el dueño de esa carpeta).
 
 ## 2. Quién es dueño de qué
 
@@ -63,7 +79,7 @@ ajena, se lo pide al dueño (no lo hace él mismo).
 - Una sola rama: `main`. Commits pequeños y frecuentes (cada 30–60 min como mínimo).
 - Mensaje con prefijo del área, en español: `[matching] agrega límite de traslado`,
   `[perfil] ...`, `[frontend] ...`, `[mercado] ...`, `[auditor] ...`, `[evals] ...`, `[docs] ...`.
-- Antes de cada push: `git pull --rebase` y que las pruebas pasen.
+- Antes de cada push: `git pull --rebase --autostash` y que las pruebas pasen.
 - **Nunca** `git push --force` a `main`, nunca `git reset --hard` sobre trabajo ajeno.
 - Nunca se suben secretos: las claves van en `.env` (ignorado); en el repo solo `.env.example`.
 - El tag final es `final-24h` y lo pone A. Todo commit posterior no cuenta.
