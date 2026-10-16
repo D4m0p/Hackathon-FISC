@@ -5,6 +5,7 @@ import os
 os.environ["RUTA_BASE_DATOS"] = ":memory:"
 os.environ.pop("TELEGRAM_BOT_TOKEN", None)
 os.environ.pop("CLAVE_ORIENTADOR", None)
+os.environ.pop("GROQ_API_KEY", None)
 
 TOKEN_ORIENTADOR = "t-orientador"
 

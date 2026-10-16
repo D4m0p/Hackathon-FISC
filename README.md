@@ -85,7 +85,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Agente | Qué hace | Cómo decide | Estado |
 |---|---|---|---|
 | **Inteligencia de mercado** | Normaliza ofertas a una taxonomía de habilidades y extrae tendencias | El LLM extrae; el código valida contra la taxonomía | *(en desarrollo)* |
-| **Perfil** | Lee el CV (PDF o foto) y hace una entrevista corta para descubrir habilidades no declaradas | El LLM extrae con esquema estricto; cada habilidad lleva su evidencia | *(en desarrollo)* |
+| **Perfil** | Lee el CV (PDF, foto o texto) y hace una entrevista corta para descubrir habilidades no declaradas | El LLM solo propone; el código acepta una habilidad solo si existe en la taxonomía y su cita aparece en el texto original; la experiencia informal llega como máximo a nivel 2; sin LLM funciona con palabras clave | Listo |
 | **Matching** | Filtra pares imposibles, puntúa y asigna con cupos | Reglas + OR-Tools CP-SAT | Listo |
 | **Ruta de formación** | Elige cursos que cierran la brecha de habilidades | OR-Tools CP-SAT con cupos, turnos, traslado y presupuesto | Listo |
 | **Auditor** | Bloquea ofertas discriminatorias y hace pruebas contrafactuales de sesgo | Reglas determinísticas; el LLM solo como segunda opinión | *(en desarrollo)* |
@@ -183,6 +183,9 @@ ver `.env.example`):
 
 | Método | Ruta | Qué hace |
 |---|---|---|
+| `GET` | `/perfil/preguntas` | Preguntas de la entrevista corta (público) |
+| `POST` | `/perfil/cv` | CV en PDF, foto o texto → habilidades con evidencia (público, no guarda nada) |
+| `POST` | `/perfil/entrevista` | Respuestas de la entrevista → habilidades con evidencia (público, no guarda nada) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
@@ -223,8 +226,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-165 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
+190 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el agente Perfil, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Casos aleatorios** (Hypothesis, `tests/test_propiedades.py` y `tests/test_estados.py`):

@@ -149,7 +149,10 @@ cd frontend && npm install && npm run dev
     `POST /vacantes/{id}/cerrar` `{motivo}` → `{vacante, afectadas, nuevas}` ·
     `GET /asignaciones?estado=cerrada`
   - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos.
-- **Perfil (B):** construye `Joven` + `DatosPersonales` y los manda a `POST /jovenes`.
+- **Perfil (B):** ya conectado. Flujo del joven nuevo en el frontend (sin token):
+  `GET /perfil/preguntas` → `POST /perfil/cv` `{tipo: "pdf"|"imagen"|"texto", contenido_base64|texto}`
+  y/o `POST /perfil/entrevista` `{respuestas: [{pregunta_id, texto}]}` → `{habilidades, descartadas,
+  alertas, metodo}` → el joven confirma → `POST /jovenes` con esas habilidades → guardar el `token`.
 - **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
   la clase `Mercado` en `agentes/mercado/__init__.py` y `Auditor` en `agentes/auditor/__init__.py`.
   La API las usa sola si existen (constructor sin argumentos); si no, usa las provisionales.

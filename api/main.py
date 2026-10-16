@@ -18,6 +18,8 @@ from contrato.modelos import (
     ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
 from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador
+from agentes.perfil import ClienteLLM, cliente_desde_entorno
+from agentes.perfil.rutas import crear_router as rutas_perfil
 from orquestador.arranque import orquestador_desde_entorno
 
 from .seguridad import Identidad, Rol, dependencias, nuevo_token, sin_permiso
@@ -105,13 +107,17 @@ class ResultadoCierre(BaseModel):
 
 # ---------- construcción ----------
 
-def crear_app(orq: Orquestador) -> FastAPI:
-    app = FastAPI(title="Empleo joven — sistema de agentes", version="0.2")
+def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None) -> FastAPI:
+    """`cliente_llm`: modelo para el agente Perfil. None = sin LLM (palabras clave)."""
+    app = FastAPI(title="Empleo joven — sistema de agentes", version="0.3")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=os.getenv("ORIGENES_PERMITIDOS", "http://localhost:5173").split(","),
         allow_methods=["*"], allow_headers=["*"])
     opcional, requerida = dependencias(orq.almacen)
+    # Agente Perfil: /perfil/preguntas, /perfil/cv y /perfil/entrevista (abiertos: el
+    # joven todavía no tiene token; no guardan nada, solo proponen habilidades).
+    app.include_router(rutas_perfil(orq, cliente=cliente_llm, usar_entorno=False))
 
     def solo_orientador(ident: Identidad = Depends(requerida)) -> Identidad:
         if not ident.es_orientador:
@@ -141,6 +147,7 @@ def crear_app(orq: Orquestador) -> FastAPI:
     def salud():
         return {"estado": "ok",
                 "mercado": type(orq.mercado).__name__, "auditor": type(orq.auditor).__name__,
+                "perfil": type(cliente_llm).__name__ if cliente_llm else "palabras_clave",
                 "notificador": type(orq.notificador).__name__}
 
     @app.get("/yo")
@@ -350,4 +357,4 @@ def crear_app(orq: Orquestador) -> FastAPI:
     return app
 
 
-app = crear_app(orquestador_desde_entorno())
+app = crear_app(orquestador_desde_entorno(), cliente_llm=cliente_desde_entorno())
