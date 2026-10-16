@@ -147,6 +147,8 @@ class Asignacion(BaseModel):
     vacante_id: str
     desglose: Desglose
     aprobada: bool | None = None   # None = pendiente del orientador
+    motivo_orientador: str | None = None
+    entrevista: datetime | None = None
 
 
 class ResultadoMatching(BaseModel):
