@@ -68,6 +68,15 @@ export const api = {
   historia: (id) => pedir("GET", `/jovenes/${id}/historia`),
 
   vacantes: () => pedir("GET", "/vacantes"),
+
+  // Empresa
+  publicarVacante: (vacante) => pedir("POST", "/vacantes", vacante),
+  publicarOferta: (texto, empresa_id) => pedir("POST", "/ofertas", { texto, empresa_id }),
+  candidatos: (vacante_id) => pedir("GET", `/vacantes/${vacante_id}/tarjetas`),
+  asignaciones: () => pedir("GET", "/asignaciones"),
+  retirar: (joven_id, vacante_id, motivo) =>
+    pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "retiro_empresa", motivo }),
+  cerrarVacante: (vacante_id, motivo) => pedir("POST", `/vacantes/${vacante_id}/cerrar`, { motivo }),
   cancelar: (joven_id, vacante_id, motivo) =>
     pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "cancelacion_joven", motivo }),
   reprogramar: (joven_id, vacante_id, motivo) =>

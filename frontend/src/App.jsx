@@ -3,7 +3,7 @@ import { api, guardarToken, leerToken } from "./api.js";
 import Entrada from "./vistas/Entrada.jsx";
 import VistaJoven from "./vistas/joven/VistaJoven.jsx";
 import Registro from "./vistas/joven/Registro.jsx";
-import VistaEmpresa from "./vistas/VistaEmpresa.jsx";
+import VistaEmpresa from "./vistas/empresa/VistaEmpresa.jsx";
 import VistaOrientador from "./vistas/VistaOrientador.jsx";
 
 export default function App() {

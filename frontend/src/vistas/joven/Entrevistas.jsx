@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api.js";
+import FormMotivo from "../../componentes/FormMotivo.jsx";
 
 const MOTIVOS_CANCELAR = ["Ya conseguí otro trabajo", "El horario ya no me sirve", "No me queda cerca", "Prefiero no decirlo"];
 const MOTIVOS_REPROGRAMAR = ["Tengo un compromiso ese día", "Problema de transporte", "Tengo una cita médica"];
@@ -72,8 +73,15 @@ export default function Entrevistas({ jovenId, asignaciones, onCambio }) {
               )}
 
               {formulario ? (
-                <FormMotivo accion={formulario} onCancelar={() => setAbierta(null)}
-                            onConfirmar={(m) => confirmar(a, formulario, m)} />
+                formulario === "cancelar" ? (
+                  <FormMotivo pregunta="¿Por qué cancela?" opciones={MOTIVOS_CANCELAR} peligro textoBoton="Sí, cancelar"
+                              nota="El cupo quedará libre para otra persona. Esto no se puede deshacer."
+                              onCancelar={() => setAbierta(null)} onConfirmar={(m) => confirmar(a, "cancelar", m)} />
+                ) : (
+                  <FormMotivo pregunta="¿Por qué necesita otra fecha?" opciones={MOTIVOS_REPROGRAMAR} textoBoton="Pedir otra fecha"
+                              nota="Le daremos el siguiente espacio libre de la empresa en su horario."
+                              onCancelar={() => setAbierta(null)} onConfirmar={(m) => confirmar(a, "reprogramar", m)} />
+                )
               ) : (estado === "aprobada" || estado === "pendiente") && (
                 <div className="acciones-item">
                   {estado === "aprobada" && a.entrevista && (
@@ -95,44 +103,3 @@ export default function Entrevistas({ jovenId, asignaciones, onCambio }) {
 }
 
 const ETIQUETAS = { aprobada: "Confirmada", pendiente: "En revisión", rechazada: "No aprobada", cerrada: "Cerrada" };
-
-function FormMotivo({ accion, onCancelar, onConfirmar }) {
-  const opciones = accion === "cancelar" ? MOTIVOS_CANCELAR : MOTIVOS_REPROGRAMAR;
-  const [motivo, setMotivo] = useState("");
-  const [error, setError] = useState("");
-  const [enviando, setEnviando] = useState(false);
-
-  async function enviar(e) {
-    e.preventDefault();
-    if (!motivo.trim()) return setError("Cuéntenos el motivo, aunque sea corto.");
-    setEnviando(true);
-    setError("");
-    try {
-      await onConfirmar(motivo.trim());
-    } catch (err) {
-      setError(err.message);
-      setEnviando(false);
-    }
-  }
-
-  return (
-    <form className="form-motivo" onSubmit={enviar}>
-      <p><b>{accion === "cancelar" ? "¿Por qué cancela?" : "¿Por qué necesita otra fecha?"}</b></p>
-      <div className="chips">
-        {opciones.map((o) => (
-          <button type="button" key={o} className={"chip" + (motivo === o ? " activo" : "")} onClick={() => setMotivo(o)}>{o}</button>
-        ))}
-      </div>
-      <input value={motivo} maxLength="300" onChange={(e) => setMotivo(e.target.value)} placeholder="U otro motivo" />
-      {accion === "reprogramar" && <p className="nota">Le daremos el siguiente espacio libre de la empresa en su horario.</p>}
-      {accion === "cancelar" && <p className="nota">El cupo quedará libre para otra persona. Esto no se puede deshacer.</p>}
-      {error && <p className="error">{error}</p>}
-      <div className="acciones">
-        <button type="button" className="enlace" onClick={onCancelar}>Volver</button>
-        <button className={"boton" + (accion === "cancelar" ? " peligro" : "")} disabled={enviando}>
-          {enviando ? "Enviando…" : accion === "cancelar" ? "Sí, cancelar" : "Pedir otra fecha"}
-        </button>
-      </div>
-    </form>
-  );
-}

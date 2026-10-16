@@ -96,7 +96,7 @@ function DatosJoven({ habilidades, onVolver, onRegistrado }) {
 
   useEffect(() => {
     api.traslados()
-      .then((ts) => setCorregimientos([...new Set(ts.map((t) => t.origen))].sort()))
+      .then((ts) => setCorregimientos([...new Set(ts.flatMap((t) => [t.origen, t.destino]))].sort()))
       .catch((e) => setError(e.message));
   }, []);
 
