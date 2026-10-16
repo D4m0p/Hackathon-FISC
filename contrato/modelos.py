@@ -135,6 +135,26 @@ class Traslado(BaseModel):
 
 # ---------- Resultados de los agentes ----------
 
+PESO_MINIMO, PESO_MAXIMO = 0.05, 0.80
+
+
+class Pesos(BaseModel):
+    """Cuánto vale cada componente del puntaje. Los ajusta el orientador.
+
+    Guardrail: ningún componente puede anularse ni dominar del todo (entre 0.05 y 0.80),
+    y deben sumar 1.
+    """
+    habilidades: float = Field(default=0.60, ge=PESO_MINIMO, le=PESO_MAXIMO)
+    traslado: float = Field(default=0.25, ge=PESO_MINIMO, le=PESO_MAXIMO)
+    salario: float = Field(default=0.15, ge=PESO_MINIMO, le=PESO_MAXIMO)
+
+    @model_validator(mode="after")
+    def _suman_uno(self) -> "Pesos":
+        if abs(self.habilidades + self.traslado + self.salario - 1) > 1e-6:
+            raise ValueError("los pesos deben sumar 1")
+        return self
+
+
 class Desglose(BaseModel):
     """Explicación de un puntaje: cada componente va de 0 a 1."""
     habilidades: float
@@ -142,6 +162,7 @@ class Desglose(BaseModel):
     salario: float
     total: float
     motivos: list[str] = []
+    pesos: Pesos | None = None      # con qué pesos se calculó el total
 
 
 class TipoIncumplimiento(str, Enum):
