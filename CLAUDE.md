@@ -126,6 +126,8 @@ cd frontend && npm install && npm run dev
     403 = sin permiso. El orientador puede actuar en nombre de cualquiera.
   - Las principales:
   - `POST /jovenes` `{joven, datos}` → `{joven, token}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
+  - `GET /jovenes/{id}/historia` → `{joven, estado, asignaciones, plan, deslizamientos, eventos}`;
+    `estado` es una frase lista para mostrar y `eventos` va en orden (agente, accion, motivo, fecha)
   - `GET /jovenes/{id}/casi-califica` → vacantes donde le falta una sola cosa:
     `[{vacante_id, titulo, incumplimiento: {tipo, detalle, faltante, codigo}, sugerencia, cursos}]`
   - `POST /vacantes` (estructurada) · `POST /ofertas` `{texto, empresa_id}` (texto libre, usa Mercado)

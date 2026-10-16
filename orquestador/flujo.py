@@ -14,6 +14,8 @@ import threading
 from datetime import datetime, timezone
 from typing import Any, Callable
 
+from pydantic import BaseModel
+
 from agentes.formacion import casi_califica, planificar_grupo
 from agentes.matching import MatrizTraslados, asignar, evaluar, ranking_para_joven, ranking_para_vacante
 from contrato.modelos import (
@@ -26,6 +28,16 @@ from .almacen import Almacen, clave_asignacion
 from .interfaces import AgenteAuditor, AgenteMercado, Notificador
 from .notificador import NotificadorRegistro
 from .provisionales import AuditorProvisional, MercadoProvisional
+
+
+class HistoriaJoven(BaseModel):
+    """Todo lo que el sistema hizo con un joven, de punta a punta."""
+    joven: Joven
+    estado: str                         # una frase con dónde está hoy
+    asignaciones: list[Asignacion]
+    plan: PlanFormacion | None
+    deslizamientos: list[dict]
+    eventos: list[Traza]                # cronológico: qué agente decidió qué y por qué
 
 
 class ErrorDeFlujo(ValueError):
@@ -220,9 +232,11 @@ class Orquestador:
                 self.almacen.borrar(PlanFormacion, j.id)
         cursos = self.almacen.listar(Curso)
         for plan in planificar_grupo(sin_asignar, vacantes, cursos, matriz):
+            anterior = self.almacen.obtener(PlanFormacion, plan.joven_id)
             self.almacen.guardar(plan)
-            self._traza(Agente.formacion, "planificar", "; ".join(plan.motivos),
-                        entrada={"joven_id": plan.joven_id}, salida={"plan": plan})
+            if anterior != plan:   # solo se traza cuando el plan es nuevo o cambió
+                self._traza(Agente.formacion, "planificar", "; ".join(plan.motivos),
+                            entrada={"joven_id": plan.joven_id}, salida={"plan": plan})
         return resultado
 
     @_exclusivo
@@ -369,6 +383,30 @@ class Orquestador:
         nombres = {h.codigo: h.nombre for h in self.almacen.listar(Habilidad)}
         return casi_califica(self._joven(joven_id), self.almacen.listar(Vacante),
                              self.almacen.listar(Curso), self.matriz(), nombres)
+
+    def historia(self, joven_id: str) -> HistoriaJoven:
+        joven = self._joven(joven_id)
+        asignaciones = [a for a in self.almacen.listar(Asignacion) if a.joven_id == joven_id]
+        plan = self.plan_de(joven_id)
+        aprobada = next((a for a in asignaciones if a.vigente and a.aprobada), None)
+        pendiente = next((a for a in asignaciones if a.vigente and a.aprobada is None), None)
+        if aprobada:
+            titulo = self._vacante(aprobada.vacante_id).titulo
+            estado = f"Entrevista agendada para «{titulo}» el {aprobada.entrevista:%d/%m/%Y a las %H:%M}"
+        elif pendiente:
+            titulo = self._vacante(pendiente.vacante_id).titulo
+            estado = f"Propuesto para «{titulo}», pendiente de aprobación del orientador"
+        elif plan and plan.cursos:
+            estado = f"Sin vacante factible por ahora: en ruta de formación ({len(plan.cursos)} curso(s))"
+        else:
+            n = len(self.tarjetas_joven(joven_id))
+            estado = f"Buscando: tiene {n} vacante(s) por revisar"
+            casi = len(self.casi_califica(joven_id))
+            if casi:
+                estado += f" y {casi} donde le falta una sola cosa"
+        return HistoriaJoven(joven=joven, estado=estado, asignaciones=asignaciones, plan=plan,
+                             deslizamientos=self.almacen.deslizamientos_de(joven_id),
+                             eventos=self.almacen.trazas_de_joven(joven_id))
 
     def plan_de(self, joven_id: str) -> PlanFormacion | None:
         return self.almacen.obtener(PlanFormacion, joven_id)

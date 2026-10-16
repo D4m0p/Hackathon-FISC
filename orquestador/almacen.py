@@ -171,6 +171,24 @@ class Almacen:
                                      (self._hash(token),)).fetchone()
         return (fila[0], fila[1]) if fila else None
 
+    def trazas_de_joven(self, joven_id: str) -> list[Traza]:
+        """Trazas que mencionan al joven, en orden cronológico: las que lo tienen como
+        entrada y los reacomodos que lo propusieron (salida.nuevas = "joven|vacante")."""
+        with self._lock:
+            filas = self._con.execute(
+                "SELECT datos FROM trazas WHERE json_extract(datos, '$.entrada.joven_id') = ? "
+                "OR EXISTS (SELECT 1 FROM json_each(datos, '$.salida.nuevas') "
+                "           WHERE substr(value, 1, length(?) + 1) = ? || '|') "
+                "ORDER BY n", (joven_id, joven_id, joven_id)).fetchall()
+        return [Traza.model_validate_json(f[0]) for f in filas]
+
+    def deslizamientos_de(self, joven_id: str) -> list[dict]:
+        with self._lock:
+            filas = self._con.execute(
+                "SELECT actor, vacante_id, le_interesa, fecha FROM deslizamientos "
+                "WHERE joven_id = ? ORDER BY fecha, actor, vacante_id", (joven_id,)).fetchall()
+        return [dict(actor=a, vacante_id=v, le_interesa=bool(i), fecha=f) for a, v, i, f in filas]
+
     # ---------- mensajes enviados ----------
     def registrar_mensaje(self, destino: str | None, texto: str, enviado: bool) -> None:
         with self._lock, self._con:

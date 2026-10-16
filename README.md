@@ -99,7 +99,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Componente determinístico | Factibilidad, puntaje, asignación y ruta de cursos son código (`agentes/matching`, `agentes/formacion`) |
 | Humano en el ciclo | El orientador aprueba o rechaza cada asignación (rechazar exige motivo) y decide sobre ofertas bloqueadas |
 | Explicabilidad | Cada asignación trae su desglose (habilidades, traslado, salario) y sus motivos en texto |
-| Trazabilidad | Tabla `trazas` y endpoint `GET /trazas?agente=` |
+| Trazabilidad | Tabla `trazas`, `GET /trazas?agente=` y la historia de cada joven de punta a punta (`GET /jovenes/{id}/historia`) |
 | Evals (≥15 casos) | *(en desarrollo)* en `evals/` |
 | Guardrails | Tokens por rol: cada actor solo toca lo suyo y las decisiones clave son del orientador; validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
 
@@ -186,6 +186,7 @@ ver `.env.example`):
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
+| `GET` | `/jovenes/{id}/historia` | Todo lo que el sistema hizo con el joven: estado actual y qué agente decidió qué, en orden |
 | `GET` | `/jovenes/{id}/casi-califica` | Vacantes donde le falta una sola cosa, con sugerencia y cursos |
 | `POST` | `/ofertas` | Publica una oferta en texto libre (Mercado → Auditor) |
 | `POST` | `/vacantes` | Publica una vacante estructurada (Auditor) |
@@ -222,8 +223,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-138 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el reacomodo, "casi califica", los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
+145 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de

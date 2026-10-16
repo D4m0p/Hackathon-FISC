@@ -17,7 +17,7 @@ from contrato.modelos import (
     Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
     ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
-from orquestador import ErrorDeFlujo, NoEncontrado, Orquestador
+from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador
 from orquestador.arranque import orquestador_desde_entorno
 
 from .seguridad import Identidad, Rol, dependencias, nuevo_token, sin_permiso
@@ -271,6 +271,11 @@ def crear_app(orq: Orquestador) -> FastAPI:
         if plan is None:
             raise HTTPException(status_code=404, detail="Este joven no tiene plan de formación")
         return plan
+
+    @app.get("/jovenes/{joven_id}/historia")
+    def historia(joven_id: str, ident: Identidad = Depends(requerida)) -> HistoriaJoven:
+        exigir_joven(ident, joven_id)
+        return orq.historia(joven_id)
 
     @app.get("/jovenes/{joven_id}/casi-califica")
     def casi(joven_id: str, ident: Identidad = Depends(requerida)) -> list[CasiCalifica]:
