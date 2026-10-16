@@ -41,6 +41,14 @@ class Agente(str, Enum):
     orientador = "orientador"    # la persona humana que aprueba
 
 
+class TipoCierre(str, Enum):
+    """Por qué una asignación dejó de estar vigente (y su cupo se liberó)."""
+    cancelacion_joven = "cancelacion_joven"
+    inasistencia = "inasistencia"
+    retiro_empresa = "retiro_empresa"
+    vacante_cerrada = "vacante_cerrada"
+
+
 class Genero(str, Enum):
     femenino = "femenino"
     masculino = "masculino"
@@ -149,6 +157,9 @@ class Asignacion(BaseModel):
     aprobada: bool | None = None   # None = pendiente del orientador
     motivo_orientador: str | None = None
     entrevista: datetime | None = None
+    vigente: bool = True            # False = se liberó el cupo (ver tipo_cierre)
+    tipo_cierre: TipoCierre | None = None
+    motivo_cierre: str | None = None
 
 
 class ResultadoMatching(BaseModel):
