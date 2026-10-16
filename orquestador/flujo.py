@@ -27,7 +27,11 @@ from .provisionales import AuditorProvisional, MercadoProvisional
 
 
 class ErrorDeFlujo(ValueError):
-    """Operación no permitida por las reglas del flujo (la API la convierte en 4xx)."""
+    """Operación no permitida por las reglas del flujo (la API responde 400)."""
+
+
+class NoEncontrado(ErrorDeFlujo):
+    """El joven, la vacante o la asignación no existe (la API responde 404)."""
 
 
 def _json(obj: Any) -> Any:
@@ -62,13 +66,13 @@ class Orquestador:
     def _joven(self, joven_id: str) -> Joven:
         j = self.almacen.obtener(Joven, joven_id)
         if j is None:
-            raise ErrorDeFlujo(f"No existe el joven {joven_id}")
+            raise NoEncontrado(f"No existe el joven {joven_id}")
         return j
 
     def _vacante(self, vacante_id: str) -> Vacante:
         v = self.almacen.obtener(Vacante, vacante_id)
         if v is None:
-            raise ErrorDeFlujo(f"No existe la vacante {vacante_id}")
+            raise NoEncontrado(f"No existe la vacante {vacante_id}")
         return v
 
     # ---------- empresas ----------
@@ -198,7 +202,7 @@ class Orquestador:
                            motivo: str = "") -> Asignacion:
         asignacion = self.almacen.obtener(Asignacion, f"{joven_id}|{vacante_id}")
         if asignacion is None:
-            raise ErrorDeFlujo("No hay una asignación pendiente para ese par")
+            raise NoEncontrado("No hay una asignación pendiente para ese par")
         if asignacion.aprobada is not None:
             raise ErrorDeFlujo("Esa asignación ya fue decidida")
         if not aprobar and not motivo.strip():

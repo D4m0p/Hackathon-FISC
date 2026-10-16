@@ -93,7 +93,27 @@ Agentes: **Inteligencia de mercado, Perfil, Matching, Ruta de formación, Audito
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/uvicorn api.main:app --reload --port 8000
+.venv/bin/uvicorn api.main:app --reload --port 8010   # documentación en http://localhost:8010/docs
 .venv/bin/python -m pytest
 cd frontend && npm install && npm run dev
 ```
+
+## 7. Cómo se conecta cada parte
+
+- **Frontend (B):** solo habla con la API en `http://localhost:8010` (la lista completa
+  está en `/docs`). Las principales:
+  - `POST /jovenes` `{joven, datos}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
+  - `POST /vacantes` (estructurada) · `POST /ofertas` `{texto, empresa_id}` (texto libre, usa Mercado)
+  - `GET /vacantes/{id}/tarjetas` (candidatos SIN datos personales)
+  - `POST /deslizar` `{actor: "joven"|"empresa", joven_id, vacante_id, le_interesa}` → `{interes_mutuo}`
+  - `POST /matching` · `GET /asignaciones?estado=pendiente|aprobada|rechazada`
+  - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
+  - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
+  - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos.
+- **Perfil (B):** construye `Joven` + `DatosPersonales` y los manda a `POST /jovenes`.
+- **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
+  la clase `Mercado` en `agentes/mercado/__init__.py` y `Auditor` en `agentes/auditor/__init__.py`.
+  La API las usa sola si existen (constructor sin argumentos); si no, usa las provisionales.
+  `GET /salud` muestra cuál está conectada.
+- **Contrafactuales (C):** el corregimiento solo puede mover los componentes `traslado` y
+  `salario` del `Desglose`; `habilidades` no depende del lugar (ver `agentes/matching/puntaje.py`).
