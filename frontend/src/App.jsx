@@ -19,8 +19,9 @@ export default function App() {
       guardarToken(token);
       setYo(ident);
     } catch (e) {
-      guardarToken(null);
-      setError(e.message);
+      // Solo se olvida el código si la API lo rechaza; si está caída, se conserva.
+      if (e.estado === 401) guardarToken(null);
+      setError(e.estado === 401 ? "Ese código no es válido. Revíselo o regístrese." : e.message);
     }
   }
 

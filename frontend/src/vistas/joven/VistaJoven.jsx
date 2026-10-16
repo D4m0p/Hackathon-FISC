@@ -75,7 +75,7 @@ function Vacantes({ jovenId, nombres }) {
       {errDeslizar && <p className="error">{errDeslizar}</p>}
       {restantes.length === 0 ? (
         <div className="vacio">
-          <p>No tiene más vacantes por ahora.</p>
+          <p>{vistas ? "Ya revisó todas las vacantes por ahora." : "Por ahora no hay vacantes que le convengan cerca de usted."}</p>
           <p className="suave">Revise «Casi califica»: puede que le falte una sola cosa para otras vacantes.</p>
           <button className="boton secundario" onClick={() => { setVistas(0); recargar(); }}>Actualizar</button>
         </div>

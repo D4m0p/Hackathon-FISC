@@ -88,8 +88,9 @@ legend { padding: 0 6px; font-weight: 600; }
 .turno input { display: none; }
 .turno.activo { background: var(--primario); border-color: var(--primario); color: var(--sobre-primario); }
 
-.pestanas { display: flex; gap: 4px; background: var(--superficie); border-radius: 12px; padding: 4px; margin-bottom: 14px; overflow-x: auto; }
-.pestanas button { flex: 1; white-space: nowrap; background: none; border: 0; padding: 9px 10px; border-radius: 9px; color: var(--suave); }
+.pestanas { display: flex; gap: 4px; background: var(--superficie); border-radius: 12px; padding: 4px; margin-bottom: 14px; }
+.pestanas button { flex: 1 1 0; min-width: 0; background: none; border: 0; padding: 9px 6px; border-radius: 9px; color: var(--suave); line-height: 1.15; }
+@media (max-width: 420px) { .pestanas button { font-size: .85rem; padding: 8px 3px; } }
 .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); font-weight: 600; }
 
 .soltar { display: grid; place-items: center; min-height: 130px; border: 2px dashed var(--borde); border-radius: var(--radio); cursor: pointer; text-align: center; padding: 16px; font-weight: 400; color: var(--suave); }
