@@ -192,9 +192,22 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-92 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+93 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
+
+**Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de
+1000 peticiones en ráfagas de hasta 378 simultáneas, mezclando registros, deslizamientos,
+10 corridas de matching a la vez, decisiones del orientador enviadas dos veces en paralelo
+y entradas maliciosas (inyección de prompt, SQL, textos gigantes, datos inválidos).
+Resultado: 0 errores 5xx; ninguna vacante supera sus cupos, ningún joven queda con dos
+asignaciones y ninguna decisión se aplica dos veces.
+
+```bash
+.venv/bin/python scripts/semilla_demo.py --reiniciar --base carga.db
+RUTA_BASE_DATOS=carga.db .venv/bin/uvicorn api.main:app --port 8010
+.venv/bin/python scripts/prueba_carga.py --url http://localhost:8010 --jovenes 300
+```
 
 ## Equipo
 

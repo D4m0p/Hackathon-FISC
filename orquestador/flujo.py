@@ -9,6 +9,8 @@ Flujo:
 """
 from __future__ import annotations
 
+import functools
+import threading
 from datetime import datetime, timezone
 from typing import Any, Callable
 
@@ -34,6 +36,16 @@ class NoEncontrado(ErrorDeFlujo):
     """El joven, la vacante o la asignación no existe (la API responde 404)."""
 
 
+def _exclusivo(metodo):
+    """Las operaciones que cambian el estado se ejecutan de a una: evita, por ejemplo,
+    que dos aprobaciones simultáneas de la misma asignación pasen las dos."""
+    @functools.wraps(metodo)
+    def envoltura(self, *args, **kwargs):
+        with self._candado:
+            return metodo(self, *args, **kwargs)
+    return envoltura
+
+
 def _json(obj: Any) -> Any:
     if hasattr(obj, "model_dump"):
         return obj.model_dump(mode="json")
@@ -51,6 +63,7 @@ class Orquestador:
         self.auditor = auditor or AuditorProvisional()
         self.notificador = notificador or NotificadorRegistro()
         self.reloj = reloj or (lambda: datetime.now(timezone.utc))
+        self._candado = threading.RLock()
 
     # ---------- utilidades ----------
     def _traza(self, agente: Agente, accion: str, motivo: str,
@@ -84,6 +97,7 @@ class Orquestador:
                     salida={"vacante": vacante})
         return self.publicar_vacante(vacante)
 
+    @_exclusivo
     def publicar_vacante(self, vacante: Vacante) -> tuple[Vacante, ResultadoAuditoria]:
         """Toda vacante pasa por el Auditor antes de publicarse, también al corregirla."""
         resultado = self.auditor.auditar_oferta(vacante)
@@ -100,6 +114,7 @@ class Orquestador:
                     entrada={"vacante_id": vacante.id}, salida={"resultado": resultado})
         return vacante, resultado
 
+    @_exclusivo
     def orientador_publicar_bloqueada(self, vacante_id: str, motivo: str) -> Vacante:
         """El humano puede corregir un falso positivo del Auditor, siempre con motivo."""
         if not motivo.strip():
@@ -113,6 +128,7 @@ class Orquestador:
         return vacante
 
     # ---------- jóvenes ----------
+    @_exclusivo
     def registrar_joven(self, joven: Joven, datos: DatosPersonales | None = None) -> Joven:
         if datos is not None and datos.joven_id != joven.id:
             raise ErrorDeFlujo("Los datos personales no corresponden al joven")
@@ -136,6 +152,7 @@ class Orquestador:
         tarjetas = ranking_para_vacante(vacante, self.almacen.listar(Joven), self.matriz())
         return [(j, d) for j, d in tarjetas if not self.almacen.ya_deslizo("empresa", j.id, vacante_id)]
 
+    @_exclusivo
     def deslizar(self, actor: str, joven_id: str, vacante_id: str, le_interesa: bool) -> bool:
         """Devuelve True si con este deslizamiento hay interés mutuo."""
         if actor not in ("joven", "empresa"):
@@ -153,6 +170,7 @@ class Orquestador:
         return mutuo
 
     # ---------- matching ----------
+    @_exclusivo
     def ejecutar_matching(self) -> ResultadoMatching:
         matriz = self.matriz()
         asignaciones = self.almacen.listar(Asignacion)
@@ -204,6 +222,7 @@ class Orquestador:
                         entrada={"joven_id": plan.joven_id}, salida={"plan": plan})
         return resultado
 
+    @_exclusivo
     def orientador_decidir(self, joven_id: str, vacante_id: str, aprobar: bool,
                            motivo: str = "") -> Asignacion:
         asignacion = self.almacen.obtener(Asignacion, f"{joven_id}|{vacante_id}")

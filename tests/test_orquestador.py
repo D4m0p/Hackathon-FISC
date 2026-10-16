@@ -287,3 +287,39 @@ def test_trazas_filtradas_por_agente_y_mas_recientes_primero(sistema):
     orq.publicar_vacante(vacante("v2"))
     trazas = orq.almacen.trazas("auditor")
     assert [t.entrada["vacante_id"] for t in trazas] == ["v2", "v1"]
+
+
+# ---------- concurrencia ----------
+
+def test_dos_aprobaciones_simultaneas_solo_una_gana():
+    import threading
+    import time
+
+    def reloj_lento():
+        time.sleep(0.05)          # ensancha la ventana entre leer "pendiente" y guardar
+        return VIERNES
+
+    notificador = NotificadorFalso()
+    orq = Orquestador(Almacen(), mercado=MercadoFalso(), auditor=AuditorFalso(),
+                      notificador=notificador, reloj=reloj_lento)
+    orq.almacen.guardar_traslados([Traslado(origen="la_chorrera", destino="arraijan",
+                                            minutos=30, costo=1.0)])
+    preparar_match(orq)
+    orq.ejecutar_matching()
+
+    resultados = []
+
+    def decidir():
+        try:
+            orq.orientador_decidir("j1", "v1", aprobar=True)
+            resultados.append("ok")
+        except ErrorDeFlujo:
+            resultados.append("rechazada")
+
+    hilos = [threading.Thread(target=decidir) for _ in range(5)]
+    for h in hilos:
+        h.start()
+    for h in hilos:
+        h.join()
+    assert resultados.count("ok") == 1
+    assert len(notificador.enviados) == 1
