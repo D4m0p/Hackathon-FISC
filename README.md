@@ -198,4 +198,4 @@ de los solvers se verificó quitándola a propósito y comprobando que alguna pr
 
 ## Equipo
 
-*(en desarrollo)*
+**LarpeoIntenso**
