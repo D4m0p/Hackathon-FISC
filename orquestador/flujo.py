@@ -22,7 +22,7 @@ from agentes.matching import (
 )
 from contrato.modelos import (
     Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad,
-    Joven, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
+    Joven, Pesos, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
 )
 
 from .agenda import proxima_entrevista
@@ -40,6 +40,22 @@ class HistoriaJoven(BaseModel):
     plan: PlanFormacion | None
     deslizamientos: list[dict]
     eventos: list[Traza]                # cronológico: qué agente decidió qué y por qué
+
+
+class CambioPropuesto(BaseModel):
+    joven_id: str
+    vacante_id: str
+    total_actual: float | None   # None = hoy no se propone
+    total_nuevo: float | None    # None = con los pesos nuevos no se propondría
+
+
+class Simulacion(BaseModel):
+    """Qué cambiaría en las propuestas si se usaran otros pesos (no se guarda nada)."""
+    pesos_actuales: Pesos
+    pesos_nuevos: Pesos
+    entran: list[CambioPropuesto]
+    salen: list[CambioPropuesto]
+    se_mantienen: int
 
 
 class ErrorDeFlujo(ValueError):
@@ -89,6 +105,9 @@ class Orquestador:
 
     def matriz(self) -> MatrizTraslados:
         return MatrizTraslados(self.almacen.traslados())
+
+    def pesos(self) -> Pesos:
+        return self.almacen.obtener(Pesos, "pesos") or Pesos()
 
     def _joven(self, joven_id: str) -> Joven:
         j = self.almacen.obtener(Joven, joven_id)
@@ -212,12 +231,12 @@ class Orquestador:
     # ---------- tarjetas y deslizamientos ----------
     def tarjetas_joven(self, joven_id: str) -> list[tuple[Vacante, Desglose]]:
         joven = self._joven(joven_id)
-        tarjetas = ranking_para_joven(joven, self.almacen.listar(Vacante), self.matriz())
+        tarjetas = ranking_para_joven(joven, self.almacen.listar(Vacante), self.matriz(), self.pesos())
         return [(v, d) for v, d in tarjetas if not self.almacen.ya_deslizo("joven", joven_id, v.id)]
 
     def tarjetas_vacante(self, vacante_id: str) -> list[tuple[Joven, Desglose]]:
         vacante = self._vacante(vacante_id)
-        tarjetas = ranking_para_vacante(vacante, self.almacen.listar(Joven), self.matriz())
+        tarjetas = ranking_para_vacante(vacante, self.almacen.listar(Joven), self.matriz(), self.pesos())
         return [(j, d) for j, d in tarjetas if not self.almacen.ya_deslizo("empresa", j.id, vacante_id)]
 
     @_exclusivo
@@ -243,19 +262,14 @@ class Orquestador:
         return mutuo
 
     # ---------- matching ----------
-    @_exclusivo
-    def ejecutar_matching(self) -> ResultadoMatching:
-        matriz = self.matriz()
+    def _entradas_matching(self) -> tuple[list[Joven], list[Vacante], set[tuple[str, str]]]:
+        """Jóvenes libres, vacantes con cupos restantes y pares permitidos."""
         asignaciones = self.almacen.listar(Asignacion)
         aprobadas = [a for a in asignaciones if a.aprobada and a.vigente]
         # No se vuelve a proponer un par rechazado por el orientador ni uno ya cerrado
         # (cancelación, inasistencia, retiro o vacante cerrada).
         excluidos = {(a.joven_id, a.vacante_id) for a in asignaciones
                      if a.aprobada is False or not a.vigente}
-        for a in asignaciones:   # las pendientes vigentes se recalculan
-            if a.aprobada is None and a.vigente:
-                self.almacen.borrar(Asignacion, clave_asignacion(a))
-
         ocupados = {a.joven_id for a in aprobadas}
         jovenes = [j for j in self.almacen.listar(Joven) if j.id not in ocupados]
         vacantes = []
@@ -263,9 +277,17 @@ class Orquestador:
             usados = sum(1 for a in aprobadas if a.vacante_id == v.id)
             if v.cupos > usados:
                 vacantes.append(v.model_copy(update={"cupos": v.cupos - usados}))
-        permitidos = self.almacen.interes_mutuo() - excluidos
+        return jovenes, vacantes, self.almacen.interes_mutuo() - excluidos
 
-        resultado = asignar(jovenes, vacantes, matriz, permitidos=permitidos)
+    @_exclusivo
+    def ejecutar_matching(self) -> ResultadoMatching:
+        matriz = self.matriz()
+        for a in self.almacen.listar(Asignacion):   # las pendientes vigentes se recalculan
+            if a.aprobada is None and a.vigente:
+                self.almacen.borrar(Asignacion, clave_asignacion(a))
+        jovenes, vacantes, permitidos = self._entradas_matching()
+
+        resultado = asignar(jovenes, vacantes, matriz, permitidos=permitidos, pesos=self.pesos())
         for a in resultado.asignaciones:
             self.almacen.guardar(a)
             self.almacen.borrar(PlanFormacion, a.joven_id)   # ya no lo necesita
@@ -442,6 +464,38 @@ class Orquestador:
                     entrada={"joven_id": joven_id, "vacante_id": vacante_id},
                     salida={"entrevista": nueva.isoformat()})
         return a
+
+    # ---------- pesos del puntaje (decisión del orientador) ----------
+    @_exclusivo
+    def simular_pesos(self, nuevos: Pesos) -> Simulacion:
+        """Corre el matching con los pesos actuales y con los nuevos, sin guardar nada."""
+        matriz = self.matriz()
+        jovenes, vacantes, permitidos = self._entradas_matching()
+        actuales = self.pesos()
+
+        def propuestas(p: Pesos) -> dict[tuple[str, str], float]:
+            r = asignar(jovenes, vacantes, matriz, permitidos=permitidos, pesos=p)
+            return {(a.joven_id, a.vacante_id): a.desglose.total for a in r.asignaciones}
+
+        antes, despues = propuestas(actuales), propuestas(nuevos)
+        entran = [CambioPropuesto(joven_id=j, vacante_id=v, total_actual=None, total_nuevo=t)
+                  for (j, v), t in sorted(despues.items()) if (j, v) not in antes]
+        salen = [CambioPropuesto(joven_id=j, vacante_id=v, total_actual=t, total_nuevo=None)
+                 for (j, v), t in sorted(antes.items()) if (j, v) not in despues]
+        return Simulacion(pesos_actuales=actuales, pesos_nuevos=nuevos, entran=entran, salen=salen,
+                          se_mantienen=len(antes.keys() & despues.keys()))
+
+    @_exclusivo
+    def cambiar_pesos(self, nuevos: Pesos, motivo: str) -> Pesos:
+        if not motivo.strip():
+            raise ErrorDeFlujo("Para cambiar los pesos hace falta un motivo")
+        anteriores = self.pesos()
+        self.almacen.guardar(nuevos)
+        self._traza(Agente.orientador, "cambiar_pesos", motivo,
+                    entrada={"antes": anteriores}, salida={"despues": nuevos})
+        # Las propuestas pendientes se calcularon con los pesos viejos.
+        self._retirar_pendientes("Cambiaron los pesos del puntaje")
+        return nuevos
 
     def casi_califica(self, joven_id: str) -> list[CasiCalifica]:
         nombres = {h.codigo: h.nombre for h in self.almacen.listar(Habilidad)}

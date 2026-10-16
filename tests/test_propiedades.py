@@ -17,7 +17,7 @@ from agentes.formacion.planificador import VALOR_SEMANA, _otorga, _resolver, bre
 from agentes.matching import MatrizTraslados, asignar, evaluar, incumplimientos, motivos_infactible
 from agentes.matching.solver import ESCALA as ESCALA_M
 from contrato.modelos import (
-    Curso, Desglose, EstadoVacante, HabilidadNivel, Joven, RequisitoHabilidad, TipoIncumplimiento,
+    Curso, Desglose, EstadoVacante, HabilidadNivel, Joven, Pesos, RequisitoHabilidad, TipoIncumplimiento,
     Traslado, Turno, Vacante,
 )
 
@@ -107,14 +107,21 @@ MERCADOS = st.one_of(mercados(), mercados_competidos())
 
 # ---------- Matching ----------
 
-def _mejor_exhaustivo(js, vs, matriz, permitidos=None) -> int:
+@st.composite
+def pesos_validos(draw) -> Pesos:
+    h = draw(st.integers(5, 80))
+    t = draw(st.integers(max(5, 20 - h), min(80, 95 - h)))
+    return Pesos(habilidades=h / 100, traslado=t / 100, salario=(100 - h - t) / 100)
+
+
+def _mejor_exhaustivo(js, vs, matriz, permitidos=None, pesos=None) -> int:
     opciones = []
     for j in js:
         posibles = [None]
         for v in vs:
             if permitidos is not None and (j.id, v.id) not in permitidos:
                 continue
-            r = evaluar(j, v, matriz)
+            r = evaluar(j, v, matriz, pesos)
             if isinstance(r, Desglose):
                 posibles.append((v.id, round(r.total * ESCALA_M)))
         opciones.append(posibles)
@@ -151,6 +158,16 @@ def test_matching_es_optimo_frente_a_busqueda_exhaustiva(m):
     r = asignar(js, vs, matriz)
     obtenido = sum(round(a.desglose.total * ESCALA_M) for a in r.asignaciones)
     assert obtenido == _mejor_exhaustivo(js, vs, matriz)
+
+
+@AJUSTES
+@given(MERCADOS, pesos_validos())
+def test_matching_es_optimo_con_cualquier_combinacion_valida_de_pesos(m, pesos):
+    matriz, js, vs = m
+    r = asignar(js, vs, matriz, pesos=pesos)
+    obtenido = sum(round(a.desglose.total * ESCALA_M) for a in r.asignaciones)
+    assert obtenido == _mejor_exhaustivo(js, vs, matriz, pesos=pesos)
+    assert all(a.desglose.pesos == pesos for a in r.asignaciones)
 
 
 @AJUSTES

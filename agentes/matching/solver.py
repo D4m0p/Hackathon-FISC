@@ -11,7 +11,7 @@ from __future__ import annotations
 from ortools.sat.python import cp_model
 
 from contrato.modelos import (
-    Asignacion, Desglose, EstadoVacante, Infactible, Joven, ResultadoMatching, Vacante,
+    Asignacion, Desglose, EstadoVacante, Infactible, Joven, Pesos, ResultadoMatching, Vacante,
 )
 
 from .puntaje import evaluar
@@ -25,26 +25,26 @@ def _publicadas(vacantes: list[Vacante]) -> list[Vacante]:
     return [v for v in vacantes if v.estado == EstadoVacante.publicada]
 
 
-def ranking_para_joven(joven: Joven, vacantes: list[Vacante],
-                       matriz: MatrizTraslados) -> list[tuple[Vacante, Desglose]]:
+def ranking_para_joven(joven: Joven, vacantes: list[Vacante], matriz: MatrizTraslados,
+                       pesos: Pesos | None = None) -> list[tuple[Vacante, Desglose]]:
     """Tarjetas que ve un joven: solo vacantes factibles, de mejor a peor."""
     tarjetas = []
     for v in _publicadas(vacantes):
-        r = evaluar(joven, v, matriz)
+        r = evaluar(joven, v, matriz, pesos)
         if isinstance(r, Desglose):
             tarjetas.append((v, r))
     tarjetas.sort(key=lambda par: (-par[1].total, par[0].id))
     return tarjetas
 
 
-def ranking_para_vacante(vacante: Vacante, jovenes: list[Joven],
-                         matriz: MatrizTraslados) -> list[tuple[Joven, Desglose]]:
+def ranking_para_vacante(vacante: Vacante, jovenes: list[Joven], matriz: MatrizTraslados,
+                         pesos: Pesos | None = None) -> list[tuple[Joven, Desglose]]:
     """Tarjetas que ve una empresa (el frontend las muestra anonimizadas)."""
     if vacante.estado != EstadoVacante.publicada:
         return []
     tarjetas = []
     for j in jovenes:
-        r = evaluar(j, vacante, matriz)
+        r = evaluar(j, vacante, matriz, pesos)
         if isinstance(r, Desglose):
             tarjetas.append((j, r))
     tarjetas.sort(key=lambda par: (-par[1].total, par[0].id))
@@ -52,7 +52,7 @@ def ranking_para_vacante(vacante: Vacante, jovenes: list[Joven],
 
 
 def asignar(jovenes: list[Joven], vacantes: list[Vacante], matriz: MatrizTraslados,
-            permitidos: set[tuple[str, str]] | None = None) -> ResultadoMatching:
+            permitidos: set[tuple[str, str]] | None = None, pesos: Pesos | None = None) -> ResultadoMatching:
     """`permitidos`: pares (joven_id, vacante_id) con interés mutuo. None = todos."""
     vacantes = _publicadas(vacantes)
     infactibles: list[Infactible] = []
@@ -61,7 +61,7 @@ def asignar(jovenes: list[Joven], vacantes: list[Vacante], matriz: MatrizTraslad
         for v in sorted(vacantes, key=lambda x: x.id):
             if permitidos is not None and (j.id, v.id) not in permitidos:
                 continue
-            r = evaluar(j, v, matriz)
+            r = evaluar(j, v, matriz, pesos)
             if isinstance(r, Infactible):
                 infactibles.append(r)
             else:

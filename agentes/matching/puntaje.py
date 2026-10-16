@@ -8,12 +8,12 @@ Auditor usa esta separación en sus pruebas contrafactuales.
 from __future__ import annotations
 
 from contrato.modelos import (
-    Desglose, Incumplimiento, Infactible, Joven, TipoIncumplimiento, Vacante,
+    Desglose, Incumplimiento, Infactible, Joven, Pesos, TipoIncumplimiento, Vacante,
 )
 
 from .traslados import MatrizTraslados, costo_mensual, costo_semanal
 
-PESOS = {"habilidades": 0.60, "traslado": 0.25, "salario": 0.15}
+PESOS = Pesos()   # valores por defecto; el orientador puede ajustarlos
 SALARIO_REFERENCIA = 900.0   # B/. mensual netos con los que el componente llega a 1
 PESO_OBLIGATORIA = 2
 PESO_OPCIONAL = 1
@@ -72,7 +72,8 @@ def motivos_infactible(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) 
     return [f.detalle for f in incumplimientos(joven, vacante, matriz)]
 
 
-def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> Desglose:
+def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
+            pesos: Pesos | None = None) -> Desglose:
     """Supone que el par es factible (llamar antes a `motivos_infactible`)."""
     viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
     assert viaje is not None, "puntaje() solo se usa con pares factibles"
@@ -95,14 +96,15 @@ def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> Desglose
     salario = min(1.0, max(0.0, neto / SALARIO_REFERENCIA))
     motivos.append(f"Salario neto de transporte: B/.{neto:.2f} al mes")
 
-    total = (PESOS["habilidades"] * habilidades + PESOS["traslado"] * traslado
-             + PESOS["salario"] * salario)
+    p = pesos or PESOS
+    total = p.habilidades * habilidades + p.traslado * traslado + p.salario * salario
     return Desglose(habilidades=round(habilidades, 4), traslado=round(traslado, 4),
-                    salario=round(salario, 4), total=round(total, 4), motivos=motivos)
+                    salario=round(salario, 4), total=round(total, 4), motivos=motivos, pesos=p)
 
 
-def evaluar(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> Desglose | Infactible:
+def evaluar(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
+            pesos: Pesos | None = None) -> Desglose | Infactible:
     motivos = motivos_infactible(joven, vacante, matriz)
     if motivos:
         return Infactible(joven_id=joven.id, vacante_id=vacante.id, motivos=motivos)
-    return puntaje(joven, vacante, matriz)
+    return puntaje(joven, vacante, matriz, pesos)

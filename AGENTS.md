@@ -143,6 +143,9 @@ cd frontend && npm install && npm run dev
   - `POST /matching` · `GET /asignaciones?estado=pendiente|aprobada|rechazada`
   - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
   - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
+  - Pesos (panel del orientador): `GET /pesos` (público) · `POST /pesos/simular`
+    `{habilidades, traslado, salario}` → `{entran, salen, se_mantienen}` · `PUT /pesos`
+    `{pesos: {...}, motivo}`. Cada peso entre 0.05 y 0.80 y deben sumar 1 (si no, 422).
   - Reacomodo: `POST /asignaciones/{joven_id}/{vacante_id}/liberar`
     `{tipo: "cancelacion_joven"|"inasistencia"|"retiro_empresa", motivo}` → `{liberada, nuevas}` ·
     `POST /asignaciones/{joven_id}/{vacante_id}/reprogramar` `{motivo}` ·

@@ -35,6 +35,9 @@ decisión importante.
   cuánto le falta ("le faltan B/.1.00 por semana para el pasaje") y qué hacer; si lo que
   falta es una habilidad, el curso que la cubre y que cabe en su horario y presupuesto.
 - Cuando hay interés mutuo, un solver de optimización asigna respetando los cupos.
+- **Pesos ajustables:** el orientador decide cuánto pesan habilidades, traslado y salario
+  (con límites: ninguno puede anularse ni dominar del todo). Antes de cambiarlos puede
+  simular qué propuestas entrarían y cuáles saldrían; cada cambio queda trazado con su motivo.
 - El orientador aprueba; el sistema agenda la entrevista y avisa por Telegram.
 - **Reacomodo:** si un joven cancela o no se presenta, si la empresa lo retira o si cierra
   la vacante, el cupo se libera y el solver propone de inmediato al siguiente candidato
@@ -97,7 +100,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Arquitectura multiagente (≥3) | 5 agentes con roles distintos, coordinados por el orquestador |
 | Herramientas que actúan | Escriben en SQLite, agendan entrevistas y envían mensajes por Telegram |
 | Componente determinístico | Factibilidad, puntaje, asignación y ruta de cursos son código (`agentes/matching`, `agentes/formacion`) |
-| Humano en el ciclo | El orientador aprueba o rechaza cada asignación (rechazar exige motivo) y decide sobre ofertas bloqueadas |
+| Humano en el ciclo | El orientador aprueba o rechaza cada asignación (rechazar exige motivo), decide sobre ofertas bloqueadas y ajusta los pesos del puntaje después de simular su efecto |
 | Explicabilidad | Cada asignación trae su desglose (habilidades, traslado, salario) y sus motivos en texto |
 | Trazabilidad | Tabla `trazas`, `GET /trazas?agente=` y la historia de cada joven de punta a punta (`GET /jovenes/{id}/historia`) |
 | Evals (≥15 casos) | *(en desarrollo)* en `evals/` |
@@ -202,6 +205,9 @@ ver `.env.example`):
 | `POST` | `/asignaciones/{joven}/{vacante}/liberar` | Cancelación, inasistencia o retiro: libera el cupo y propone reemplazo |
 | `POST` | `/asignaciones/{joven}/{vacante}/reprogramar` | Mueve la entrevista al siguiente espacio libre |
 | `POST` | `/vacantes/{id}/cerrar` | Cierra la vacante y reubica a los afectados |
+| `GET` | `/pesos` | Pesos actuales del puntaje (público) |
+| `POST` | `/pesos/simular` | Qué propuestas entrarían y saldrían con otros pesos, sin guardar nada (orientador) |
+| `PUT` | `/pesos` | El orientador cambia los pesos, con motivo |
 | `GET` | `/trazas` | Qué agente decidió qué, filtrable por agente |
 | `GET` | `/mensajes` | Mensajes enviados o registrados |
 | `GET` | `/salud` | Qué agentes están conectados |
@@ -226,8 +232,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-190 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el agente Perfil, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
+202 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Casos aleatorios** (Hypothesis, `tests/test_propiedades.py` y `tests/test_estados.py`):

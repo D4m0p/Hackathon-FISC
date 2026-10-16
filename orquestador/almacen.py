@@ -10,7 +10,7 @@ from typing import TypeVar
 from pydantic import BaseModel
 
 from contrato.modelos import (
-    Asignacion, Curso, DatosPersonales, Habilidad, Joven, PlanFormacion, Traslado, Traza, Vacante,
+    Asignacion, Curso, DatosPersonales, Habilidad, Joven, Pesos, PlanFormacion, Traslado, Traza, Vacante,
 )
 
 M = TypeVar("M", bound=BaseModel)
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS mensajes (
 
 _TIPOS: dict[type[BaseModel], str] = {
     Joven: "joven", DatosPersonales: "datos_personales", Vacante: "vacante", Curso: "curso",
-    Asignacion: "asignacion", PlanFormacion: "plan", Habilidad: "habilidad",
+    Asignacion: "asignacion", PlanFormacion: "plan", Habilidad: "habilidad", Pesos: "config",
 }
 
 
@@ -61,6 +61,8 @@ def _id(obj: BaseModel) -> str:
         return clave_asignacion(obj)
     if isinstance(obj, Habilidad):
         return obj.codigo
+    if isinstance(obj, Pesos):
+        return "pesos"
     return obj.id
 
 

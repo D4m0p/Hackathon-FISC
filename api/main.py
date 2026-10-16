@@ -15,9 +15,9 @@ from pydantic import BaseModel, Field
 
 from contrato.modelos import (
     Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
-    ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
+    Pesos, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
-from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador
+from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion
 from agentes.perfil import ClienteLLM, cliente_desde_entorno
 from agentes.perfil.rutas import crear_router as rutas_perfil
 from orquestador.arranque import orquestador_desde_entorno
@@ -87,6 +87,11 @@ class RespuestaDeslizamiento(BaseModel):
 class Decision(BaseModel):
     aprobar: bool
     motivo: str = Field(default="", max_length=1000)
+
+
+class CambioPesos(BaseModel):
+    pesos: Pesos
+    motivo: str = Field(min_length=1, max_length=1000)
 
 
 class Liberacion(BaseModel):
@@ -343,6 +348,19 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None) -> FastAP
                     ident: Identidad = Depends(requerida)) -> Asignacion:
         exigir_joven(ident, joven_id)
         return orq.reprogramar_entrevista(joven_id, vacante_id, cuerpo.motivo)
+
+    # ----- pesos del puntaje -----
+    @app.get("/pesos")
+    def ver_pesos() -> Pesos:
+        return orq.pesos()
+
+    @app.post("/pesos/simular")
+    def simular_pesos(pesos: Pesos, _: Identidad = Depends(solo_orientador)) -> Simulacion:
+        return orq.simular_pesos(pesos)
+
+    @app.put("/pesos")
+    def cambiar_pesos(cuerpo: CambioPesos, _: Identidad = Depends(solo_orientador)) -> Pesos:
+        return orq.cambiar_pesos(cuerpo.pesos, cuerpo.motivo)
 
     # ----- transparencia -----
     @app.get("/trazas")
