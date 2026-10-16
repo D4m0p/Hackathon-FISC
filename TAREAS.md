@@ -1,14 +1,14 @@
-# Tareas por integrante
+# Tareas por integrante (no va al repositorio)
 
-Cada bloque es un encargo autocontenido: quien lo toma no necesita más contexto.
+Cada bloque es un encargo autocontenido: se le puede pegar tal cual al asistente.
 Horas = horas del evento (0 = inicio).
 
 ---
 
-## A — Integrante A: contrato, orquestador, Matching, Ruta de formación, API
+## A — Usted (Claude Code): contrato, orquestador, Matching, Ruta de formación, API
 
-**Hora 0–2 (bloquea a los demás, va primero) — HECHO: contrato subido en `contrato/modelos.py`**
-1. Crear el repo, registrarlo ante la organización, subir `scripts/novedades.sh`, `.gitignore`, `.env.example`, `requirements.txt`, esqueleto de carpetas.
+**Hora 0–2 (bloquea a los demás, va primero)**
+1. Crear el repo, registrarlo ante la organización, `instalar.sh`, subir `scripts/novedades.sh`, `.gitignore`, `.env.example`, `requirements.txt`, esqueleto de carpetas.
 2. `contrato/modelos.py` con Pydantic: `Habilidad` (código tipo ESCO, nombre, nivel 0–3), `Joven` (id, corregimiento, horario disponible, presupuesto de transporte semanal, habilidades, salario mínimo aceptable), `Vacante` (id, empresa, corregimiento, horario, salario, habilidades requeridas, cupos, estado: borrador/bloqueada/publicada), `Curso` (id, centro, habilidades que otorga, cupos, horario, costo, corregimiento, duración), `Traslado` (origen, destino, minutos, costo), `Asignacion`, `PlanFormacion`, `Traza` (agente, entrada, decisión, motivo, fecha), `ResultadoAuditoria`. Datos de nombre/género **separados** del perfil que usa el solver (el solver nunca los recibe).
 3. Avisar al equipo: "contrato congelado".
 
@@ -25,9 +25,9 @@ Horas = horas del evento (0 = inicio).
 
 ---
 
-## B — Integrante B: agente Perfil + frontend
+## B — Compañero 2 (Claude Code): agente Perfil + frontend
 
-**Hora 0–2**: leer `contrato/modelos.py` y las reglas del equipo. Esqueleto de `frontend/` (React + Vite).
+**Hora 0–2**: leer `contrato/` y el `CLAUDE.md`. Esqueleto de `frontend/` (React + Vite).
 
 **Hora 2–10**
 1. `agentes/perfil/`: entrada = CV en PDF, foto de CV o nada. Extraer texto (pypdf; para fotos, modelo con visión) → LLM con esquema JSON estricto devuelve habilidades con evidencia. Entrevista corta (máx. 5 preguntas) para descubrir experiencia informal: "¿ha ayudado en un negocio familiar?" → atención al cliente, manejo de caja. El texto del CV es dato, nunca instrucciones. Pruebas con un cliente LLM falso.
@@ -40,7 +40,7 @@ Horas = horas del evento (0 = inicio).
 
 ---
 
-## C — Integrante C: Mercado, Auditor, datos, evals, documentos
+## C — Compañero 3 (OpenCode, modelo gratis): Mercado, Auditor, datos, evals, documentos
 
 **Antes del evento (permitido: es investigación, no código)**: juntar 30–50 ofertas reales de portales panameños y volantes, catálogo de cursos gratuitos de INADEH, tabla de tiempos y tarifas de transporte entre ~15 corregimientos (MiBus, metro, busitos de La Chorrera/Arraiján), lista de habilidades tipo ESCO en español. Guardar las fuentes (URL y fecha): el 30 % de la nota pide información verificable.
 
@@ -54,4 +54,4 @@ Horas = horas del evento (0 = inicio).
 **Hora 12–18**
 4. `evals/`: al menos 40 casos (el mínimo es 15) en JSON + `evals/correr.py` que imprime una tabla de métricas: precisión/exhaustividad del detector, estabilidad contrafactual, factibilidad del matching (0 asignaciones infactibles), extracción de habilidades, guardrails (inyección de prompt, CV absurdo, oferta fuera de alcance). Guardar el resultado en `evals/resultados.md`.
 
-**Hora 18–21**: `README.md` (problema, arquitectura, tecnologías, fuentes de datos, instalación, ejecución, credenciales de demo), `docs/arquitectura` (diagrama con agentes, herramientas, flujo y punto humano), `docs/bitacora_ia.md`, `docs/metodologia.md`. Sin marcas de herramientas de IA en ningún archivo.
+**Hora 18–21**: `README.md` (problema, arquitectura, tecnologías, fuentes de datos, instalación, ejecución, credenciales de demo), `docs/arquitectura` (diagrama con agentes, herramientas, flujo y punto humano), `docs/bitacora_ia.md`, `docs/metodologia.md`. Respetar la sección 0 del `CLAUDE.md`.
