@@ -67,6 +67,12 @@ export const api = {
   plan: (id) => pedir("GET", `/jovenes/${id}/plan`),
   historia: (id) => pedir("GET", `/jovenes/${id}/historia`),
 
+  vacantes: () => pedir("GET", "/vacantes"),
+  cancelar: (joven_id, vacante_id, motivo) =>
+    pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "cancelacion_joven", motivo }),
+  reprogramar: (joven_id, vacante_id, motivo) =>
+    pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/reprogramar`, { motivo }),
+
   deslizar: (actor, joven_id, vacante_id, le_interesa) =>
     pedir("POST", "/deslizar", { actor, joven_id, vacante_id, le_interesa }),
 };

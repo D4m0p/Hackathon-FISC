@@ -136,3 +136,19 @@ legend { padding: 0 6px; font-weight: 600; }
 .linea-tiempo { padding-left: 18px; font-size: .9rem; }
 .linea-tiempo li { margin: 6px 0; }
 .agente { font-size: .75rem; text-transform: uppercase; background: var(--primario-claro); color: var(--primario); padding: 1px 7px; border-radius: 6px; margin-right: 4px; }
+
+/* Entrevistas del joven */
+.entrevista { padding: 14px 16px; box-shadow: none; border: 1px solid var(--borde); }
+.entrevista.aprobada { border-color: var(--primario); }
+.entrevista.cerrada, .entrevista.rechazada { opacity: .75; }
+.entrevista-cabeza { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.entrevista-cabeza h3 { font-size: 1.05rem; }
+.estado-chip { font-size: .75rem; white-space: nowrap; padding: 2px 9px; border-radius: 99px; background: var(--borde); color: var(--suave); }
+.estado-chip.aprobada { background: var(--primario); color: var(--sobre-primario); }
+.estado-chip.pendiente { background: var(--aviso); color: var(--texto); }
+.acciones-item { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; }
+.enlace.peligro { color: var(--no); }
+.boton.peligro { background: #b42318; color: #fff; }
+.form-motivo { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--borde); }
+.form-motivo .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.chip.activo { background: var(--primario); border-color: var(--primario); color: var(--sobre-primario); }

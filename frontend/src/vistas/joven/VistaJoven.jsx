@@ -3,8 +3,9 @@ import { api } from "../../api.js";
 import Barras from "../../componentes/Barras.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import { NIVELES, TURNOS, conNombres, corregimiento, dinero } from "../../nombres.js";
+import Entrevistas from "./Entrevistas.jsx";
 
-const PESTANAS = [["vacantes", "Vacantes"], ["casi", "Casi califica"], ["plan", "Mi plan"], ["estado", "Mi estado"]];
+const PESTANAS = [["vacantes", "Vacantes"], ["casi", "Casi califica"], ["plan", "Mi plan"], ["estado", "Mi proceso"]];
 
 export default function VistaJoven({ jovenId }) {
   const [pestana, setPestana] = useState("vacantes");
@@ -158,13 +159,14 @@ function Plan({ jovenId, cursos, nombres }) {
 }
 
 function Estado({ jovenId, nombres }) {
-  const { datos, error, cargando } = useCarga(() => api.historia(jovenId), [jovenId]);
-  if (cargando) return <p className="centro">Cargando…</p>;
+  const { datos, error, cargando, recargar } = useCarga(() => api.historia(jovenId), [jovenId]);
+  if (cargando && !datos) return <p className="centro">Cargando…</p>;
   if (error) return <p className="error">{error}</p>;
   return (
     <section className="panel">
       <h2>Dónde está su proceso</h2>
       <p className="aviso">{datos.estado}</p>
+      <Entrevistas jovenId={jovenId} asignaciones={datos.asignaciones} onCambio={recargar} />
       <h4>Sus habilidades</h4>
       <ul className="habilidades">
         {datos.joven.habilidades.map((h) => (
