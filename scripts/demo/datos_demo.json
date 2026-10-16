@@ -1,0 +1,954 @@
+{
+ "_nota": "Datos ILUSTRATIVOS para la demo. Tiempos y tarifas aproximados; cursos inspirados en la oferta de INADEH. Se reemplazan por los datos con fuentes de datos/ cuando estén listos.",
+ "habilidades": [
+  {
+   "codigo": "atencion_cliente",
+   "nombre": "Atención al cliente"
+  },
+  {
+   "codigo": "manejo_caja",
+   "nombre": "Manejo de caja"
+  },
+  {
+   "codigo": "ventas",
+   "nombre": "Ventas"
+  },
+  {
+   "codigo": "excel_basico",
+   "nombre": "Excel básico"
+  },
+  {
+   "codigo": "ingles_conversacional",
+   "nombre": "Inglés conversacional"
+  },
+  {
+   "codigo": "reposicion_inventario",
+   "nombre": "Reposición e inventario"
+  },
+  {
+   "codigo": "manipulacion_alimentos",
+   "nombre": "Manipulación de alimentos"
+  },
+  {
+   "codigo": "soporte_tecnico",
+   "nombre": "Soporte técnico"
+  },
+  {
+   "codigo": "redes_sociales",
+   "nombre": "Redes sociales"
+  },
+  {
+   "codigo": "logistica_bodega",
+   "nombre": "Logística de bodega"
+  },
+  {
+   "codigo": "servicio_mesa",
+   "nombre": "Servicio de mesa"
+  }
+ ],
+ "traslados": [
+  {
+   "origen": "la_chorrera",
+   "destino": "arraijan",
+   "minutos": 30,
+   "costo": 1.0
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "bella_vista",
+   "minutos": 70,
+   "costo": 1.6
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "san_francisco",
+   "minutos": 80,
+   "costo": 1.6
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "tocumen",
+   "minutos": 115,
+   "costo": 2.1
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "san_miguelito",
+   "minutos": 95,
+   "costo": 1.95
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "juan_diaz",
+   "minutos": 105,
+   "costo": 1.95
+  },
+  {
+   "origen": "la_chorrera",
+   "destino": "betania",
+   "minutos": 80,
+   "costo": 1.6
+  },
+  {
+   "origen": "arraijan",
+   "destino": "bella_vista",
+   "minutos": 50,
+   "costo": 1.25
+  },
+  {
+   "origen": "arraijan",
+   "destino": "san_francisco",
+   "minutos": 60,
+   "costo": 1.25
+  },
+  {
+   "origen": "arraijan",
+   "destino": "tocumen",
+   "minutos": 95,
+   "costo": 1.75
+  },
+  {
+   "origen": "arraijan",
+   "destino": "san_miguelito",
+   "minutos": 75,
+   "costo": 1.6
+  },
+  {
+   "origen": "arraijan",
+   "destino": "juan_diaz",
+   "minutos": 85,
+   "costo": 1.6
+  },
+  {
+   "origen": "arraijan",
+   "destino": "betania",
+   "minutos": 60,
+   "costo": 1.25
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "san_francisco",
+   "minutos": 15,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "tocumen",
+   "minutos": 45,
+   "costo": 0.7
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "san_miguelito",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "juan_diaz",
+   "minutos": 35,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "betania",
+   "minutos": 20,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "tocumen",
+   "minutos": 40,
+   "costo": 0.7
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "san_miguelito",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "juan_diaz",
+   "minutos": 25,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "betania",
+   "minutos": 25,
+   "costo": 0.35
+  },
+  {
+   "origen": "tocumen",
+   "destino": "san_miguelito",
+   "minutos": 35,
+   "costo": 0.6
+  },
+  {
+   "origen": "tocumen",
+   "destino": "juan_diaz",
+   "minutos": 20,
+   "costo": 0.35
+  },
+  {
+   "origen": "tocumen",
+   "destino": "betania",
+   "minutos": 45,
+   "costo": 0.7
+  },
+  {
+   "origen": "san_miguelito",
+   "destino": "juan_diaz",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_miguelito",
+   "destino": "betania",
+   "minutos": 20,
+   "costo": 0.35
+  },
+  {
+   "origen": "juan_diaz",
+   "destino": "betania",
+   "minutos": 35,
+   "costo": 0.35
+  }
+ ],
+ "cursos": [
+  {
+   "id": "c01",
+   "centro": "INADEH",
+   "nombre": "Técnicas de ventas",
+   "corregimiento": "la_chorrera",
+   "turnos": [
+    "tarde"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 4,
+   "costo": 0,
+   "cupos_disponibles": 15,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "ventas",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c02",
+   "centro": "INADEH",
+   "nombre": "Inglés conversacional básico",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 12,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "ingles_conversacional",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c03",
+   "centro": "INADEH",
+   "nombre": "Inglés conversacional intermedio",
+   "corregimiento": "bella_vista",
+   "turnos": [
+    "tarde"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 16,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "ingles_conversacional",
+     "nivel": 2
+    }
+   ]
+  },
+  {
+   "id": "c04",
+   "centro": "INADEH",
+   "nombre": "Marketing digital y redes sociales",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 2,
+   "semanas": 6,
+   "costo": 0,
+   "cupos_disponibles": 1,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "redes_sociales",
+     "nivel": 2
+    }
+   ]
+  },
+  {
+   "id": "c05",
+   "centro": "INADEH",
+   "nombre": "Manipulación de alimentos",
+   "corregimiento": "juan_diaz",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 5,
+   "semanas": 1,
+   "costo": 5,
+   "cupos_disponibles": 30,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c06",
+   "centro": "INADEH",
+   "nombre": "Excel básico",
+   "corregimiento": "arraijan",
+   "turnos": [
+    "noche"
+   ],
+   "sesiones_por_semana": 2,
+   "semanas": 4,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "excel_basico",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c07",
+   "centro": "INADEH",
+   "nombre": "Atención al cliente y caja",
+   "corregimiento": "arraijan",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 4,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "atencion_cliente",
+     "nivel": 1
+    },
+    {
+     "codigo": "manejo_caja",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c08",
+   "centro": "INADEH",
+   "nombre": "Operación de bodega e inventario",
+   "corregimiento": "tocumen",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 6,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "logistica_bodega",
+     "nivel": 1
+    },
+    {
+     "codigo": "reposicion_inventario",
+     "nivel": 1
+    }
+   ]
+  }
+ ],
+ "vacantes": [
+  {
+   "id": "v01",
+   "empresa_id": "e_super",
+   "titulo": "Cajero/a de supermercado",
+   "corregimiento": "arraijan",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 650,
+   "habilidades_requeridas": [
+    {
+     "codigo": "manejo_caja",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 2,
+   "texto_original": "Supermercado en Vista Alegre busca cajeros/as, turno de mañana. Experiencia en caja."
+  },
+  {
+   "id": "v02",
+   "empresa_id": "e_call",
+   "titulo": "Agente de call center bilingüe",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 800,
+   "habilidades_requeridas": [
+    {
+     "codigo": "ingles_conversacional",
+     "nivel_minimo": 2,
+     "obligatoria": true
+    },
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 3,
+   "texto_original": null
+  },
+  {
+   "id": "v03",
+   "empresa_id": "e_logis",
+   "titulo": "Auxiliar de bodega",
+   "corregimiento": "tocumen",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 680,
+   "habilidades_requeridas": [
+    {
+     "codigo": "logistica_bodega",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v04",
+   "empresa_id": "e_resto",
+   "titulo": "Mesero/a",
+   "corregimiento": "bella_vista",
+   "turnos": [
+    "noche"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 600,
+   "habilidades_requeridas": [
+    {
+     "codigo": "servicio_mesa",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v05",
+   "empresa_id": "e_tienda",
+   "titulo": "Asistente de ventas",
+   "corregimiento": "la_chorrera",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 620,
+   "habilidades_requeridas": [
+    {
+     "codigo": "ventas",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 1,
+   "texto_original": null
+  },
+  {
+   "id": "v06",
+   "empresa_id": "e_tec",
+   "titulo": "Soporte técnico nivel 1",
+   "corregimiento": "betania",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 750,
+   "habilidades_requeridas": [
+    {
+     "codigo": "soporte_tecnico",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "excel_basico",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 1,
+   "texto_original": null
+  },
+  {
+   "id": "v07",
+   "empresa_id": "e_agencia",
+   "titulo": "Community manager junior",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 700,
+   "habilidades_requeridas": [
+    {
+     "codigo": "redes_sociales",
+     "nivel_minimo": 2,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 1,
+   "texto_original": null
+  },
+  {
+   "id": "v08",
+   "empresa_id": "e_super",
+   "titulo": "Repositor/a",
+   "corregimiento": "san_miguelito",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 600,
+   "habilidades_requeridas": [
+    {
+     "codigo": "reposicion_inventario",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v09",
+   "empresa_id": "e_resto",
+   "titulo": "Ayudante de cocina",
+   "corregimiento": "juan_diaz",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 620,
+   "habilidades_requeridas": [
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v10",
+   "empresa_id": "e_hotel",
+   "titulo": "Recepcionista",
+   "corregimiento": "bella_vista",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 700,
+   "habilidades_requeridas": [
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 1,
+   "texto_original": "Se busca recepcionista femenina de buena presencia, menor de 25 años, para hotel en Bella Vista."
+  }
+ ],
+ "jovenes": [
+  {
+   "joven": {
+    "id": "j01",
+    "corregimiento": "la_chorrera",
+    "disponibilidad": [
+     "manana",
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 15,
+    "salario_minimo": 550,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 2,
+      "evidencia": "Atiende la tienda de su familia desde los 15 años"
+     },
+     {
+      "codigo": "manejo_caja",
+      "nivel": 1,
+      "evidencia": "Cobra en la tienda familiar"
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j01",
+    "nombre": "María González",
+    "genero": "femenino",
+    "edad": 19
+   }
+  },
+  {
+   "joven": {
+    "id": "j02",
+    "corregimiento": "arraijan",
+    "disponibilidad": [
+     "manana"
+    ],
+    "presupuesto_transporte_semanal": 20,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "logistica_bodega",
+      "nivel": 1
+     },
+     {
+      "codigo": "reposicion_inventario",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j02",
+    "nombre": "Carlos Rodríguez",
+    "genero": "masculino",
+    "edad": 21
+   }
+  },
+  {
+   "joven": {
+    "id": "j03",
+    "corregimiento": "bella_vista",
+    "disponibilidad": [
+     "tarde",
+     "noche"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "ingles_conversacional",
+      "nivel": 2
+     },
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 2
+     },
+     {
+      "codigo": "servicio_mesa",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j03",
+    "nombre": "Ana Castillo",
+    "genero": "femenino",
+    "edad": 22
+   }
+  },
+  {
+   "joven": {
+    "id": "j04",
+    "corregimiento": "san_miguelito",
+    "disponibilidad": [
+     "manana",
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 12,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "soporte_tecnico",
+      "nivel": 2
+     },
+     {
+      "codigo": "excel_basico",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j04",
+    "nombre": "Luis Herrera",
+    "genero": "masculino",
+    "edad": 20
+   }
+  },
+  {
+   "joven": {
+    "id": "j05",
+    "corregimiento": "juan_diaz",
+    "disponibilidad": [
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 550,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "manipulacion_alimentos",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j05",
+    "nombre": "Sofía Martínez",
+    "genero": "femenino",
+    "edad": 18
+   }
+  },
+  {
+   "joven": {
+    "id": "j06",
+    "corregimiento": "tocumen",
+    "disponibilidad": [
+     "manana"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "logistica_bodega",
+      "nivel": 2
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j06",
+    "nombre": "José Pérez",
+    "genero": "masculino",
+    "edad": 23
+   }
+  },
+  {
+   "joven": {
+    "id": "j07",
+    "corregimiento": "san_francisco",
+    "disponibilidad": [
+     "manana",
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 650,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "redes_sociales",
+      "nivel": 1,
+      "evidencia": "Maneja el Instagram de un emprendimiento de su barrio"
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j07",
+    "nombre": "Valeria Sánchez",
+    "genero": "femenino",
+    "edad": 20
+   }
+  },
+  {
+   "joven": {
+    "id": "j08",
+    "corregimiento": "la_chorrera",
+    "disponibilidad": [
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 12,
+    "salario_minimo": 550,
+    "max_minutos_traslado": 75,
+    "habilidades": []
+   },
+   "datos": {
+    "joven_id": "j08",
+    "nombre": "Daniel Ríos",
+    "genero": "masculino",
+    "edad": 18
+   }
+  },
+  {
+   "joven": {
+    "id": "j09",
+    "corregimiento": "betania",
+    "disponibilidad": [
+     "manana",
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 1
+     },
+     {
+      "codigo": "ventas",
+      "nivel": 1
+     },
+     {
+      "codigo": "excel_basico",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j09",
+    "nombre": "Camila Torres",
+    "genero": "femenino",
+    "edad": 21
+   }
+  },
+  {
+   "joven": {
+    "id": "j10",
+    "corregimiento": "arraijan",
+    "disponibilidad": [
+     "manana",
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 15,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "manejo_caja",
+      "nivel": 2
+     },
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j10",
+    "nombre": "Andrés Moreno",
+    "genero": "masculino",
+    "edad": 22
+   }
+  }
+ ],
+ "deslizamientos": [
+  {
+   "actor": "joven",
+   "joven_id": "j01",
+   "vacante_id": "v01",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j01",
+   "vacante_id": "v01",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j10",
+   "vacante_id": "v01",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j10",
+   "vacante_id": "v01",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j03",
+   "vacante_id": "v02",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j03",
+   "vacante_id": "v02",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j04",
+   "vacante_id": "v06",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j04",
+   "vacante_id": "v06",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j06",
+   "vacante_id": "v03",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j06",
+   "vacante_id": "v03",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j05",
+   "vacante_id": "v09",
+   "le_interesa": true
+  }
+ ]
+}

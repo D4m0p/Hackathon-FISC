@@ -214,6 +214,14 @@ def test_quien_queda_sin_asignar_recibe_plan_de_formacion(sistema):
     assert "planificar" in acciones(orq, "formacion")
 
 
+def test_quien_tiene_vacantes_factibles_no_recibe_plan(sistema):
+    orq, _, _ = sistema
+    orq.registrar_joven(joven())          # tiene "caja": v1 le es factible
+    orq.publicar_vacante(vacante())
+    orq.ejecutar_matching()               # sin interés mutuo: queda sin asignar
+    assert orq.plan_de("j1") is None
+
+
 def test_rechazo_exige_motivo_y_no_se_vuelve_a_proponer(sistema):
     orq, _, _ = sistema
     preparar_match(orq)

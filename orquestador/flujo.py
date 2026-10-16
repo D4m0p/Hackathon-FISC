@@ -190,7 +190,13 @@ class Orquestador:
                         "; ".join(h.detalle for h in r.hallazgos),
                         entrada={"objeto_id": r.objeto_id}, salida={"resultado": r})
 
-        sin_asignar = [j for j in jovenes if j.id in set(resultado.sin_asignar)]
+        # Ruta de formación solo para quien no tiene NINGUNA vacante factible; quien sí
+        # tiene pero aún no logró interés mutuo sigue deslizando.
+        sin_asignar = [j for j in jovenes if j.id in set(resultado.sin_asignar)
+                       and not ranking_para_joven(j, vacantes, matriz)]
+        for j in jovenes:
+            if j.id not in {x.id for x in sin_asignar}:
+                self.almacen.borrar(PlanFormacion, j.id)
         cursos = self.almacen.listar(Curso)
         for plan in planificar_grupo(sin_asignar, vacantes, cursos, matriz):
             self.almacen.guardar(plan)
