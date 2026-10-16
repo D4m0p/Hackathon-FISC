@@ -54,6 +54,13 @@ El asistente trae los cambios del equipo **solo, sin preguntar**:
   `--autostash` guarda y vuelve a poner los cambios locales sin commitear, así no se pierde nada.
 - Después del pull, si llegaron cambios que tocan lo que se está usando, corre las pruebas
   antes de seguir.
+- **Trampa de `--autostash`:** si al reaplicar los cambios locales hay conflicto, git **no
+  falla** (termina con código 0), deja marcas `<<<<<<<` en los archivos y guarda una copia en
+  `git stash list`. Por eso, después de **cada** pull, comprobar que esto no muestre nada:
+  ```bash
+  git diff --name-only --diff-filter=U; git grep -nE '^(<<<<<<<|>>>>>>>)' -- . ':!*.md'
+  ```
+  y **nunca encadenar el pull con `commit` o `push` en el mismo comando**.
 - **Si el pull da conflicto, el asistente se detiene**: no resuelve a ciegas, no usa
   `--force`, `reset --hard` ni `checkout --` sobre archivos ajenos. Le muestra al usuario
   qué archivos chocan y lo resuelven juntos (o con el dueño de esa carpeta).
