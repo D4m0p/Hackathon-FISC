@@ -135,9 +135,11 @@ _REGLAS: tuple[Regla, ...] = (
     ),
 )
 
-# (patrón, tipo). tipo: "tope" = límite superior, "minimo" = mínimo de edad, "rango".
+# (patrón, tipo). tipo: "tope" = límite superior, "minimo" = mínimo de edad, "rango",
+# "menor" = "menor(es) de N años": tope si N > 18; con N <= 18 es excluir a menores de
+# edad, que es legal ("No se aceptan menores de 18 años").
 _EDAD_PATRONES: tuple[tuple[str, str], ...] = (
-    (r"menor(?:es)?\s+de\s+(\d{1,2})\s+a(?:ñ|n)os", "tope"),
+    (r"menor(?:es)?\s+de\s+(\d{1,2})\s+a(?:ñ|n)os", "menor"),
     (r"no\s+mayor(?:es)?\s+de\s+(\d{1,2})\s+a(?:ñ|n)os", "tope"),
     (r"no\s+(?:más|mas)\s+de\s+(\d{1,2})\s+a(?:ñ|n)os", "tope"),
     (r"(?:hasta|máximo|maximo)\s+(\d{1,2})\s+a(?:ñ|n)os", "tope"),
@@ -171,8 +173,10 @@ _RELLENO = frozenset({
     "exige", "exigen", "exigir", "requiere", "requieren", "requerir",
     "solicita", "solicitan", "solicitar", "necesita", "necesitan", "necesitar",
     "permite", "permiten", "permitir", "acepta", "aceptan", "aceptar",
+    "pide", "piden", "pedir", "pedimos", "exigimos", "requerimos", "solicitamos",
 })
-_INICIOS_NEGACION = ("no es", "no se", "no importa", "no hace falta", "sin", "tampoco")
+# "ni" continúa una negación anterior: "no se exige buena presencia ni excelente presentación".
+_INICIOS_NEGACION = ("no es", "no se", "no importa", "no hace falta", "sin", "tampoco", "ni")
 _PALABRA = re.compile(r"[\wáéíóúüñ]+", re.UNICODE)
 _PRODUCTO = re.compile(
     r"\b(?:ropa|moda|colecci[oó]n|secci[oó]n|calzado|zapat\w*|prenda\w*|l[íi]nea|"
@@ -188,7 +192,8 @@ def _termina_en_negacion(ventana: str) -> bool:
     if not palabras:
         return False
     cola = " ".join(palabras[-3:])
-    return any(cola.endswith(inicio) for inicio in _INICIOS_NEGACION)
+    # por palabra completa: "mini" no es "ni", "Calvin" no es "sin"
+    return any(cola == inicio or cola.endswith(" " + inicio) for inicio in _INICIOS_NEGACION)
 
 
 def _negado(texto: str, inicio: int, fin: int, interna: bool) -> bool:
@@ -227,10 +232,10 @@ def _hallazgo_edad(texto: str) -> Hallazgo | None:
         for coincidencia in patron.finditer(texto):
             if _es_experiencia(texto, coincidencia):
                 continue
-            if tipo == "minimo":
+            if tipo in ("minimo", "menor"):
                 numero = coincidencia.group(1)
                 if not numero or int(numero) <= EDAD_MINIMA_LEGAL:
-                    continue   # un mínimo de 18 años (o menor) es legal: no se marca
+                    continue   # mínimo de 18 o excluir a menores de edad: legal, no se marca
             return Hallazgo(regla="edad",
                             fragmento=_fragmento(texto, coincidencia.start(),
                                                  coincidencia.end()),
@@ -247,22 +252,29 @@ def detectar(texto: str | None) -> list[Hallazgo]:
     if edad is not None:
         hallazgos.append(edad)
     for regla, patrones in _COMPILADAS:
-        for patron in patrones:
-            coincidencia = patron.search(texto)
-            if not coincidencia:
-                continue
+        hallazgo = _primera_coincidencia_valida(texto, regla, patrones)
+        if hallazgo is not None:
+            hallazgos.append(hallazgo)
+    return hallazgos
+
+
+def _primera_coincidencia_valida(texto: str, regla: Regla,
+                                 patrones: tuple[re.Pattern[str], ...]) -> Hallazgo | None:
+    """Revisa TODAS las coincidencias: una negada ("no se requiere foto") no debe ocultar
+    un requisito real más adelante ("envíe su CV con foto")."""
+    for patron in patrones:
+        for coincidencia in patron.finditer(texto):
             if regla.negacion and _negado(texto, coincidencia.start(), coincidencia.end(),
                                           regla.negacion_interna):
-                break
+                continue
             if regla.contexto_producto and _contexto_producto(texto, coincidencia.start()):
                 continue
-            hallazgos.append(Hallazgo(
+            return Hallazgo(
                 regla=regla.nombre,
                 fragmento=_fragmento(texto, coincidencia.start(), coincidencia.end()),
                 detalle=regla.detalle,
-                sugerencia=regla.sugerencia))
-            break
-    return hallazgos
+                sugerencia=regla.sugerencia)
+    return None
 
 
 __all__ = ["EDAD_MINIMA_LEGAL", "Regla", "detectar"]

@@ -150,3 +150,39 @@ def test_la_oferta_v10_de_la_demo_se_bloquea():
 
 def test_auditar_matching_por_ahora_no_emite_resultados():
     assert Auditor().auditar_matching(None, [], {}, [], None) == []
+
+
+# ---------- regresiones (revisión del 16-10) ----------
+
+def _reglas_de(texto):
+    return [h.regla for h in detectar(texto)]
+
+
+def test_una_negacion_no_oculta_un_requisito_real_mas_adelante():
+    assert "foto_obligatoria" in _reglas_de("No se requiere foto obligatoria. Enviar CV con foto al correo.")
+    assert "residir_en" in _reglas_de("No es necesario residir en Arraiján, pero debe residir en La Chorrera.")
+
+
+def test_negacion_sola_sigue_sin_marcarse():
+    assert _reglas_de("No se requiere foto obligatoria.") == []
+
+
+def test_no_aceptar_menores_de_edad_es_legal():
+    assert _reglas_de("No se aceptan menores de 18 años.") == []
+    assert _reglas_de("Abstenerse menores de 18 años.") == []
+
+
+def test_un_tope_de_edad_adulta_se_sigue_marcando():
+    assert _reglas_de("Solo menores de 25 años.") == ["edad"]
+    assert _reglas_de("No mayor de 30 años.") == ["edad"]
+
+
+def test_ni_continua_la_negacion():
+    assert _reglas_de("No se exige buena presencia ni excelente presentación.") == []
+    assert _reglas_de("No es requisito residir en Panamá ni vivir en la ciudad.") == []
+    assert _reglas_de("No se pide fotografía obligatoria ni foto reciente.") == []
+
+
+def test_la_negacion_se_reconoce_por_palabra_completa():
+    # "mini" termina en "ni" y "Calvin" en "in": no son negaciones
+    assert "foto_obligatoria" in _reglas_de("Tienda mini con foto obligatoria.")
