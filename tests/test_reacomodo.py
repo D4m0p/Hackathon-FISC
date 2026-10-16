@@ -169,10 +169,8 @@ def test_solo_se_reprograma_una_aprobada(orq):
 # ---------- API ----------
 
 def test_reacomodo_por_http(orq):
-    from fastapi.testclient import TestClient
-
-    from api.main import crear_app
-    c = TestClient(crear_app(orq))
+    from conftest import cliente_orientador
+    c = cliente_orientador(orq)
     ganador, suplente = dos_candidatos_un_cupo(orq)
     r = c.post(f"/asignaciones/{ganador}/v1/liberar", json={"tipo": "inasistencia", "motivo": "No llegó"})
     assert r.status_code == 200 and r.json()["nuevas"][0]["joven_id"] == suplente

@@ -101,7 +101,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Explicabilidad | Cada asignación trae su desglose (habilidades, traslado, salario) y sus motivos en texto |
 | Trazabilidad | Tabla `trazas` y endpoint `GET /trazas?agente=` |
 | Evals (≥15 casos) | *(en desarrollo)* en `evals/` |
-| Guardrails | Validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
+| Guardrails | Tokens por rol: cada actor solo toca lo suyo y las decisiones clave son del orientador; validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
 
 ### Decisiones de diseño
 
@@ -154,13 +154,28 @@ cp .env.example .env            # opcional: claves de Groq y Telegram
 
 ### Credenciales de demo
 
-La demo no requiere usuario ni contraseña. Las claves son opcionales y van en `.env`
-(nunca en el repositorio; ver `.env.example`):
+La API usa tokens por rol (`Authorization: Bearer <token>`). El script de datos de
+demostración crea estos, **predecibles a propósito y solo para la demo**:
+
+| Rol | Token | Qué puede hacer |
+|---|---|---|
+| Orientador | `demo-orientador` (o el valor de `CLAVE_ORIENTADOR`) | Todo: matching, aprobar o rechazar, inasistencias, ofertas bloqueadas, trazas |
+| Joven | `demo-j01` … `demo-j10` | Solo lo suyo: perfil, tarjetas, plan, casi califica, deslizar, cancelar, reprogramar |
+| Empresa | `demo-e_super`, `demo-e_call`, `demo-e_logis`, `demo-e_resto`, `demo-e_tienda`, `demo-e_tec`, `demo-e_agencia`, `demo-e_hotel` | Solo sus vacantes: publicar, ver candidatos anonimizados, deslizar, retirar, cerrar |
+
+Un joven nuevo que se registra con `POST /jovenes` recibe su propio token aleatorio en la
+respuesta. Los tokens de empresa nuevos los emite el orientador con `POST /credenciales`.
+En la base solo se guarda el hash SHA-256 de cada token. En `/docs`, el botón
+**Authorize** permite probar la API con cualquiera de estos tokens.
+
+Las claves de servicios externos son opcionales y van en `.env` (nunca en el repositorio;
+ver `.env.example`):
 
 | Variable | Para qué | Sin ella |
 |---|---|---|
 | `GROQ_API_KEY` | Extracción de CVs y ofertas | Mercado y Perfil no procesan texto libre |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID_DEMO` | Envío real del aviso de entrevista | El mensaje queda registrado en la base pero no se envía |
+| `CLAVE_ORIENTADOR` | Token del orientador fuera de la demo | Solo existe `demo-orientador` si se cargaron los datos de demo |
 | `RUTA_BASE_DATOS` | Archivo SQLite | Usa `datos_app.db` |
 | `ORIGENES_PERMITIDOS` | Orígenes del frontend (CORS) | `http://localhost:5173` |
 
@@ -186,9 +201,13 @@ La demo no requiere usuario ni contraseña. Las claves son opcionales y van en `
 | `GET` | `/trazas` | Qué agente decidió qué, filtrable por agente |
 | `GET` | `/mensajes` | Mensajes enviados o registrados |
 | `GET` | `/salud` | Qué agentes están conectados |
+| `GET` | `/yo` | Rol y sujeto del token |
+| `POST` | `/credenciales` | El orientador emite un token de empresa, joven u orientador |
 
-Errores: `404` si algo no existe, `400` si una regla del flujo no lo permite (con el motivo
-en `detail`), `422` si los datos no son válidos.
+Errores: `401` sin token o token inválido, `403` sin permiso para esa acción, `404` si algo
+no existe, `400` si una regla del flujo no lo permite (con el motivo en `detail`), `422` si
+los datos no son válidos. Públicas (sin token): `/salud`, `/habilidades`, `/cursos`,
+`/traslados`, vacantes publicadas y el registro de un joven nuevo.
 
 ## Estructura
 
@@ -203,15 +222,15 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-121 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el reacomodo, "casi califica", la API y la historia de los datos de demostración. Además, cada restricción
+138 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el reacomodo, "casi califica", los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de
 1000 peticiones en ráfagas de hasta 378 simultáneas, mezclando registros, deslizamientos,
 10 corridas de matching a la vez, decisiones del orientador enviadas dos veces en paralelo
-y entradas maliciosas (inyección de prompt, SQL, textos gigantes, datos inválidos).
-Resultado: 0 errores 5xx; ninguna vacante supera sus cupos, ningún joven queda con dos
+entradas maliciosas (inyección de prompt, SQL, textos gigantes, datos inválidos) y acciones
+sin token. Resultado: 0 errores 5xx; todas las acciones sin token rechazadas; ninguna vacante supera sus cupos, ningún joven queda con dos
 asignaciones y ninguna decisión se aplica dos veces.
 
 ```bash

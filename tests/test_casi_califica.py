@@ -140,9 +140,7 @@ def test_maria_en_la_demo():
     assert r[0].cursos == ["c01"] and "Técnicas de ventas" in r[0].sugerencia
     assert "Le falta Ventas" in r[0].sugerencia
 
-    from fastapi.testclient import TestClient
-
-    from api.main import crear_app
-    c = TestClient(crear_app(orq))
+    from conftest import cliente_orientador
+    c = cliente_orientador(orq)
     assert c.get("/jovenes/j01/casi-califica").json()[1]["incumplimiento"]["faltante"] == 1.0
     assert c.get("/jovenes/nadie/casi-califica").status_code == 404

@@ -1,7 +1,5 @@
 import pytest
-from fastapi.testclient import TestClient
-
-from api.main import crear_app
+from conftest import cliente_orientador
 from orquestador import Almacen, Orquestador
 
 VACANTE = {"id": "v1", "empresa_id": "e1", "titulo": "Cajero", "corregimiento": "arraijan",
@@ -17,7 +15,7 @@ DATOS = {"joven_id": "j1", "nombre": "Ana Pérez", "genero": "femenino", "edad":
 @pytest.fixture
 def cliente():
     orq = Orquestador(Almacen())
-    c = TestClient(crear_app(orq))
+    c = cliente_orientador(orq)
     c.post("/traslados", json=[{"origen": "la_chorrera", "destino": "arraijan",
                                 "minutos": 30, "costo": 1.0}])
     return c

@@ -24,6 +24,24 @@ from orquestador.arranque import orquestador_desde_entorno  # noqa: E402
 DATOS = RAIZ / "scripts" / "demo" / "datos_demo.json"
 
 
+TOKEN_ORIENTADOR_DEMO = "demo-orientador"
+
+
+def credenciales_demo(orq: Orquestador, datos: dict) -> dict[str, str]:
+    """Tokens PREDECIBLES, solo para la demo: demo-<joven_id>, demo-<empresa_id> y
+    el del orientador (CLAVE_ORIENTADOR del entorno o demo-orientador)."""
+    tokens = {"orientador": os.getenv("CLAVE_ORIENTADOR") or TOKEN_ORIENTADOR_DEMO}
+    orq.almacen.guardar_credencial(tokens["orientador"], "orientador", None)
+    for r in datos["jovenes"]:
+        j = r["joven"]["id"]
+        tokens[j] = f"demo-{j}"
+        orq.almacen.guardar_credencial(tokens[j], "joven", j)
+    for e in sorted({v["empresa_id"] for v in datos["vacantes"]}):
+        tokens[e] = f"demo-{e}"
+        orq.almacen.guardar_credencial(tokens[e], "empresa", e)
+    return tokens
+
+
 def cargar(orq: Orquestador, datos: dict, con_matching: bool = False) -> dict:
     orq.almacen.guardar_traslados([Traslado(**t) for t in datos["traslados"]])
     for h in datos["habilidades"]:
@@ -61,11 +79,16 @@ def main() -> None:
     if args.reiniciar and args.base != ":memory:" and Path(args.base).exists():
         Path(args.base).unlink()
     orq = orquestador_desde_entorno(args.base)
-    resumen = cargar(orq, json.loads(DATOS.read_text(encoding="utf-8")), args.matching)
+    datos = json.loads(DATOS.read_text(encoding="utf-8"))
+    resumen = cargar(orq, datos, args.matching)
+    tokens = credenciales_demo(orq, datos)
     print(f"Base: {args.base}")
     print(f"Auditor: {type(orq.auditor).__name__}")
     for clave, valor in resumen.items():
         print(f"  {clave}: {valor}")
+    print("Tokens de demo (Authorization: Bearer <token>):")
+    print(f"  orientador: {tokens['orientador']} · jóvenes: demo-j01 … demo-j10 · "
+          f"empresas: demo-<empresa_id> (p. ej. demo-e_super)")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 """Persistencia en SQLite. Cada entidad se guarda como JSON validado por el contrato."""
 from __future__ import annotations
 
+import hashlib
 import sqlite3
 import threading
 from datetime import datetime, timezone
@@ -27,6 +28,11 @@ CREATE TABLE IF NOT EXISTS deslizamientos (
 );
 CREATE TABLE IF NOT EXISTS trazas (
     n INTEGER PRIMARY KEY AUTOINCREMENT, agente TEXT NOT NULL, datos TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS credenciales (
+    token_hash TEXT PRIMARY KEY,
+    rol TEXT NOT NULL CHECK (rol IN ('joven', 'empresa', 'orientador')),
+    sujeto TEXT
 );
 CREATE TABLE IF NOT EXISTS mensajes (
     n INTEGER PRIMARY KEY AUTOINCREMENT, destino TEXT, texto TEXT NOT NULL,
@@ -147,6 +153,23 @@ class Almacen:
         with self._lock:
             filas = self._con.execute(consulta, params + (limite,)).fetchall()
         return [Traza.model_validate_json(f[0]) for f in filas]
+
+    # ---------- credenciales (solo se guarda el hash del token) ----------
+    @staticmethod
+    def _hash(token: str) -> str:
+        return hashlib.sha256(token.encode()).hexdigest()
+
+    def guardar_credencial(self, token: str, rol: str, sujeto: str | None) -> None:
+        with self._lock, self._con:
+            self._con.execute(
+                "INSERT INTO credenciales VALUES (?, ?, ?) ON CONFLICT (token_hash) DO UPDATE SET "
+                "rol = excluded.rol, sujeto = excluded.sujeto", (self._hash(token), rol, sujeto))
+
+    def credencial(self, token: str) -> tuple[str, str | None] | None:
+        with self._lock:
+            fila = self._con.execute("SELECT rol, sujeto FROM credenciales WHERE token_hash = ?",
+                                     (self._hash(token),)).fetchone()
+        return (fila[0], fila[1]) if fila else None
 
     # ---------- mensajes enviados ----------
     def registrar_mensaje(self, destino: str | None, texto: str, enviado: bool) -> None:

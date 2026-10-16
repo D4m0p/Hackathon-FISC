@@ -45,12 +45,24 @@ MALICIOSOS = [
 ]
 
 
+# Deben responder 401 o 403: nadie sin credencial decide nada.
+SIN_TOKEN = [
+    ("POST", "/matching", None),
+    ("POST", "/asignaciones/j01/v01/decision", {"aprobar": True}),
+    ("GET", "/trazas", None),
+    ("POST", "/deslizar", {"actor": "empresa", "joven_id": "j01", "vacante_id": "v01", "le_interesa": True}),
+    ("POST", "/jovenes", {"joven": {"id": "j01", "corregimiento": "x", "disponibilidad": ["manana"],
+                                    "presupuesto_transporte_semanal": 0, "salario_minimo": 9999}}),
+]
+
+
 class Registro:
     def __init__(self):
         self.tiempos: dict[str, list[float]] = defaultdict(list)
         self.estados: Counter = Counter()
         self.errores_5xx: list[str] = []
         self.excepciones: list[str] = []
+        self.estados_sin_token: list[int] = []
 
     async def pedir(self, cliente: httpx.AsyncClient, metodo: str, ruta: str, cuerpo=None,
                     etiqueta: str | None = None) -> httpx.Response | None:
@@ -63,6 +75,8 @@ class Registro:
             return None
         self.tiempos[etiqueta].append((time.perf_counter() - t0) * 1000)
         self.estados[r.status_code] += 1
+        if etiqueta == "sin token":
+            self.estados_sin_token.append(r.status_code)
         if r.status_code >= 500:
             self.errores_5xx.append(f"{etiqueta} → {r.status_code}: {r.text[:200]}")
         return r
@@ -80,11 +94,13 @@ def joven_aleatorio(rng: random.Random, i: int) -> dict:
                   "genero": rng.choice(["femenino", "masculino", "otro", "no_indica"])}}
 
 
-async def correr(url: str, n_jovenes: int, semilla: int) -> int:
+async def correr(url: str, n_jovenes: int, semilla: int, token: str) -> int:
     rng = random.Random(semilla)
     reg = Registro()
     limites = httpx.Limits(max_connections=400, max_keepalive_connections=400)
-    async with httpx.AsyncClient(base_url=url, timeout=60, limits=limites) as c:
+    cabecera = {"Authorization": f"Bearer {token}"}
+    async with httpx.AsyncClient(base_url=url, timeout=60, limits=limites) as anonimo, \
+            httpx.AsyncClient(base_url=url, timeout=60, limits=limites, headers=cabecera) as c:
         r = await reg.pedir(c, "GET", "/salud")
         if r is None or r.status_code != 200:
             print("La API no responde en", url)
@@ -119,6 +135,7 @@ async def correr(url: str, n_jovenes: int, semilla: int) -> int:
         tareas += [reg.pedir(c, "GET", "/trazas?limite=50") for _ in range(20)]
         tareas += [reg.pedir(c, "GET", f"/vacantes/{v}/tarjetas") for v in list(vacantes)[:9] * 2]
         tareas += [reg.pedir(c, m, ruta, cuerpo, etiqueta="malicioso") for m, ruta, cuerpo in MALICIOSOS * 3]
+        tareas += [reg.pedir(anonimo, m, ruta, cuerpo, etiqueta="sin token") for m, ruta, cuerpo in SIN_TOKEN * 3]
         rng.shuffle(tareas)
         t = time.perf_counter()
         await asyncio.gather(*tareas)
@@ -162,6 +179,9 @@ async def correr(url: str, n_jovenes: int, semilla: int) -> int:
         fallas.append(f"{len(mensajes)} mensajes para {len(aprobadas)} aprobadas")
     if any(j["id"].startswith("'") for j in jovenes_final):
         pass   # el id raro se guarda como texto; lo importante es que la tabla sigue viva
+    colados = [c for c in reg.estados_sin_token if c not in (401, 403)]
+    if colados:
+        fallas.append(f"Peticiones sin token que NO fueron rechazadas: {colados}")
     fallas += reg.errores_5xx + reg.excepciones
 
     total = sum(reg.estados.values())
@@ -187,8 +207,9 @@ def main() -> None:
     p.add_argument("--url", default="http://localhost:8010")
     p.add_argument("--jovenes", type=int, default=200)
     p.add_argument("--semilla", type=int, default=7)
+    p.add_argument("--token", default="demo-orientador", help="token del orientador")
     a = p.parse_args()
-    sys.exit(asyncio.run(correr(a.url, a.jovenes, a.semilla)))
+    sys.exit(asyncio.run(correr(a.url, a.jovenes, a.semilla, a.token)))
 
 
 if __name__ == "__main__":

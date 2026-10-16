@@ -118,8 +118,14 @@ cd frontend && npm install && npm run dev
 ## 7. Cómo se conecta cada parte
 
 - **Frontend (B):** solo habla con la API en `http://localhost:8010` (la lista completa
-  está en `/docs`). Las principales:
-  - `POST /jovenes` `{joven, datos}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
+  está en `/docs`, con botón **Authorize** para probar con un token).
+  - **Autenticación:** cabecera `Authorization: Bearer <token>`. Tokens de demo:
+    `demo-orientador`, `demo-j01`…`demo-j10`, `demo-e_super` (etc., `demo-<empresa_id>`).
+    `POST /jovenes` de un joven nuevo responde `{joven, token}`: guardar ese token.
+    `GET /yo` → `{rol, sujeto}` para saber qué vista mostrar. 401 = sin token o inválido,
+    403 = sin permiso. El orientador puede actuar en nombre de cualquiera.
+  - Las principales:
+  - `POST /jovenes` `{joven, datos}` → `{joven, token}` · `GET /jovenes/{id}/tarjetas` · `GET /jovenes/{id}/plan`
   - `GET /jovenes/{id}/casi-califica` → vacantes donde le falta una sola cosa:
     `[{vacante_id, titulo, incumplimiento: {tipo, detalle, faltante, codigo}, sugerencia, cursos}]`
   - `POST /vacantes` (estructurada) · `POST /ofertas` `{texto, empresa_id}` (texto libre, usa Mercado)
