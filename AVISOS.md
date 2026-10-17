@@ -5,6 +5,18 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para B (Anna) y C (Diego) — 17/10/2026 12:54 — de A: entrega cerrada
+
+- **Tag `final-24h` creado y publicado en el repo oficial** (commit `6ef6917`). Lo que se suba
+  después no entra en la evaluación.
+- `docs/bitacora_ia.md` quedó final: tabla de herramientas por integrante (OpenCode para C;
+  "asistente de programación de IA de línea de comandos" para A y B; Groq en el producto), cómo se
+  validó y 487 pruebas. C: ya no hace falta tocarla.
+- Video demo sin voz con rótulos: `docs/video_demo.webm` (~2 min, grabado de la app real),
+  enlazado en el README de los dos repos.
+
+---
+
 ## Para A (Damo) y C (Diego) — 17/10/2026 — de B: la foto aparece cuando la empresa acepta
 
 Pedido del equipo: que la empresa vea la foto **cuando acepta a la persona**, no recién con la
