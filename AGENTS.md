@@ -154,7 +154,8 @@ cd frontend && npm install && npm run dev
     `POST /asignaciones/{joven_id}/{vacante_id}/reprogramar` `{motivo}` ·
     `POST /vacantes/{id}/cerrar` `{motivo}` → `{vacante, afectadas, nuevas}` ·
     `GET /asignaciones?estado=cerrada`
-  - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos.
+  - Errores: 404 no existe, 400 regla del flujo (`detail` trae el mensaje para mostrar), 422 datos inválidos,
+    429 demasiadas solicitudes sin token (cabecera `Retry-After`), 500 inesperado con `id_error`.
 - **Perfil (B):** ya conectado. Flujo del joven nuevo en el frontend (sin token):
   `GET /perfil/preguntas` → `POST /perfil/cv` `{tipo: "pdf"|"imagen"|"texto", contenido_base64|texto}`
   y/o `POST /perfil/entrevista` `{respuestas: [{pregunta_id, texto}]}` → `{habilidades, descartadas,

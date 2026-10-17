@@ -70,11 +70,26 @@ class NoEncontrado(ErrorDeFlujo):
 
 def _exclusivo(metodo):
     """Las operaciones que cambian el estado se ejecutan de a una: evita, por ejemplo,
-    que dos aprobaciones simultáneas de la misma asignación pasen las dos."""
+    que dos aprobaciones simultáneas de la misma asignación pasen las dos.
+
+    Los avisos (Telegram) que genera la operación se envían AL SOLTAR el candado: un
+    envío lento no deja al resto del sistema esperando. Con llamadas anidadas, envía
+    solo la más externa."""
     @functools.wraps(metodo)
     def envoltura(self, *args, **kwargs):
-        with self._candado:
-            return metodo(self, *args, **kwargs)
+        local = self._local
+        profundidad = getattr(local, "profundidad", 0)
+        if profundidad == 0:
+            local.avisos = []
+        local.profundidad = profundidad + 1
+        try:
+            with self._candado:
+                return metodo(self, *args, **kwargs)
+        finally:
+            local.profundidad = profundidad
+            if profundidad == 0:
+                avisos, local.avisos = local.avisos, []
+                self._enviar_avisos(avisos)
     return envoltura
 
 
@@ -96,6 +111,7 @@ class Orquestador:
         self.notificador = notificador or NotificadorRegistro()
         self.reloj = reloj or (lambda: datetime.now(timezone.utc))
         self._candado = threading.RLock()
+        self._local = threading.local()   # avisos pendientes de la operación en curso
 
     # ---------- utilidades ----------
     def _traza(self, agente: Agente, accion: str, motivo: str,
@@ -354,7 +370,8 @@ class Orquestador:
 
         if not aprobar:
             asignacion = asignacion.model_copy(update={"aprobada": False, "motivo_orientador": motivo})
-            self.almacen.guardar(asignacion)
+            if not self.almacen.decidir_si_pendiente(asignacion):
+                raise ErrorDeFlujo("Esa asignación ya fue decidida")
             self._traza(Agente.orientador, "rechazar", motivo,
                         entrada={"joven_id": joven_id, "vacante_id": vacante_id})
             return asignacion
@@ -363,18 +380,19 @@ class Orquestador:
         entrevista = proxima_entrevista(joven, vacante, self.reloj(), self._ocupados(vacante_id))
         asignacion = asignacion.model_copy(update={
             "aprobada": True, "motivo_orientador": motivo or None, "entrevista": entrevista})
-        self.almacen.guardar(asignacion)
+        # Atómico en la base: aunque haya varios procesos, solo uno puede decidir.
+        if not self.almacen.decidir_si_pendiente(asignacion):
+            raise ErrorDeFlujo("Esa asignación ya fue decidida")
         self._traza(Agente.orientador, "aprobar", motivo or "Aprobada",
                     entrada={"joven_id": joven_id, "vacante_id": vacante_id})
 
-        enviado = self._notificar(
+        self._notificar(
             joven_id, f"Tiene una entrevista para «{vacante.titulo}» el "
                       f"{entrevista:%d/%m/%Y a las %H:%M}. Motivo de la selección: "
-                      f"{'; '.join(asignacion.desglose.motivos)}")
-        self._traza(Agente.orquestador, "agendar_y_notificar",
-                    "Mensaje enviado" if enviado else "Mensaje registrado (sin canal de envío)",
-                    entrada={"joven_id": joven_id, "vacante_id": vacante_id},
-                    salida={"entrevista": entrevista.isoformat(), "enviado": enviado})
+                      f"{'; '.join(asignacion.desglose.motivos)}",
+            traza={"accion": "agendar_y_notificar",
+                   "entrada": {"joven_id": joven_id, "vacante_id": vacante_id},
+                   "salida": {"entrevista": entrevista.isoformat()}})
         return asignacion
 
     # ---------- reacomodo ----------
@@ -382,13 +400,29 @@ class Orquestador:
         return {a.entrevista for a in self.almacen.asignaciones(vacante_id=vacante_id)
                 if a.vigente and a.entrevista is not None}
 
-    def _notificar(self, joven_id: str, cuerpo: str) -> bool:
+    def _notificar(self, joven_id: str, cuerpo: str, traza: dict | None = None) -> None:
+        """Arma el aviso ahora (con los datos de este momento) y lo deja en cola: se envía
+        al soltar el candado. `traza`: si se da, se registra después del envío con su resultado."""
         datos = self.almacen.obtener(DatosPersonales, joven_id)
         texto = (f"Hola, {datos.nombre}. " if datos else "Hola. ") + cuerpo
         destino = datos.contacto_telegram if datos else None
-        enviado = self.notificador.enviar(destino, texto)
-        self.almacen.registrar_mensaje(destino, texto, enviado)
-        return enviado
+        aviso = (destino, texto, traza)
+        if getattr(self._local, "profundidad", 0) > 0:
+            self._local.avisos.append(aviso)
+        else:
+            self._enviar_avisos([aviso])
+
+    def _enviar_avisos(self, avisos: list) -> None:
+        for destino, texto, traza in avisos:
+            try:
+                enviado = self.notificador.enviar(destino, texto)
+            except Exception:   # un canal caído no debe tumbar la operación ya guardada
+                enviado = False
+            self.almacen.registrar_mensaje(destino, texto, enviado)
+            if traza is not None:
+                self._traza(Agente.orquestador, traza["accion"],
+                            "Mensaje enviado" if enviado else "Mensaje registrado (sin canal de envío)",
+                            entrada=traza["entrada"], salida={**traza["salida"], "enviado": enviado})
 
     def _vigente(self, joven_id: str, vacante_id: str) -> Asignacion:
         a = self.almacen.obtener(Asignacion, f"{joven_id}|{vacante_id}")

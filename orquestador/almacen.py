@@ -155,6 +155,16 @@ class Almacen:
                 "AND j.le_interesa = 1 AND e.le_interesa = 1").fetchall()
         return {(a, b) for a, b in filas}
 
+    def decidir_si_pendiente(self, a: Asignacion) -> bool:
+        """Guarda la decisión SOLO si la asignación sigue pendiente y vigente en la base
+        (compara y cambia en una sola sentencia). False = otro proceso ya decidió."""
+        with self._lock, self._con:
+            cur = self._con.execute(
+                "UPDATE entidades SET datos = ? WHERE tipo = 'asignacion' AND id = ? "
+                "AND json_extract(datos, '$.aprobada') IS NULL AND json_extract(datos, '$.vigente') = 1",
+                (a.model_dump_json(), clave_asignacion(a)))
+            return cur.rowcount == 1
+
     def hay_interes_mutuo(self, joven_id: str, vacante_id: str) -> bool:
         with self._lock:
             n = self._con.execute(

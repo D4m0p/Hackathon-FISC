@@ -23,6 +23,8 @@ from agentes.perfil.rutas import crear_router as rutas_perfil
 from orquestador.arranque import orquestador_desde_entorno
 from orquestador.interfaces import es_oferta_incompleta, faltantes_de
 
+from .limites import LimiteAnonimos, tope_desde_entorno
+from .registro import RegistroPeticiones, error_inesperado
 from .seguridad import Identidad, Rol, dependencias, nuevo_token, sin_permiso
 
 MAX_TEXTO = 5000   # guardrail: ofertas y CVs más largos se rechazan antes de llegar al LLM
@@ -113,13 +115,20 @@ class ResultadoCierre(BaseModel):
 
 # ---------- construcción ----------
 
-def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None) -> FastAPI:
-    """`cliente_llm`: modelo para el agente Perfil. None = sin LLM (palabras clave)."""
+def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
+              limite_anonimo_por_minuto: int | None = None) -> FastAPI:
+    """`cliente_llm`: modelo para el agente Perfil. None = sin LLM (palabras clave).
+    `limite_anonimo_por_minuto`: tope por IP sin token; None = variable LIMITE_ANONIMO_POR_MINUTO (30)."""
     app = FastAPI(title="Empleo joven — sistema de agentes", version="0.3")
+    # Orden: el último que se agrega es el más externo (registro > CORS > límite).
+    app.add_middleware(LimiteAnonimos, almacen=orq.almacen,
+                       tope=limite_anonimo_por_minuto or tope_desde_entorno())
     app.add_middleware(
         CORSMiddleware,
         allow_origins=os.getenv("ORIGENES_PERMITIDOS", "http://localhost:5173").split(","),
         allow_methods=["*"], allow_headers=["*"])
+    app.add_middleware(RegistroPeticiones)
+    app.add_exception_handler(Exception, error_inesperado)
     opcional, requerida = dependencias(orq.almacen)
     # Agente Perfil: /perfil/preguntas, /perfil/cv y /perfil/entrevista (abiertos: el
     # joven todavía no tiene token; no guardan nada, solo proponen habilidades).

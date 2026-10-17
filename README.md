@@ -118,6 +118,9 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
   alguien sin trabajo; el solver maximiza el total respetando cupos (hay una prueba que lo
   demuestra: `test_optimo_global_gana_al_voraz`).
 - **Resultados reproducibles.** Los modelos se construyen siempre en el mismo orden y CP-SAT corre con semilla fija y un solo hilo.
+- **Los avisos no frenan al sistema.** Los mensajes de Telegram se envían después de soltar
+  el candado del orquestador; un canal lento o caído no bloquea las demás operaciones ni
+  deshace la aprobación ya guardada.
 - **Rendimiento.** El Matching es un flujo de costo mínimo (exacto y polinomial; antes CP-SAT,
   que con miles de pares agotaba su límite de tiempo sin solución). El solver trabaja solo con
   el puntaje numérico y la explicación se arma únicamente para los pares elegidos. Con 2000
@@ -186,6 +189,12 @@ ver `.env.example`):
 | `CLAVE_ORIENTADOR` | Token del orientador fuera de la demo | Solo existe `demo-orientador` si se cargaron los datos de demo |
 | `RUTA_BASE_DATOS` | Archivo SQLite | Usa `datos_app.db` |
 | `ORIGENES_PERMITIDOS` | Orígenes del frontend (CORS) | `http://localhost:5173` |
+| `LIMITE_ANONIMO_POR_MINUTO` | Tope por IP para el registro y el Perfil sin token | 30 |
+
+**Un solo proceso.** Levante uvicorn con un solo worker (como en los comandos de arriba). La
+decisión del orientador es atómica en la base aunque haya varios procesos, pero el candado del
+orquestador, el límite de peticiones y la caché de traslados son por proceso. Detrás de un proxy,
+agregue `--proxy-headers` para que el límite use la IP real del cliente.
 
 ## API
 
@@ -220,7 +229,9 @@ ver `.env.example`):
 | `GET` | `/yo` | Rol y sujeto del token |
 | `POST` | `/credenciales` | El orientador emite un token de empresa, joven u orientador |
 
-Errores: `401` sin token o token inválido, `403` sin permiso para esa acción, `404` si algo
+Cada respuesta trae `X-Id-Peticion`; un error inesperado responde `500` con `id_error` (el mismo
+id queda en el log con la traza completa, sin exponer detalles al cliente). Errores: `429` si un
+cliente sin token se pasa del límite (con `Retry-After`), `401` sin token o token inválido, `403` sin permiso para esa acción, `404` si algo
 no existe, `400` si una regla del flujo no lo permite (con el motivo en `detail`), `422` si
 los datos no son válidos. Públicas (sin token): `/salud`, `/habilidades`, `/cursos`,
 `/traslados`, vacantes publicadas y el registro de un joven nuevo.
