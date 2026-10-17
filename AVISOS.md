@@ -5,16 +5,6 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — logos de empresa en el frontend (hecho por A, acordado)
-
-Se agregó `componentes/LogoEmpresa.jsx`: logo generado con las iniciales del nombre de la empresa
-sobre un color fijo (de su id, entre aqua y azul). Va en la tarjeta del joven (junto al título y
-con el nombre de la empresa) y en la cabecera de la vista Empresa. Los candidatos siguen SIN foto
-a propósito: la empresa decide por habilidades (el Auditor bloquea a quien exige foto). Haga
-`git pull` antes de seguir con esos archivos.
-
----
-
 ## Para C (Diego) — 17/10/2026 — borrador de `docs/metodologia.md` para revisar
 
 A escribió un borrador del documento de metodología (despliegue, funcionamiento y arquitectura),
