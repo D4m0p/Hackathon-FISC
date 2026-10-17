@@ -5,6 +5,39 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para A (Damo) — 17/10/2026 — pedido de B: que el matching se dispare solo (autonomía)
+
+**Por qué.** La rúbrica de "Diseño agéntico" (25 %) evalúa **autonomía** y la regla de oro pide
+agentes que "perciben, deciden y actúan". Hoy casi todo ya reacciona solo (Auditor al publicar,
+reacomodo al liberar un cupo, aviso al aprobar), pero el **matching solo corre cuando el
+orientador toca el botón**: una vacante nueva, un joven nuevo o un interés mutuo no generan
+propuestas hasta ese clic. Queremos que el sistema tome la iniciativa y el humano siga
+aprobando (las propuestas quedan pendientes como hoy).
+
+**Lo que le pedimos (orquestador):**
+1. Un ayudante tipo `_reacomodar`, p. ej. `_matching_automatico(disparador, objeto_id)`, que
+   corra `ejecutar_matching()`, calcule las propuestas **nuevas** pendientes y registre traza:
+   agente `matching`, **acción `auto_matching`**, `entrada = {disparador, objeto_id}`,
+   `salida = {nuevas: ["j03|v05", ...]}` y un `motivo` listo para mostrar, p. ej.
+   *"Se publicó «Asistente de ventas»: el sistema buscó candidatos solo. Propuestas nuevas: j11→v05"*
+   o *"…Propuestas nuevas: ninguna"*.
+2. Llamarlo en tres momentos (`disparador`):
+   - `vacante_publicada`: al final de `publicar_vacante` cuando queda **publicada** (y en
+     `orientador_publicar_bloqueada`).
+   - `joven_nuevo`: al final de `registrar_joven` cuando el joven es nuevo.
+   - `interes_mutuo`: en `deslizar` cuando devuelve `True`.
+3. Que la semilla pueda apagarlo durante la carga masiva (p. ej. `Orquestador(..., automatico=False)`
+   o un parámetro), para no correr 20 matchings al sembrar. En la API, encendido.
+4. Opcional (si sobra tiempo): un "vigía" que, al correr, deje trazas `auto_aviso` para el
+   orientador ("vacante sin candidatos", "joven sin opciones y el curso X tiene cupo").
+
+**Frontend (B):** la pestaña Propuestas del orientador ya tiene el panel "Lo que el sistema hizo
+solo", que lee `/trazas` y muestra las acciones automáticas (auditoría al publicar, reacomodo,
+interés mutuo, rutas de formación, revisión de sesgo). Las trazas `auto_matching` y `auto_aviso`
+aparecerán solas apenas existan; no hace falta otro endpoint.
+
+---
+
 ## Para A (Damo) — 17/10/2026 — pedido de B: cifra de impacto y un límite
 
 **1. `GET /impacto` (orientador) — la cifra que muestra el problema de la geografía.**
