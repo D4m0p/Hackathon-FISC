@@ -210,7 +210,7 @@ por qué un portal que ignora la geografía manda a los jóvenes a trabajos a lo
 
 | Qué | Resultado |
 |---|---|
-| Pruebas automáticas (pytest) | 454 |
+| Pruebas automáticas (pytest) | 464 |
 | Evals de Matching, Auditor y Mercado (`evals/`) | 40 casos en 8 categorías, todos cumplen |
 | Evals del agente Perfil (`agentes/perfil/evals/`) | 35 casos de reglas, todos cumplen |
 | Casos aleatorios (Hypothesis) | El Matching y la Ruta de formación se comparan contra búsqueda exhaustiva en instancias pequeñas, con cualquier combinación válida de pesos: el solver nunca pierde |

@@ -306,7 +306,7 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-454 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+464 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
