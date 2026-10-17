@@ -146,6 +146,12 @@ cd frontend && npm install && npm run dev
   - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
   - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
   - `GET /planes` → todos los planes de formación de una vez (orientador; para «Sin match»).
+  - `GET /mercado/tendencias?top=5` (público) → `{por_zona: {zona: [{codigo, nombre, vacantes}]},
+    vacantes_por_zona, total_vacantes, nota}`.
+  - `GET /auditoria/contrafactual/{joven_id}` (orientador) → `{veredicto: "sin_sesgo"|"revisar",
+    hallazgos, identidad, campos_que_ve_el_solver, filas: [{vacante_id, titulo, original:
+    {habilidades, traslado, salario, total}, variantes: [{corregimiento, factible, componentes,
+    habilidades_igual}]}]}`. Es la escena del Auditor del guion de la demo.
   - Pesos (panel del orientador): `GET /pesos` (público) · `POST /pesos/simular`
     `{habilidades, traslado, salario}` → `{entran, salen, se_mantienen}` · `PUT /pesos`
     `{pesos: {...}, motivo}`. Cada peso entre 0.05 y 0.80 y deben sumar 1 (si no, 422).

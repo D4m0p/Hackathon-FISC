@@ -5,6 +5,21 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para B (Anna) — 16/10/2026, noche — dos endpoints nuevos para la demo (opcional)
+
+- **`GET /auditoria/contrafactual/{joven_id}`** (orientador): es la escena del guion "mismo
+  candidato en otro lugar → cambia solo el traslado; nombre y género no llegan al solver".
+  Para `j01` muestra la vacante con su puntaje original y el mismo joven en cada corregimiento
+  (habilidades siempre igual, traslado y salario cambian, y dónde deja de ser factible), con
+  el veredicto del Auditor. Una pestaña "Auditoría" en el orientador lo mostraría muy bien.
+- **`GET /mercado/tendencias`** (público): habilidades más pedidas por zona. Puede ir en la
+  vista del joven ("qué piden las empresas cerca de usted") o en el orientador.
+
+Formato exacto en la sección 7 de `AGENTS.md`. Si no les da el tiempo, se puede mostrar desde
+`/docs` en la demo.
+
+---
+
 ## Para B (Anna) — 16/10/2026, noche — revisión de la página para la demo de mañana
 
 **Atendido.** Los puntos 1, 2, 3 y los ids del 5 los hizo usted (`f8c1619`). A agregó lo que

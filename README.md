@@ -230,6 +230,8 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `POST` | `/asignaciones/{joven}/{vacante}/liberar` | Cancelación, inasistencia o retiro: libera el cupo y propone reemplazo |
 | `POST` | `/asignaciones/{joven}/{vacante}/reprogramar` | Mueve la entrevista al siguiente espacio libre |
 | `POST` | `/vacantes/{id}/cerrar` | Cierra la vacante y reubica a los afectados |
+| `GET` | `/mercado/tendencias` | Habilidades más pedidas por zona entre las vacantes publicadas (agente de Mercado, público) |
+| `GET` | `/auditoria/contrafactual/{joven}` | El mismo joven en cada corregimiento: solo cambian traslado y salario; veredicto del Auditor (orientador) |
 | `GET` | `/pesos` | Pesos actuales del puntaje (público) |
 | `POST` | `/pesos/simular` | Qué propuestas entrarían y saldrían con otros pesos, sin guardar nada (orientador) |
 | `PUT` | `/pesos` | El orientador cambia los pesos, con motivo |

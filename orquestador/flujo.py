@@ -13,17 +13,19 @@ import functools
 import inspect
 import threading
 from datetime import datetime, timezone
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 from pydantic import BaseModel
 
+from agentes.auditor.contrafactual import desgloses_de_joven, hallazgos_de_joven
 from agentes.formacion import casi_califica, planificar_grupo
+from agentes.mercado.tendencias import tendencias_por_zona, vacantes_por_zona
 from agentes.matching import (
     MatrizTraslados, asignar, es_factible, motivos_infactible, ranking_para_joven, ranking_para_vacante,
     tiene_alguna_factible,
 )
 from contrato.modelos import (
-    Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad,
+    Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad, Hallazgo,
     Joven, Pesos, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
 )
 
@@ -58,6 +60,55 @@ class Simulacion(BaseModel):
     entran: list[CambioPropuesto]
     salen: list[CambioPropuesto]
     se_mantienen: int
+
+
+class Componentes(BaseModel):
+    habilidades: float
+    traslado: float
+    salario: float
+    total: float
+
+
+def _componentes(d: Desglose) -> Componentes:
+    return Componentes(habilidades=d.habilidades, traslado=d.traslado, salario=d.salario, total=d.total)
+
+
+class VarianteLugar(BaseModel):
+    corregimiento: str
+    factible: bool
+    componentes: Componentes | None = None
+    habilidades_igual: bool | None = None   # None si en ese lugar la vacante no es factible
+
+
+class FilaContrafactual(BaseModel):
+    vacante_id: str
+    titulo: str
+    original: Componentes
+    variantes: list[VarianteLugar]
+
+
+class DemostracionContrafactual(BaseModel):
+    """La escena del Auditor: el mismo joven en otros lugares; nombre y género, fuera del solver."""
+    joven_id: str
+    corregimiento: str
+    veredicto: Literal["sin_sesgo", "revisar"]
+    hallazgos: list[Hallazgo]
+    identidad: str
+    campos_que_ve_el_solver: list[str]
+    filas: list[FilaContrafactual]
+
+
+class HabilidadPedida(BaseModel):
+    codigo: str
+    nombre: str
+    vacantes: int
+
+
+class Tendencias(BaseModel):
+    por_zona: dict[str, list[HabilidadPedida]]
+    vacantes_por_zona: dict[str, int]
+    total_vacantes: int
+    nota: str
 
 
 class ErrorDeFlujo(ValueError):
@@ -549,6 +600,51 @@ class Orquestador:
         # Las propuestas pendientes se calcularon con los pesos viejos.
         self._retirar_pendientes("Cambiaron los pesos del puntaje")
         return nuevos
+
+    # ---------- transparencia de los agentes ----------
+    def demostrar_contrafactual(self, joven_id: str) -> DemostracionContrafactual:
+        """Números para mostrar que el lugar solo mueve traslado y salario, nunca habilidades.
+        El veredicto lo da el Auditor (`hallazgos_de_joven`); aquí solo se arma la vista."""
+        joven = self._joven(joven_id)
+        vacantes = self.almacen.listar(Vacante)
+        matriz, pesos = self.matriz(), self.pesos()
+        traslados = self.almacen.traslados()
+        lugares = sorted({t.origen for t in traslados} | {t.destino for t in traslados}
+                         | {joven.corregimiento} | {v.corregimiento for v in vacantes})
+        base = desgloses_de_joven(joven, vacantes, matriz, pesos)
+        en_otro_lugar = {c: desgloses_de_joven(joven.model_copy(update={"corregimiento": c}), vacantes, matriz, pesos)
+                         for c in lugares if c != joven.corregimiento}
+        titulos = {v.id: v.titulo for v in vacantes}
+        filas = []
+        for vid, d in sorted(base.items(), key=lambda par: (-par[1].total, par[0])):
+            variantes = []
+            for c, otros in en_otro_lugar.items():
+                d2 = otros.get(vid)
+                variantes.append(VarianteLugar(
+                    corregimiento=c, factible=d2 is not None,
+                    componentes=_componentes(d2) if d2 else None,
+                    habilidades_igual=(abs(d2.habilidades - d.habilidades) < 1e-9) if d2 else None))
+            filas.append(FilaContrafactual(vacante_id=vid, titulo=titulos[vid], original=_componentes(d),
+                                           variantes=variantes))
+        hallazgos = hallazgos_de_joven(joven, vacantes, matriz, pesos, lugares)
+        return DemostracionContrafactual(
+            joven_id=joven_id, corregimiento=joven.corregimiento,
+            veredicto="revisar" if hallazgos else "sin_sesgo", hallazgos=hallazgos,
+            identidad=("Nombre, género, edad y contacto no llegan al solver: viven aparte, en "
+                       "DatosPersonales. Por diseño, cambiarlos no puede mover el puntaje (es una "
+                       "garantía estructural, no una prueba de comportamiento)."),
+            campos_que_ve_el_solver=sorted(Joven.model_fields), filas=filas)
+
+    def tendencias(self, top: int = 5) -> Tendencias:
+        """Habilidades más pedidas por zona entre las vacantes publicadas (agente de Mercado)."""
+        publicadas = [v for v in self.almacen.listar(Vacante) if v.estado == EstadoVacante.publicada]
+        taxonomia = {h.codigo: h for h in self.almacen.listar(Habilidad)}
+        por_zona = {zona: [HabilidadPedida(codigo=c, nombre=taxonomia[c].nombre, vacantes=n) for c, n in lista]
+                    for zona, lista in tendencias_por_zona(publicadas, taxonomia, top).items()}
+        return Tendencias(por_zona=por_zona, vacantes_por_zona=vacantes_por_zona(publicadas),
+                          total_vacantes=len(publicadas),
+                          nota="Calculado sobre las vacantes publicadas en el sistema; con pocas "
+                               "vacantes es ilustrativo, no evidencia del mercado.")
 
     def casi_califica(self, joven_id: str) -> list[CasiCalifica]:
         nombres = {h.codigo: h.nombre for h in self.almacen.listar(Habilidad)}

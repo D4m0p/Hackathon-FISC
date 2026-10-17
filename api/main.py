@@ -17,7 +17,9 @@ from contrato.modelos import (
     Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Joven, PlanFormacion,
     Pesos, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
-from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion
+from orquestador import (
+    DemostracionContrafactual, ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion, Tendencias,
+)
 from agentes.perfil import ClienteLLM, cliente_desde_entorno
 from agentes.perfil.rutas import crear_router as rutas_perfil
 from orquestador.arranque import orquestador_desde_entorno
@@ -378,6 +380,17 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
                     ident: Identidad = Depends(requerida)) -> Asignacion:
         exigir_joven(ident, joven_id)
         return orq.reprogramar_entrevista(joven_id, vacante_id, cuerpo.motivo)
+
+    # ----- transparencia de los agentes -----
+    @app.get("/mercado/tendencias")
+    def tendencias(top: int = Query(default=5, ge=1, le=20)) -> Tendencias:
+        """Habilidades más pedidas por zona (agente de Mercado). Público: orienta a los jóvenes."""
+        return orq.tendencias(top)
+
+    @app.get("/auditoria/contrafactual/{joven_id}")
+    def contrafactual(joven_id: str, _: Identidad = Depends(solo_orientador)) -> DemostracionContrafactual:
+        """El mismo joven en cada corregimiento: solo cambian traslado y salario (Auditor)."""
+        return orq.demostrar_contrafactual(joven_id)
 
     # ----- pesos del puntaje -----
     @app.get("/pesos")
