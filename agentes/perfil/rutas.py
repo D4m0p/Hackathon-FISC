@@ -16,7 +16,7 @@ from typing import Literal
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from contrato.modelos import Agente, Habilidad, Traza
+from contrato.modelos import Agente, Habilidad, HabilidadNivel, Traza
 
 from .agente import ErrorDocumento, MAX_CARACTERES_CV, Perfil, Respuesta, ResultadoPerfil
 from .entrevista import MAX_PREGUNTAS, Pregunta
@@ -29,6 +29,17 @@ class CuerpoCV(BaseModel):
     contenido_base64: str | None = Field(default=None, max_length=6_000_000)
     tipo_mime: str | None = None          # para imagen: image/jpeg, image/png, image/webp
     texto: str | None = Field(default=None, max_length=MAX_CARACTERES_CV)
+
+
+class ResultadoCv(ResultadoPerfil):
+    # Solo para PDF o foto: el texto leído, para que la persona vea de dónde salió cada habilidad.
+    # Se devuelve a quien lo subió y no se guarda (la traza solo lleva conteos).
+    texto_leido: str | None = None
+
+
+class CuerpoDeclarar(BaseModel):
+    codigo: str = Field(min_length=1, max_length=60)
+    evidencia: str = Field(max_length=300)
 
 
 class CuerpoEntrevista(BaseModel):
@@ -69,7 +80,7 @@ def crear_router(orq, cliente: ClienteLLM | None = None, usar_entorno: bool = Tr
         return agente().preguntas()
 
     @router.post("/cv")
-    def desde_cv(cuerpo: CuerpoCV) -> ResultadoPerfil:
+    def desde_cv(cuerpo: CuerpoCV) -> ResultadoCv:
         perfil = agente()
         try:
             if cuerpo.tipo == "texto":
@@ -89,7 +100,21 @@ def crear_router(orq, cliente: ClienteLLM | None = None, usar_entorno: bool = Tr
             raise HTTPException(status_code=400, detail=str(e)) from None
         r = perfil.desde_cv(texto)
         trazar("extraer_cv", {"tipo": cuerpo.tipo, "caracteres": len(texto)}, r)
-        return r
+        leido = None if cuerpo.tipo == "texto" else texto[:MAX_CARACTERES_CV]
+        return ResultadoCv(**r.model_dump(), texto_leido=leido)
+
+    @router.post("/declarar")
+    def declarar(cuerpo: CuerpoDeclarar) -> HabilidadNivel:
+        try:
+            h = agente().declarar(cuerpo.codigo, cuerpo.evidencia)
+        except ErrorDocumento as e:
+            raise HTTPException(status_code=400, detail=str(e)) from None
+        orq.almacen.registrar_traza(Traza(
+            agente=Agente.perfil, accion="declarar_habilidad",
+            entrada={"codigo": cuerpo.codigo, "caracteres": len(cuerpo.evidencia)},
+            salida={"codigo": h.codigo, "nivel": h.nivel},
+            motivo="La persona la agregó a mano; queda en nivel básico porque no sale de un documento"))
+        return h
 
     @router.post("/entrevista")
     def desde_entrevista(cuerpo: CuerpoEntrevista) -> ResultadoPerfil:

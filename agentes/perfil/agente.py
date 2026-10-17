@@ -30,6 +30,9 @@ TIPOS_AUDIO = {"audio/webm": "webm", "audio/ogg": "ogg", "audio/opus": "ogg", "a
                "audio/mp3": "mp3", "audio/mp4": "m4a", "audio/m4a": "m4a", "audio/x-m4a": "m4a",
                "audio/aac": "m4a", "audio/wav": "wav", "audio/x-wav": "wav", "audio/wave": "wav"}
 MAX_BYTES_AUDIO = 5 * 1024 * 1024   # unos 2 minutos de nota de voz
+MIN_CARACTERES_DECLARADA = 10
+NIVEL_DECLARADA = 1                  # sin documento que lo respalde, queda como básico
+PREFIJO_DECLARADA = "Según la persona: "
 
 
 class ErrorDocumento(Exception):
@@ -167,6 +170,19 @@ class Perfil:
             parciales.append(self._extraer(resp.texto, set(p.codigos_posibles),
                                            nivel_max=NIVEL_MAX_INFORMAL))
         return combinar(*parciales) if parciales else ResultadoPerfil(habilidades=[], metodo="palabras_clave")
+
+    def declarar(self, codigo: str, evidencia: str) -> HabilidadNivel:
+        """Habilidad que la persona agrega a mano: solo de la taxonomía, con una frase de dónde
+        la hizo o aprendió, en nivel básico y marcada como dicha por la persona."""
+        if codigo not in self.taxonomia:
+            raise ErrorDocumento("Esa habilidad no está en la lista")
+        texto = " ".join(evidencia.split())
+        if len(texto) < MIN_CARACTERES_DECLARADA:
+            raise ErrorDocumento("Cuéntenos en una frase dónde lo hizo o lo aprendió")
+        if alertas_inyeccion(texto):
+            raise ErrorDocumento("Escriba solo dónde lo hizo o lo aprendió")
+        return HabilidadNivel(codigo=codigo, nivel=NIVEL_DECLARADA,
+                              evidencia=(PREFIJO_DECLARADA + texto)[:200])
 
     def _extraer(self, texto: str, permitidos: set[str], nivel_max: int) -> ResultadoPerfil:
         alertas = alertas_inyeccion(texto)
