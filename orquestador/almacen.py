@@ -78,6 +78,14 @@ class Almacen:
                 self._con.execute("PRAGMA synchronous=NORMAL")
             self._con.executescript(_ESQUEMA)
 
+    def responde(self) -> bool:
+        """La base contesta una consulta mínima (para /salud)."""
+        try:
+            with self._lock:
+                return self._con.execute("SELECT 1").fetchone() == (1,)
+        except sqlite3.Error:
+            return False
+
     # ---------- entidades ----------
     def guardar(self, obj: BaseModel) -> None:
         with self._lock, self._con:

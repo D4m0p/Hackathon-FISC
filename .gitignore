@@ -8,3 +8,5 @@ dist/
 *.sqlite3
 .DS_Store
 .hypothesis/
+*.db-wal
+*.db-shm

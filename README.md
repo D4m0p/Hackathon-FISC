@@ -110,7 +110,9 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 
 - **Los datos personales viven aparte.** `Joven` no tiene nombre, género ni edad; esos
   campos están en `DatosPersonales`. Los solvers reciben solo `Joven`, así que no pueden
-  usarlos aunque quisieran.
+  usarlos aunque quisieran. La empresa ve habilidades y niveles **sin la evidencia textual**
+  del CV, que puede traer nombre, cédula o teléfono (hay una prueba que lo verifica con un
+  CV real de ejemplo).
 - **El puntaje separa lo geográfico.** El corregimiento solo puede mover los componentes
   de traslado y salario neto; el de habilidades no depende del lugar. Así el Auditor puede
   distinguir una diferencia legítima (vive lejos) de un sesgo.
@@ -146,6 +148,15 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
   cursos de INADEH y tarifas de transporte, cada uno con su fuente y fecha de consulta.
 
 ## Instalación y ejecución
+
+**Demo con un solo comando** (carga los datos de demostración, levanta la API y la página, y
+Ctrl+C apaga todo):
+
+```bash
+scripts/demo.sh            # --sin-reiniciar conserva la base; --ayuda muestra las opciones
+```
+
+Paso a paso:
 
 ```bash
 git clone <url-del-repositorio> && cd <carpeta>
@@ -185,7 +196,7 @@ ver `.env.example`):
 | Variable | Para qué | Sin ella |
 |---|---|---|
 | `GROQ_API_KEY` | Extracción de CVs y ofertas | Mercado y Perfil no procesan texto libre |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID_DEMO` | Envío real del aviso de entrevista | El mensaje queda registrado en la base pero no se envía |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID_DEMO` | Envío real del aviso de entrevista. Un bot solo puede escribir a un chat numérico que ya le habló; si el envío al joven falla, el aviso va al chat de la demo indicando para quién era | El mensaje queda registrado en la base pero no se envía |
 | `CLAVE_ORIENTADOR` | Token del orientador fuera de la demo | Solo existe `demo-orientador` si se cargaron los datos de demo |
 | `RUTA_BASE_DATOS` | Archivo SQLite | Usa `datos_app.db` |
 | `ORIGENES_PERMITIDOS` | Orígenes del frontend (CORS) | `http://localhost:5173` |

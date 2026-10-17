@@ -76,6 +76,13 @@ class TarjetaCandidato(BaseModel):
     desglose: Desglose
 
 
+def _anonimo(joven: Joven) -> Joven:
+    """Para la empresa: habilidades y niveles, SIN la evidencia textual. La evidencia es una
+    frase del CV o de la entrevista y puede traer nombre, cédula o teléfono."""
+    return joven.model_copy(update={"habilidades": [h.model_copy(update={"evidencia": None})
+                                                    for h in joven.habilidades]})
+
+
 class Deslizamiento(BaseModel):
     actor: Literal["joven", "empresa"]
     joven_id: str
@@ -160,7 +167,10 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
     # ----- públicos -----
     @app.get("/salud")
     def salud():
-        return {"estado": "ok",
+        if not orq.almacen.responde():
+            return JSONResponse(status_code=503, content={"estado": "sin_base",
+                                                          "detail": "La base de datos no responde"})
+        return {"estado": "ok", "base": "ok",
                 "mercado": type(orq.mercado).__name__, "auditor": type(orq.auditor).__name__,
                 "perfil": type(cliente_llm).__name__ if cliente_llm else "palabras_clave",
                 "notificador": type(orq.notificador).__name__}
@@ -252,7 +262,7 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
     @app.get("/vacantes/{vacante_id}/tarjetas")
     def tarjetas_de_la_vacante(vacante_id: str, ident: Identidad = Depends(requerida)) -> list[TarjetaCandidato]:
         exigir_dueno_vacante(ident, vacante_id)
-        return [TarjetaCandidato(joven=j, desglose=d) for j, d in orq.tarjetas_vacante(vacante_id)]
+        return [TarjetaCandidato(joven=_anonimo(j), desglose=d) for j, d in orq.tarjetas_vacante(vacante_id)]
 
     @app.post("/vacantes/{vacante_id}/cerrar")
     def cerrar_vacante(vacante_id: str, cuerpo: Motivo, ident: Identidad = Depends(requerida)) -> ResultadoCierre:

@@ -109,3 +109,14 @@ def test_cors_permite_el_frontend_local(cliente):
     r = cliente.options("/salud", headers={"Origin": "http://localhost:5173",
                                            "Access-Control-Request-Method": "GET"})
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_salud_avisa_si_la_base_no_responde(cliente):
+    from orquestador import Almacen as _A
+    assert cliente.get("/salud").json()["base"] == "ok"
+    orq = Orquestador(_A())
+    orq.almacen._con.close()                       # base caída
+    from api.main import crear_app as _crear
+    from fastapi.testclient import TestClient as _TC
+    r = _TC(_crear(orq)).get("/salud")
+    assert r.status_code == 503 and r.json()["estado"] == "sin_base"

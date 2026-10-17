@@ -87,8 +87,9 @@ def main() -> None:
     for clave, valor in resumen.items():
         print(f"  {clave}: {valor}")
     print("Tokens de demo (Authorization: Bearer <token>):")
-    print(f"  orientador: {tokens['orientador']} · jóvenes: demo-j01 … demo-j10 · "
-          f"empresas: demo-<empresa_id> (p. ej. demo-e_super)")
+    ids = sorted(r["joven"]["id"] for r in datos["jovenes"])
+    print(f"  orientador: {tokens['orientador']} · jóvenes: demo-{ids[0]} … demo-{ids[-1]} "
+          f"(demo-j11 = Lucía, para deslizar en vivo) · empresas: demo-<empresa_id> (p. ej. demo-e_super)")
 
 
 if __name__ == "__main__":
