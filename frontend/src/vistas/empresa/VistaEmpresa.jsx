@@ -1,17 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
-import { corregimiento, dinero } from "../../nombres.js";
+import { TURNOS, corregimiento, dinero } from "../../nombres.js";
 import DetalleVacante from "./DetalleVacante.jsx";
 import FormVacante from "./FormVacante.jsx";
 import Hallazgos from "./Hallazgos.jsx";
 
 const ESTADOS = { publicada: "Publicada", bloqueada: "Bloqueada", cerrada: "Cerrada", borrador: "Borrador" };
+const FALTANTES = {
+  corregimiento: "dónde queda el trabajo", salario_mensual: "el salario mensual", turnos: "el horario (mañana, tarde…)",
+  titulo: "el nombre del puesto", habilidades_requeridas: "qué debe saber hacer",
+};
 
 export default function VistaEmpresa({ empresaId }) {
   // pantalla: lista | nueva | texto | detalle | editar | resultado
   const [pantalla, setPantalla] = useState({ tipo: "lista" });
   const [vacantes, setVacantes] = useState(null);
+  const [nombres, setNombres] = useState({});
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    api.habilidades().then((hs) => setNombres(Object.fromEntries(hs.map((h) => [h.codigo, h.nombre])))).catch(() => {});
+  }, []);
 
   const cargar = useCallback(() => {
     api.vacantes()
@@ -41,6 +50,13 @@ export default function VistaEmpresa({ empresaId }) {
     return (
       <section className="panel">
         <h2>{vacante.titulo}</h2>
+        <p className="suave">
+          {corregimiento(vacante.corregimiento)} · {[...vacante.turnos].map((t) => TURNOS[t]).join(", ")} ·{" "}
+          {dinero(vacante.salario_mensual)} al mes · {vacante.cupos} cupo(s)
+        </p>
+        {vacante.habilidades_requeridas.length > 0 && (
+          <p>Pide: {vacante.habilidades_requeridas.map((r) => nombres[r.codigo] || r.codigo).join(", ")}</p>
+        )}
         <Hallazgos auditoria={auditoria} />
         <div className="acciones">
           <button className="enlace" onClick={volver}>Ir a mis vacantes</button>
@@ -102,10 +118,12 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
     try {
       onPublicada(await api.publicarOferta(texto.trim(), empresaId));
     } catch (err) {
-      setError({ mensaje: err.message, sinMercado: err.estado === 501 });
+      setError({ mensaje: err.message, sinMercado: err.estado === 501, faltantes: err.cuerpo?.faltantes });
       setEnviando(false);
     }
   }
+
+  const faltan = error?.faltantes?.map((c) => FALTANTES[c] || c.replace(/_/g, " "));
 
   return (
     <form className="panel" onSubmit={enviar}>
@@ -113,14 +131,20 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
       <p className="suave">Pegue la oferta como la publicaría en redes o en un volante. El sistema saca el puesto, el horario, el salario y las habilidades.</p>
       <textarea rows="8" maxLength="5000" value={texto} onChange={(e) => setTexto(e.target.value)}
                 placeholder="Ej.: Se busca cajero/a para supermercado en Arraiján, turno de mañana, B/. 650 al mes…" />
-      {error && (
+      {error && (faltan?.length ? (
+        <div className="aviso alerta">
+          <p><b>A la oferta le falta información para publicarla:</b> {faltan.join(", ")}.</p>
+          <p>Agréguela al texto y vuelva a publicar, o complete el formulario.</p>
+          <button type="button" className="boton secundario" onClick={() => onFormulario(texto)}>Completar en el formulario</button>
+        </div>
+      ) : (
         <div className="error">
           {error.sinMercado ? "La lectura automática de ofertas todavía no está disponible." : error.mensaje}
           {error.sinMercado && (
             <p><button type="button" className="boton secundario" onClick={() => onFormulario(texto)}>Usar el formulario con este texto</button></p>
           )}
         </div>
-      )}
+      ))}
       <div className="acciones">
         <button type="button" className="enlace" onClick={onCancelar}>Cancelar</button>
         <button className="boton" disabled={enviando}>{enviando ? "Leyendo…" : "Publicar"}</button>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api.js";
+import { api, nuevoId } from "../../api.js";
 import { NIVELES, TURNOS, corregimiento } from "../../nombres.js";
 import Entrevista from "./Entrevista.jsx";
 import SubirCv from "./SubirCv.jsx";
@@ -111,7 +111,7 @@ function DatosJoven({ habilidades, onVolver, onRegistrado }) {
     if (!f.disponibilidad.length) return setError("Marque al menos un horario disponible.");
     setError("");
     setEnviando(true);
-    const id = "j-" + crypto.randomUUID().slice(0, 8);
+    const id = nuevoId("j");
     const joven = {
       id, corregimiento: f.corregimiento, disponibilidad: f.disponibilidad,
       presupuesto_transporte_semanal: Number(f.presupuesto), salario_minimo: Number(f.salario),

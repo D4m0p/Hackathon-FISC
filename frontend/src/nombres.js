@@ -21,6 +21,11 @@ export function dinero(n) {
 export const NIVELES = { 1: "Básico", 2: "Con práctica", 3: "Avanzado" };
 
 // Reemplaza códigos de habilidad dentro de un texto ("Tiene manejo_caja") por su nombre.
+// Los códigos de una sola palabra ("ventas") solo cuando aparecen como habilidad, para no
+// tocar títulos como «Asistente de ventas» o «Técnicas de ventas».
 export function conNombres(texto, habilidades) {
-  return texto.replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (c) => habilidades[c] || c);
+  return texto.split(/(«[^»]*»)/).map((parte) => (parte.startsWith("«") ? parte : parte
+    .replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (c) => habilidades[c] || c)
+    .replace(/(^|Tiene |obligatoria |: |, )([a-z]+)\b/g, (m, antes, c) => (habilidades[c] ? antes + habilidades[c] : m))
+  )).join("");
 }

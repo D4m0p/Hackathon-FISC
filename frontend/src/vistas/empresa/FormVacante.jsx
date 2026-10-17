@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api.js";
+import { api, nuevoId } from "../../api.js";
 import { TURNOS, corregimiento } from "../../nombres.js";
 
 const VACIA = {
@@ -39,7 +39,7 @@ export default function FormVacante({ empresaId, inicial, onPublicada, onCancela
     setError("");
     setEnviando(true);
     const vacante = {
-      id: inicial?.id || "v-" + crypto.randomUUID().slice(0, 8),
+      id: inicial?.id || nuevoId("v"),
       empresa_id: empresaId,
       titulo: v.titulo.trim(),
       texto_original: v.texto_original.trim() || null,

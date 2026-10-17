@@ -14,10 +14,17 @@ export function guardarToken(token) {
 }
 
 export class ErrorApi extends Error {
-  constructor(estado, mensaje) {
+  constructor(estado, mensaje, cuerpo = null) {
     super(mensaje);
     this.estado = estado;
+    this.cuerpo = cuerpo;   // p. ej. {detail, faltantes} cuando a una oferta le faltan datos
   }
+}
+
+// Id corto para registros nuevos. randomUUID solo existe en https o localhost.
+export function nuevoId(prefijo) {
+  const azar = globalThis.crypto?.randomUUID?.().slice(0, 8) || Math.random().toString(36).slice(2, 10);
+  return `${prefijo}-${azar}`;
 }
 
 function mensajeDeError(estado, cuerpo) {
@@ -44,7 +51,7 @@ async function pedir(metodo, ruta, cuerpo, token = leerToken()) {
   }
   if (r.status === 204) return null;
   const datos = await r.json().catch(() => null);
-  if (!r.ok) throw new ErrorApi(r.status, mensajeDeError(r.status, datos));
+  if (!r.ok) throw new ErrorApi(r.status, mensajeDeError(r.status, datos), datos);
   return datos;
 }
 
@@ -88,6 +95,7 @@ export const api = {
   vacantesEstado: (estado) => pedir("GET", `/vacantes?estado=${estado}`),
   publicarBloqueada: (vacante_id, motivo) => pedir("POST", `/vacantes/${vacante_id}/publicar-bloqueada`, { motivo }),
   jovenes: () => pedir("GET", "/jovenes"),
+  planes: () => pedir("GET", "/planes"),
   trazas: (agente) => pedir("GET", `/trazas?limite=300${agente ? `&agente=${agente}` : ""}`),
   mensajes: () => pedir("GET", "/mensajes"),
   pesos: () => pedir("GET", "/pesos"),

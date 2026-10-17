@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, ErrorApi } from "../../api.js";
+import { api } from "../../api.js";
 import { conNombres, corregimiento, dinero } from "../../nombres.js";
 
 // Jóvenes que no tienen match viable y la ruta de cursos que calculó el agente de Formación.
@@ -8,10 +8,10 @@ export default function SinMatch({ cat }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.jovenes().then((js) => Promise.all(js.map((j) =>
-      api.plan(j.id).then((p) => ({ joven: j, plan: p }))
-        .catch((e) => (e instanceof ErrorApi && e.estado === 404 ? null : Promise.reject(e))),
-    ))).then((rs) => setPlanes(rs.filter(Boolean))).catch((e) => setError(e.message));
+    Promise.all([api.planes(), api.jovenes()]).then(([ps, js]) => {
+      const porId = Object.fromEntries(js.map((j) => [j.id, j]));
+      setPlanes(ps.map((p) => ({ joven: porId[p.joven_id] || { id: p.joven_id, corregimiento: "" }, plan: p })));
+    }).catch((e) => setError(e.message));
   }, []);
 
   if (error) return <p className="error">{error}</p>;
