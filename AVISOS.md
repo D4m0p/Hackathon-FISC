@@ -18,6 +18,27 @@ foto sale con su animación en el aviso de «¡Interés mutuo!» y en «En proce
 
 ---
 
+## Para A (Damo) y C (Diego) — 17/10/2026 — de B: ubicaciones que faltan y reinicio de la demo
+
+Pedido del equipo. Cambios (revísenlos y cambien lo que quieran):
+- **A, `agentes/matching/traslados.py`:** si un viaje no está en la tabla pero los dos
+  corregimientos tienen punto en `datos/corregimientos.csv`, `MatrizTraslados` lo estima: distancia
+  en línea recta × ritmo (min/km) de los viajes de la tabla, percentil 75, y tarifa del corredor
+  MiBus (0,75, la de `construir_transporte.py`). Hoy da 4,14 min/km. `es_estimado()` y el motivo
+  dice "estimado por distancia". Sin coordenadas no estima (y nunca `san_miguelito`). El
+  orquestador le pasa `coordenadas_osm()`; las pruebas y los evals que crean la matriz sin
+  coordenadas siguen igual. En la demo no cambia nada (13 pares viables con y sin estimación).
+- **A, `api/main.py`:** `validar_ubicacion()` en `POST /vacantes`, `/cursos` y `/jovenes`: un
+  corregimiento que no está en traslados ni en el CSV da 400 con 3 sugerencias (difflib).
+  `POST /demo/reiniciar` (solo orientador; `PERMITIR_REINICIAR_DEMO=0` lo apaga) usa
+  `Almacen.vaciar()` (nuevo) y `scripts/semilla_demo.cargar` con el matching.
+- **C:** su criterio de "no inventar" se mantiene para lugares sin coordenadas; para los que sí
+  tienen, la estimación usa solo datos del proyecto (su tabla y la tarifa oficial). Si quiere,
+  menciónelo en `FUENTES_TRANSPORTE.md` / metodología.
+- Pruebas: `tests/test_ubicaciones.py` (7). En total, 487 pasan.
+
+---
+
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
 
 Por la hora del tag, B hizo estos cambios en su carpeta; revíselos y cambie lo que quiera.

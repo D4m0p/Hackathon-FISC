@@ -143,6 +143,9 @@ cd frontend && npm install && npm run dev
   - `GET /vacantes/{id}/tarjetas` (candidatos SIN datos personales)
   - `POST /deslizar` `{actor: "joven"|"empresa", joven_id, vacante_id, le_interesa}` → `{interes_mutuo}`
   - `POST /matching` · `GET /asignaciones?estado=pendiente|aprobada|rechazada`
+  - `POST /demo/reiniciar` (orientador) → vuelve a los datos de demostración. Un corregimiento
+    desconocido en `POST /vacantes`, `/cursos` o `/jovenes` da 400 con sugerencias; un viaje que
+    falta en la tabla se estima por distancia con las coordenadas de OpenStreetMap.
   - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
   - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
   - `GET /planes` → todos los planes de formación de una vez (orientador; para «Sin match»).

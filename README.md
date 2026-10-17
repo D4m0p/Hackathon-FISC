@@ -172,6 +172,18 @@ El mapa ubica cada corregimiento con las coordenadas de `datos/corregimientos.cs
 son distritos y no tienen un punto único, se dibujan aproximados y con borde punteado; la costa y
 el Canal son trazos simplificados. Los tiempos y costos de viaje salen de la tabla de traslados.
 
+**Ubicaciones que faltan.** Si un viaje no está en la tabla pero los dos corregimientos tienen su
+punto de OpenStreetMap, el Matching lo **estima por distancia**: distancia en línea recta por el
+ritmo (minutos por km) de los viajes que sí están en la tabla, en su percentil 75 (conservador), y
+la tarifa oficial del corredor de MiBus. Queda marcado en los motivos como "estimado por
+distancia"; sin coordenadas con fuente no se estima nada. Un lugar que no conocemos no se acepta
+en silencio: `POST /vacantes`, `POST /cursos` y `POST /jovenes` responden 400 y sugieren los
+corregimientos de nombre más parecido, y el mapa lista aparte cualquier lugar sin punto.
+
+**Reiniciar la simulación:** el orientador tiene el botón "↺ Reiniciar simulación" (arriba a la
+derecha), que vuelve a los datos de demostración (`POST /demo/reiniciar`; se desactiva con
+`PERMITIR_REINICIAR_DEMO=0`).
+
 ## Fuentes de datos
 
 - **Datos de demostración** (`scripts/demo/datos_demo.json`): **ilustrativos**. Tiempos y
@@ -260,6 +272,7 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `POST` | `/perfil/transcribir` | Nota de voz o foto (CV o volante) → texto para que la persona lo revise; no decide nada (público) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `PUT` / `DELETE` | `/jovenes/{id}/foto` | El joven sube (JPG, PNG o WebP, hasta 2 MB, validada por su contenido) o quita su foto |
+| `POST` | `/demo/reiniciar` | Borra todo y vuelve a cargar los datos de demostración con su matching (orientador; `PERMITIR_REINICIAR_DEMO=0` lo desactiva) |
 | `GET` | `/jovenes/{id}/foto` | La ven el propio joven, el orientador y **solo la empresa que ya aceptó a esa persona con interés mutuo** (o con entrevista aprobada); si el orientador rechaza o se cancela, deja de verla; para cualquier otro, 404 |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
