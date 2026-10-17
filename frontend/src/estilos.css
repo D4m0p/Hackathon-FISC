@@ -238,3 +238,37 @@ legend { padding: 0 6px; font-weight: 600; }
 .camino .hecho .camino-punto { background: var(--primario); color: var(--sobre-primario); }
 .camino .actual .camino-punto { background: var(--superficie); color: var(--primario); border: 3px solid var(--primario); }
 .camino .actual { color: var(--texto); font-weight: 600; }
+
+/* Auditoría contrafactual (orientador) */
+.pestanas { overflow-x: auto; scrollbar-width: none; }
+.pestanas::-webkit-scrollbar { display: none; }
+.selector-joven select { max-width: 320px; }
+.veredicto { display: grid; gap: 4px; border-radius: var(--radio); padding: 14px 16px; margin: 10px 0; }
+.veredicto b { font-size: 1.3rem; }
+.veredicto.sin_sesgo { background: var(--primario-claro); border: 2px solid var(--primario); }
+.veredicto.sin_sesgo b { color: var(--primario); }
+.veredicto.revisar { background: var(--aviso); border: 2px solid var(--no); }
+.veredicto.revisar b { color: var(--no); }
+.ve-no-ve h4:first-child { margin-top: 0; }
+.chip.ve { background: var(--primario-claro); border-color: transparent; color: var(--primario); }
+.chip.no-ve { text-decoration: line-through; opacity: .7; }
+.tabla-envoltura { overflow-x: auto; }
+.tabla-contrafactual { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tabla-contrafactual th, .tabla-contrafactual td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--borde); }
+.tabla-contrafactual th[scope=row], .tabla-contrafactual thead th:first-child { text-align: left; }
+.tabla-contrafactual thead th { color: var(--suave); font-weight: 600; font-size: .8rem; }
+.tabla-contrafactual tr.hogar { background: var(--primario-claro); }
+.tabla-contrafactual td.igual { color: var(--primario); font-weight: 700; }
+.tabla-contrafactual td.distinto { color: var(--no); font-weight: 700; }
+.tabla-contrafactual tr.no-factible td { text-align: left; font-style: italic; }
+
+/* Lo que piden las empresas cerca (joven) */
+.piden h3 { font-size: 1.05rem; }
+.lista-piden { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+.lista-piden li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 10px; }
+.lista-piden li.tiene b { color: var(--primario); }
+.lista-piden li.falta-hab b { color: var(--no); }
+@media (max-width: 420px) { .lista-piden li { grid-template-columns: 1fr auto; } .lista-piden li .suave { display: none; } }
+.ve-no-ve .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.pestanas button { flex: 1 0 auto; padding-left: 10px; padding-right: 10px; }
+@media (min-width: 421px) { .pestanas { flex-wrap: wrap; overflow-x: visible; } }

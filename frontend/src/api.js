@@ -100,6 +100,8 @@ export const api = {
   planes: () => pedir("GET", "/planes"),
   trazas: (agente) => pedir("GET", `/trazas?limite=300${agente ? `&agente=${agente}` : ""}`),
   mensajes: () => pedir("GET", "/mensajes"),
+  contrafactual: (joven_id) => pedir("GET", `/auditoria/contrafactual/${joven_id}`),
+  tendencias: (top = 5) => pedir("GET", `/mercado/tendencias?top=${top}`),
   pesos: () => pedir("GET", "/pesos"),
   simularPesos: (pesos) => pedir("POST", "/pesos/simular", pesos),
   cambiarPesos: (pesos, motivo) => pedir("PUT", "/pesos", { pesos, motivo }),

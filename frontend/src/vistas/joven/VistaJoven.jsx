@@ -149,13 +149,42 @@ function TarjetaVacante({ t, nombres }) {
   );
 }
 
+// Lo que más piden las empresas en su corregimiento, marcando lo que ya tiene.
+function LoQuePiden({ jovenId, nombres }) {
+  const [datos, setDatos] = useState(null);
+  useEffect(() => {
+    Promise.all([api.joven(jovenId), api.tendencias(5)])
+      .then(([j, t]) => setDatos({ joven: j, piden: t.por_zona[j.corregimiento] || [], nota: t.nota }))
+      .catch(() => setDatos(null));
+  }, [jovenId]);
+  if (!datos || !datos.piden.length) return null;
+  const tiene = new Set(datos.joven.habilidades.map((h) => h.codigo));
+  return (
+    <section className="panel piden">
+      <h3>Lo que más piden las empresas cerca de usted
+        <Ayuda>Cuenta cuántas vacantes publicadas en {corregimiento(datos.joven.corregimiento)} piden cada
+        habilidad. {datos.nota}</Ayuda></h3>
+      <ul className="lista-piden">
+        {datos.piden.map((p) => (
+          <li key={p.codigo} className={tiene.has(p.codigo) ? "tiene" : "falta-hab"}>
+            <span>{nombres[p.codigo] || p.nombre}</span>
+            <span className="suave">{p.vacantes} vacante(s)</span>
+            <b>{tiene.has(p.codigo) ? "✓ Usted ya la tiene" : "Le falta"}</b>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function CasiCalifica({ jovenId, cursos, nombres }) {
   const { datos, error, cargando } = useCarga(() => api.casiCalifica(jovenId), [jovenId]);
   if (cargando) return <p className="centro">Cargando…</p>;
   if (error) return <p className="error">{error}</p>;
-  if (!datos.length) return <p className="vacio">No hay vacantes a las que le falte una sola cosa.</p>;
+  if (!datos.length) return <><LoQuePiden jovenId={jovenId} nombres={nombres} /><p className="vacio">No hay vacantes a las que le falte una sola cosa.</p></>;
   return (
     <>
+      <LoQuePiden jovenId={jovenId} nombres={nombres} />
       <p className="suave intro">Vacantes para las que le falta <b>una sola cosa</b>. Si es una habilidad, le decimos qué curso gratuito la cubre.</p>
       <ul className="lista">
         {datos.map((c) => (
