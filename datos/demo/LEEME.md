@@ -80,8 +80,11 @@ con incorporarlo al flujo de siembra que ya existe.
 - El conversor **no** busca datos adicionales en la web: solo transforma lo que ya
   está en los CSV. Si una fuente publicara un corregimiento o turnos concretos,
   habría que ampliar el CSV y el mapeo correspondiente.
-- `exclusiones.json` incluye el `sha256` de cada CSV de entrada en
-  `vacantes_demo.json`/`cursos_demo.json`, para saber exactamente qué versión se
-  convirtió.
+- `vacantes_demo.json` y `cursos_demo.json` guardan en `origen.sha256` la huella
+  del CSV de entrada, para saber exactamente qué versión se convirtió. Es un dato
+  de **trazabilidad**: ninguna prueba lo valida (ningún test lo lee) y una huella
+  desfasada **no** hace fallar la suite; solo deja de identificar la versión
+  convertida. Por eso, si cambia un CSV de origen hay que regenerar esta carpeta
+  (con `normalizar_demo.py`) para que la huella vuelva a corresponder.
 - Los originales siguen siendo la referencia: `datos/ofertas_empleo.csv`,
   `datos/cursos.csv`, `datos/FUENTES_OFERTAS.md` y `datos/FUENTES.md`.

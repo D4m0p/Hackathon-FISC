@@ -4,7 +4,7 @@
  "fecha_datos": "2026-10-16",
  "origen": {
   "archivo": "datos/cursos.csv",
-  "sha256": "7ea3d0c73d3e08810fc7d0600ac3046aeda23774bbcccd06523ff3e310db15b9"
+  "sha256": "89ebdf71336ae381d201b7e8188f5f53d6105fabbf7652b2d436a72c04bc9c35"
  },
  "total_origen": 28,
  "total_convertidos": 0,

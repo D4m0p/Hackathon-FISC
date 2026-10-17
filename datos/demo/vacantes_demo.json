@@ -4,7 +4,7 @@
  "fecha_datos": "2026-10-16",
  "origen": {
   "archivo": "datos/ofertas_empleo.csv",
-  "sha256": "f7df95330e204b2e3fce16d4e9344b391a56c22cd6071951441bb7a1de09a5e7"
+  "sha256": "941c33721ef4b0962f48fa17d5950d56128d79df43fddc7396f0155acb21742f"
  },
  "total_origen": 30,
  "total_convertidos": 0,
