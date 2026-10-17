@@ -5,6 +5,7 @@ export const DEMO = [
   { token: "demo-j11", texto: "Joven (Lucía)" },
   { token: "demo-e_tienda", texto: "Empresa (Tienda)" },
   { token: "demo-e_hotel", texto: "Empresa (Hotel)" },
+  { token: "demo-inadeh", texto: "Centro (INADEH)" },
   { token: "demo-orientador", texto: "Orientador" },
   { token: "demo-j07", texto: "Joven sin match" },
 ];

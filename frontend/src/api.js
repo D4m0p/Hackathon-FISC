@@ -107,6 +107,9 @@ export const api = {
   demandaCentro: (centro) => pedir("GET", `/centros/${encodeURIComponent(centro)}/demanda`),
   reservarCupo: (curso_id, joven_id, motivo) => pedir("POST", `/cursos/${curso_id}/reservas`, { joven_id, motivo }),
 
+  impacto: () => pedir("GET", "/impacto"),
+  impactoJoven: (joven_id) => pedir("GET", `/jovenes/${joven_id}/impacto`),
+
   contrafactual: (joven_id) => pedir("GET", `/auditoria/contrafactual/${joven_id}`),
   tendencias: (top = 5) => pedir("GET", `/mercado/tendencias?top=${top}`),
   pesos: () => pedir("GET", "/pesos"),

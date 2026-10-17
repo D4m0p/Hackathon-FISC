@@ -83,7 +83,7 @@ function Vacantes({ jovenId, nombres, onGuia }) {
         <span className="suave">{restantes.length ? `${restantes.length} vacante(s) para usted` : ""}</span>
         <button className="enlace" onClick={onGuia}>¿Cómo funciona?</button>
       </div>
-      <Ahorro jovenId={jovenId} disponibles={datos.length} />
+      <Ahorro jovenId={jovenId} />
       {aviso?.tipo === "mutuo" && (
         <div className="mutuo" role="status">
           <b>¡A la empresa también le interesa!</b> «{aviso.titulo}» quiere conocerle.
@@ -123,42 +123,29 @@ const MOTIVOS_AHORRO = {
   sin_datos: (n) => `de ${n} no tenemos datos de cómo llegar`,
 };
 
-function Ahorro({ jovenId, disponibles }) {
+function Ahorro({ jovenId }) {
   const [datos, setDatos] = useState(null);
-  useEffect(() => {
-    Promise.all([api.vacantes(), api.casiCalifica(jovenId), api.historia(jovenId)])
-      .then(([pub, casi, h]) => setDatos({ pub, casi, h })).catch(() => setDatos(null));
-  }, [jovenId]);
+  useEffect(() => { api.impactoJoven(jovenId).then(setDatos).catch(() => setDatos(null)); }, [jovenId]);
   if (!datos) return null;
-
-  const publicadas = new Set(datos.pub.map((v) => v.id));
-  const deslizadas = new Set(datos.h.deslizamientos.filter((d) => d.actor === "joven" && publicadas.has(d.vacante_id)).map((d) => d.vacante_id));
-  const sirven = disponibles + deslizadas.size;
-  const otras = publicadas.size - sirven;
+  const otras = datos.publicadas - datos.viables;
   if (otras <= 0) return null;
-
-  const porMotivo = {};
-  for (const c of datos.casi) porMotivo[c.incumplimiento.tipo] = (porMotivo[c.incumplimiento.tipo] || 0) + 1;
-  const variasCosas = otras - datos.casi.length;
-  const lejos = datos.casi.filter((c) => c.incumplimiento.tipo === "traslado")
-    .map((c) => Number(c.incumplimiento.detalle.match(/(\d+) min/)?.[1])).filter(Boolean);
-
+  const motivos = Object.keys(MOTIVOS_AHORRO).filter((k) => datos.descartes[k] > 0);
   return (
     <details className="ahorro">
       <summary>
-        De <b>{publicadas.size}</b> vacantes publicadas, <b>{sirven} le sirven</b>.
-        Le ahorramos <b>{otras}</b> postulaciones que no le convenían.
+        {datos.viables > 0 ? (
+          <>De <b>{datos.publicadas}</b> vacantes publicadas, <b>{datos.viables} le sirven</b>.
+            Le ahorramos <b>{otras}</b> postulaciones que no le convenían.</>
+        ) : (
+          <>Ninguna de las <b>{datos.publicadas}</b> vacantes publicadas le sirve todavía.
+            Mire «Le falta poco» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
+        )}
       </summary>
       <ul>
-        {Object.entries(porMotivo).sort(([a], [b]) => Object.keys(MOTIVOS_AHORRO).indexOf(a) - Object.keys(MOTIVOS_AHORRO).indexOf(b)).map(([tipo, n]) => (
-          <li key={tipo}>
-            {(MOTIVOS_AHORRO[tipo] || ((k) => `${k} por otra razón`))(n)}
-            {tipo === "traslado" && lejos.length > 0 && ` (hasta ${Math.max(...lejos)} min de ida)`}
-          </li>
-        ))}
-        {variasCosas > 0 && <li>{variasCosas} no encaja{variasCosas > 1 ? "n" : ""} con su perfil en varias cosas a la vez</li>}
+        {motivos.map((k) => <li key={k}>{MOTIVOS_AHORRO[k](datos.descartes[k])}</li>)}
       </ul>
-      <p className="nota">Un portal común le mostraría las {publicadas.size}. Aquí solo le mostramos las que le quedan cerca, en su horario y le dejan dinero después del pasaje.</p>
+      <p className="nota">Una vacante puede fallar en más de una cosa. Un portal común le mostraría las {datos.publicadas};
+        aquí solo le mostramos las que le quedan cerca, en su horario y le dejan dinero después del pasaje.</p>
     </details>
   );
 }
