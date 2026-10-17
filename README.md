@@ -163,9 +163,11 @@ arriba cambia de rol en un clic durante la demo y el botón ☀️/🌙 elige te
   aprobar o rechazar, ofertas bloqueadas, jóvenes sin opción, prioridades del puntaje con
   simulación, **auditoría contrafactual** e historial de decisiones.
 
-El mapa es **esquemático**: usa posiciones aproximadas de los corregimientos
-(`frontend/src/geo.js`) y así lo indica en pantalla; los tiempos y costos de viaje salen de la
-tabla de traslados.
+El mapa ubica cada corregimiento con las coordenadas de `datos/corregimientos.csv`
+(OpenStreetMap, © colaboradores de OpenStreetMap, con fuente por fila; ver
+`datos/FUENTES_CORREGIMIENTOS.md`). La Chorrera y San Miguelito, que en los datos de demostración
+son distritos y no tienen un punto único, se dibujan aproximados y con borde punteado; la costa y
+el Canal son trazos simplificados. Los tiempos y costos de viaje salen de la tabla de traslados.
 
 ## Fuentes de datos
 
