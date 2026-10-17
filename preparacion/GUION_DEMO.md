@@ -10,8 +10,8 @@ centro de formación, auditoría y reinicio).
 1. Levantar todo: `scripts/demo.sh` (o API en 8010 y Vite en 5173) y abrir `http://localhost:5173`.
 2. Entrar como **Orientador** → **↺ Reiniciar simulación** (arriba a la derecha) → «Sí, reiniciar».
    Deja la demo en su estado inicial; repetirlo entre ensayos.
-3. Entrar como **Joven (Lucía)** → «Mi proceso» → **Subir mi foto** (cualquier foto). Se usa en el
-   bloque 5. (El reinicio borra las fotos: subirla después de reiniciar.)
+3. Lucía ya tiene un **retrato ilustrado de ejemplo** (viene en la semilla y vuelve con el
+   reinicio): es la foto que aparece en el bloque 5. Las empresas tienen logos ilustrados.
 4. Tema claro, ventana ancha (o el teléfono con la app instalada) y el micrófono permitido en el
    navegador. Tener copiado el texto de la oferta del bloque 2.
 5. Ir a la pantalla de entrada (Salir). Los accesos de demostración están abajo.
@@ -42,7 +42,7 @@ centro de formación, auditoría y reinicio).
   sigue funcionando sin el modelo".
 - **El micrófono no responde:** escribir la misma frase en el cuadro de la pregunta.
 - **Algo quedó en un estado raro:** Orientador → **↺ Reiniciar simulación** (vuelve al inicio en
-  segundos) y subir otra vez la foto de Lucía.
+  segundos, con la foto de Lucía incluida).
 - **El mensaje de Telegram** queda "registrado" mientras no haya bot configurado: mostrarlo en
   pantalla, no prometer que suena el teléfono.
 

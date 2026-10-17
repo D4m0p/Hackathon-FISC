@@ -18,6 +18,16 @@ foto sale con su animación en el aviso de «¡Interés mutuo!» y en «En proce
 
 ---
 
+## Para A (Damo) — 17/10/2026 — de B: foto de ejemplo de Lucía en la semilla y logos de empresa
+
+- `scripts/semilla_demo.py`: `cargar()` ahora guarda las fotos de `scripts/demo/fotos/<joven_id>.png`
+  (hoy `j11.png`, un retrato ILUSTRADO, no una persona real). Así vale también para
+  `POST /demo/reiniciar`. La empresa la sigue viendo solo con interés mutuo.
+- Logos ilustrados de las 8 empresas en `frontend/public/logos/<empresa_id>.svg`; `LogoEmpresa`
+  los usa y vuelve a las iniciales si una empresa no tiene logo.
+
+---
+
 ## Para A (Damo) y C (Diego) — 17/10/2026 — de B: ubicaciones que faltan y reinicio de la demo
 
 Pedido del equipo. Cambios (revísenlos y cambien lo que quieran):
