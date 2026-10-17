@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
+import BarrasH from "../../componentes/BarrasH.jsx";
 import Contador from "../../componentes/Contador.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import LogoEmpresa from "../../componentes/LogoEmpresa.jsx";
+import MapaPanama from "../../componentes/MapaPanama.jsx";
 import { TURNOS, corregimiento, dinero, nombreEmpresa } from "../../nombres.js";
 import DetalleVacante from "./DetalleVacante.jsx";
 import FormVacante from "./FormVacante.jsx";
@@ -39,6 +41,20 @@ export default function VistaEmpresa({ empresaId }) {
       .catch((e) => setError(e.message));
   }, [empresaId]);
   useEffect(cargar, [cargar]);
+
+  // Candidatos por vacante publicada, asignaciones y tendencias: se piden una sola vez y se reparten.
+  const [datos, setDatos] = useState(null);
+  useEffect(() => {
+    if (!vacantes) return;
+    const publicadas = vacantes.filter((v) => v.estado === "publicada");
+    Promise.all([
+      Promise.all(publicadas.map((v) => api.candidatos(v.id).catch(() => []))),
+      api.asignaciones().catch(() => []),
+      api.tendencias(5).catch(() => null),
+    ]).then(([listas, asig, tend]) => setDatos({
+      listas: Object.fromEntries(publicadas.map((v, i) => [v.id, listas[i]])), asig, tend,
+    }));
+  }, [vacantes]);
   useEffect(() => { window.scrollTo(0, 0); }, [pantalla]);
 
   function publicada(resultado) {
@@ -95,7 +111,8 @@ export default function VistaEmpresa({ empresaId }) {
         <span className="cabeza-vacante"><LogoEmpresa empresaId={empresaId} tamano={36} /><b>{nombreEmpresa(empresaId)}</b></span>
         <button className="enlace" onClick={() => setGuia(true)}>¿Cómo funciona?</button>
       </div>
-      <ResumenEmpresa vacantes={vacantes} />
+      <ResumenEmpresa vacantes={vacantes} datos={datos} />
+      <TableroEmpresa vacantes={vacantes} datos={datos} nombres={nombres} />
       <div className="opciones">
         <button className="opcion" onClick={() => setPantalla({ tipo: "nueva" })}>
           <b>Publicar vacante</b><span>Con un formulario</span>
@@ -107,7 +124,9 @@ export default function VistaEmpresa({ empresaId }) {
       <h4>Mis vacantes</h4>
       {vacantes.length === 0 && <p className="vacio">Todavía no tiene vacantes.</p>}
       <ul className="lista">
-        {[...vacantes].sort((a, b) => orden[a.estado] - orden[b.estado]).map((v) => (
+        {[...vacantes].sort((a, b) => orden[a.estado] - orden[b.estado]).map((v) => {
+          const av = avanceVacante(v, datos);
+          return (
           <li key={v.id}>
             <button className={"item fila-vacante " + v.estado} onClick={() => setPantalla({ tipo: "detalle", id: v.id })}>
               <div>
@@ -116,8 +135,18 @@ export default function VistaEmpresa({ empresaId }) {
               </div>
               <span className={"estado-chip " + v.estado}>{ESTADOS[v.estado]}</span>
             </button>
+            {av && (
+              <div className="emp-avance">
+                <span className="emp-avance-pista" aria-hidden="true">
+                  <span className="emp-avance-aprobados" style={{ width: `${(av.aprobados / Math.max(1, av.candidatos + av.proceso + av.aprobados)) * 100}%` }} />
+                  <span className="emp-avance-proceso" style={{ width: `${(av.proceso / Math.max(1, av.candidatos + av.proceso + av.aprobados)) * 100}%` }} />
+                </span>
+                <span className="emp-avance-texto">{av.candidatos} por revisar · {av.proceso} en proceso · {av.aprobados} {av.aprobados === 1 ? "aprobado" : "aprobados"}</span>
+              </div>
+            )}
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );
@@ -201,22 +230,28 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
   );
 }
 
+// Candidatos, en proceso (pendientes) y aprobados de una vacante publicada; null mientras no hay datos.
+function avanceVacante(v, datos) {
+  const lista = datos?.listas[v.id];
+  if (!lista) return null;
+  const mias = datos.asig.filter((a) => a.vacante_id === v.id && a.vigente === true);
+  return {
+    candidatos: lista.length,
+    proceso: mias.filter((a) => a.aprobada === null).length,
+    aprobados: mias.filter((a) => a.aprobada === true).length,
+  };
+}
+
 // Cifras de la empresa: vacantes publicadas, candidatos por revisar y personas en proceso.
-function ResumenEmpresa({ vacantes }) {
-  const [extra, setExtra] = useState({ candidatos: 0, proceso: 0 });
+function ResumenEmpresa({ vacantes, datos }) {
   const publicadas = vacantes.filter((v) => v.estado === "publicada");
   const bloqueadas = vacantes.filter((v) => v.estado === "bloqueada").length;
-  useEffect(() => {
-    Promise.all([Promise.all(publicadas.map((v) => api.candidatos(v.id).catch(() => []))), api.asignaciones().catch(() => [])])
-      .then(([listas, asig]) => setExtra({
-        candidatos: listas.reduce((s, l) => s + l.length, 0),
-        proceso: asig.filter((a) => a.vigente && a.aprobada !== false).length,
-      }));
-  }, [vacantes]); // eslint-disable-line react-hooks/exhaustive-deps
+  const candidatos = datos ? Object.values(datos.listas).reduce((s, l) => s + l.length, 0) : 0;
+  const proceso = datos ? datos.asig.filter((a) => a.vigente && a.aprobada !== false).length : 0;
   const kpis = [
     ["Vacantes publicadas", publicadas.length, bloqueadas ? `${bloqueadas} bloqueada(s) por corregir` : "todas revisadas por el Auditor"],
-    ["Candidatos por revisar", extra.candidatos, "cumplen y pueden llegar a tiempo"],
-    ["Personas en proceso", extra.proceso, "en revisión o con entrevista"],
+    ["Candidatos por revisar", candidatos, "cumplen y pueden llegar a tiempo"],
+    ["Personas en proceso", proceso, "en revisión o con entrevista"],
   ];
   return (
     <div className="kpis tres">
@@ -224,6 +259,74 @@ function ResumenEmpresa({ vacantes }) {
         <div key={titulo} className="kpi"><span className="kpi-titulo">{titulo}</span>
           <b className="kpi-valor"><Contador valor={valor} /></b><span className="kpi-sub">{sub}</span></div>
       ))}
+    </div>
+  );
+}
+
+// Mapa de vacantes y candidatos, habilidades de los candidatos y lo que piden otras empresas en la zona.
+// Un solo punto por corregimiento (el mapa identifica los puntos por su corregimiento).
+function TableroEmpresa({ vacantes, datos, nombres }) {
+  const [zona, setZona] = useState(null);
+  const publicadas = vacantes.filter((v) => v.estado === "publicada");
+  if (!publicadas.length || !datos) return null;
+
+  const candidatos = Object.values(datos.listas).flat().map((t) => t.joven);
+  const pedidas = new Set(publicadas.flatMap((v) => v.habilidades_requeridas.map((r) => r.codigo)));
+  const zonas = [...new Set([...publicadas.map((v) => v.corregimiento), ...candidatos.map((j) => j.corregimiento)])];
+  const puntos = zonas.map((z) => {
+    const vs = publicadas.filter((v) => v.corregimiento === z);
+    const cupos = vs.reduce((s, v) => s + v.cupos, 0);
+    const n = candidatos.filter((j) => j.corregimiento === z).length;
+    return {
+      codigo: z, radio: vs.length ? 7 + cupos * 3 : 6 + Math.min(n, 8) * 1.5,
+      color: vs.length ? "var(--aqua)" : "var(--celeste)", anillo: n ? "var(--celeste)" : null,
+      lineas: [...(vs.length ? [`${vs.length} vacante(s) · ${cupos} cupo(s)`] : []), ...(n ? [`${n} ${n === 1 ? "candidato" : "candidatos"}`] : [])],
+    };
+  });
+
+  const cuenta = {};
+  candidatos.forEach((j) => j.habilidades.forEach((h) => { cuenta[h.codigo] = (cuenta[h.codigo] || 0) + 1; }));
+  const filas = Object.entries(cuenta).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([c, n]) => ({
+    clave: c, etiqueta: nombres[c] || c, valor: n, color: pedidas.has(c) ? "var(--aqua)" : "var(--celeste)",
+  }));
+
+  const zonasVacante = [...new Set(publicadas.map((v) => v.corregimiento))];
+  const zonaTend = zona && zonasVacante.includes(zona) ? zona : null;
+  const piden = zonaTend
+    ? datos.tend?.por_zona[zonaTend] || []
+    : Object.values(zonasVacante.flatMap((z) => datos.tend?.por_zona[z] || []).reduce((acc, h) => {
+      acc[h.codigo] = { ...h, vacantes: (acc[h.codigo]?.vacantes || 0) + h.vacantes };
+      return acc;
+    }, {})).sort((a, b) => b.vacantes - a.vacantes).slice(0, 5);
+
+  return (
+    <div className="panorama-grilla emp-grilla">
+      <section className="panel-oscuro panorama-mapa">
+        <div className="panel-cabeza">
+          <h3>Dónde viven sus candidatos</h3>
+          {zona && <button className="chip claro" onClick={() => setZona(null)}>Ver todo · quitar {corregimiento(zona)}</button>}
+        </div>
+        <MapaPanama puntos={puntos} seleccionado={zona} onSeleccion={setZona}
+                    leyenda={<><i className="punto aqua" /> vacantes (tamaño) <i className="punto anillo" /> viven candidatos</>} />
+        <p className="nota">Toque un corregimiento para ver qué piden otras empresas ahí.</p>
+      </section>
+
+      <div className="panorama-lado">
+        <section className="panel">
+          <h3>Lo que saben sus candidatos</h3>
+          {filas.length ? <BarrasH filas={filas} /> : <p className="suave">Todavía no hay candidatos para sus vacantes.</p>}
+          <p className="nota"><i className="punto aqua" /> la piden sus vacantes · <i className="punto celeste" /> otras habilidades.
+            Candidatos que cumplen y pueden llegar a tiempo; sin nombre, género ni edad.</p>
+        </section>
+
+        {piden.length > 0 && (
+          <section className="panel">
+            <h3>Qué piden otras empresas en {zonaTend ? corregimiento(zonaTend) : "su zona"}</h3>
+            <BarrasH filas={piden.map((h) => ({ clave: h.codigo, etiqueta: nombres[h.codigo] || h.nombre, valor: h.vacantes }))} sufijo=" vac." />
+            {datos.tend?.nota && <p className="nota">{datos.tend.nota}</p>}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

@@ -480,3 +480,13 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
   .joven-principal { max-width: 560px; width: 100%; margin: 0 auto; position: static; }
   .joven-kpis { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Tablero de la empresa */
+.emp-grilla { margin-top: 14px; }
+.punto.celeste { background: var(--celeste); }
+.emp-avance { display: grid; gap: 4px; padding: 6px 4px 2px; }
+.emp-avance-pista { display: flex; height: 8px; background: var(--borde); border-radius: 99px; overflow: hidden; }
+.emp-avance-aprobados { background: var(--si, #2e9d6a); height: 100%; transition: width .6s ease; }
+.emp-avance-proceso { background: var(--aqua); height: 100%; transition: width .6s ease; }
+.emp-avance-texto { font-size: .8rem; color: var(--suave); }
+.emp-grilla .panel .nota .punto { margin-right: 3px; }
