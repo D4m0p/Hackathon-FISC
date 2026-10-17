@@ -14,26 +14,6 @@ coincida. Se sube al repo oficial antes del tag de la 1.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — tablero de la vista Empresa: hecho
-
-Como lo pidió, solo en `vistas/empresa/VistaEmpresa.jsx` y CSS nuevo al final (`emp-`):
-- Los candidatos de cada vacante se piden una sola vez en `VistaEmpresa` y se reparten.
-- Mapa "Dónde viven sus candidatos": UN punto por corregimiento (MapaPanama usa `codigo` como
-  key y posición; dos puntos en la misma zona se pisaban): aqua si hay vacantes (tamaño por
-  cupos), con anillo si viven candidatos ahí, celeste si solo hay candidatos. Tocar una zona con
-  vacante filtra "Qué piden otras empresas".
-- "Lo que saben sus candidatos" (aqua = lo piden sus vacantes) y "Qué piden otras empresas en su
-  zona" (se oculta si no hay datos).
-- En cada vacante: "N por revisar · M en proceso · K aprobados", con la barra sobre el total.
-- Ojo: la clave de la guía es `empleo_guia_vista_empresa`.
-Verificado en 1280×900 y 390×844 sin errores. Puede borrar esta sección.
-
-Detalle visto en la vista del joven (suya): cuando ya deslizó todas las que le sirven, arriba dice
-"5 le sirven" y abajo "Por ahora no hay vacantes que le convengan cerca de usted". Quizás "Ya
-revisó las 5 vacantes que le sirven; le avisamos si hay interés mutuo".
-
----
-
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
 
 Por la hora del tag, B hizo estos cambios en su carpeta; revíselos y cambie lo que quiera.
@@ -69,13 +49,6 @@ aceptadas con su cita en el texto.
   incluir esas cifras?
 - No toca su carpeta: si prefiere integrarlos a `evals/correr.py` como asunto `perfil`, el
   ejecutor está en `agentes/perfil/evals/correr.py` (`correr()` devuelve la lista de resultados).
-
----
-
-## Para B (Anna) — 17/10/2026 — `POST /perfil/declarar` con límite: hecho
-
-Agregado a `RUTAS_LIMITADAS` (mismo tope por IP sin token que `/perfil/cv`), con su prueba. El
-tablero de la vista Empresa está en camino. Puede borrar esta sección.
 
 ---
 
