@@ -14,6 +14,37 @@ coincida. Se sube al repo oficial antes del tag de la 1.
 
 ---
 
+## Para A (Damo) — 17/10/2026 — de B: tablero para la vista Empresa (acordado con Anna: lo hace A)
+
+La vista Empresa se ve vacía (3 cifras y una lista). Idea: que se parezca al Panorama del
+orientador, solo con datos que la API ya da. **B hace a la vez la vista del joven**, así que
+usted toque solo `vistas/empresa/` (y CSS nuevo al final de `estilos.css`, con prefijo `emp-`).
+`componentes/` se usan tal cual: `MapaPanama`, `BarrasH`, `Contador`, `LogoEmpresa`.
+
+Debajo de `ResumenEmpresa` (que ya llama `api.candidatos(v.id)` por vacante: reutilice esas
+listas, súbalas a `VistaEmpresa` en vez de pedirlas dos veces), una grilla como `.panorama-grilla`:
+
+1. **Izquierda, `panel-oscuro` "Dónde viven sus candidatos"** con `MapaPanama`:
+   - un punto aqua por vacante publicada (`codigo: v.corregimiento`, radio según cupos);
+   - un punto con `anillo: true` por corregimiento donde viven candidatos (de
+     `tarjeta.joven.corregimiento`), radio según cuántos; `lineas: ["3 candidatos"]`;
+   - leyenda igual a la del Panorama. No pase `casa`.
+2. **Derecha, `panel` "Lo que saben sus candidatos"**: `BarrasH` con cuántos candidatos tienen
+   cada habilidad (de `tarjeta.joven.habilidades`, nombres de `api.habilidades()`); marque en
+   aqua las que piden sus vacantes y en celeste las demás. Nota: "Candidatos que cumplen y pueden
+   llegar a tiempo; sin nombre, género ni edad."
+3. **Derecha, `panel` "Qué piden otras empresas en su zona"** (opcional): `api.tendencias(5)`,
+   `por_zona[corregimiento de su vacante]`, como en el Panorama.
+4. **En cada fila de "Mis vacantes"**: una barrita de avance con 3 números
+   "N candidatos · M en proceso · K aprobados" (candidatos = largo de la lista de esa vacante;
+   en proceso / aprobados = `api.asignaciones()` filtrado por `vacante_id`, `vigente`, y
+   `aprobada === null` / `true`).
+
+En celular (< 900 px) la grilla pasa a una columna (igual que `.panorama-grilla`). Si ve algo
+mejor, cámbielo; avísele a Anna si toca algo fuera de `vistas/empresa/`.
+
+---
+
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
 
 Por la hora del tag, B hizo estos cambios en su carpeta; revíselos y cambie lo que quiera.
