@@ -166,6 +166,11 @@ cd frontend && npm install && npm run dev
   `GET /perfil/preguntas` → `POST /perfil/cv` `{tipo: "pdf"|"imagen"|"texto", contenido_base64|texto}`
   y/o `POST /perfil/entrevista` `{respuestas: [{pregunta_id, texto}]}` → `{habilidades, descartadas,
   alertas, metodo}` → el joven confirma → `POST /jovenes` con esas habilidades → guardar el `token`.
+  Entradas por voz o foto: `POST /perfil/transcribir` `{tipo: "audio"|"imagen", contenido_base64,
+  tipo_mime, documento: "cv"|"oferta"}` → `{texto, alertas}`. No decide nada: el texto vuelve a la
+  persona para revisarlo y luego sigue por `/perfil/entrevista`, `/perfil/cv` u `/ofertas` (volante).
+  Audio: notas de voz (webm/ogg/opus de WhatsApp, mp3, m4a, wav), máx. 5 MB (~2 min), Whisper
+  (`GROQ_MODELO_AUDIO`, por defecto `whisper-large-v3-turbo`). Sin clave de Groq responde 400.
 - **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
   la clase `Mercado` en `agentes/mercado/__init__.py` y `Auditor` en `agentes/auditor/__init__.py`.
   La API las usa sola si existen (constructor sin argumentos); si no, usa las provisionales.

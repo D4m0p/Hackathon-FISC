@@ -58,7 +58,7 @@ flowchart LR
     B -->|corrección o motivo| O
     AU -->|limpia| P[(Publicada)]
 
-    J[Joven] -->|CV, foto o entrevista| PE[Perfil]
+    J[Joven] -->|CV, foto, entrevista escrita o por voz| PE[Perfil]
     PE -->|habilidades con evidencia| R[(Jóvenes)]
 
     P --> D{Deslizar}
@@ -88,7 +88,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Agente | Qué hace | Cómo decide | Estado |
 |---|---|---|---|
 | **Inteligencia de mercado** | Normaliza ofertas a una taxonomía de habilidades y extrae tendencias | El LLM extrae; el código valida contra la taxonomía | *(en desarrollo)* |
-| **Perfil** | Lee el CV (PDF, foto o texto) y hace una entrevista corta para descubrir habilidades no declaradas | El LLM solo propone; el código acepta una habilidad solo si existe en la taxonomía y su cita aparece en el texto original; la experiencia informal llega como máximo a nivel 2; sin LLM funciona con palabras clave | Listo |
+| **Perfil** | Lee el CV (PDF, foto o texto) y hace una entrevista corta, escrita o por nota de voz, para descubrir habilidades no declaradas; también lee fotos de volantes de ofertas | El LLM solo propone; el código acepta una habilidad solo si existe en la taxonomía y su cita aparece en el texto original; la experiencia informal llega como máximo a nivel 2; sin LLM funciona con palabras clave | Listo |
 | **Matching** | Filtra pares imposibles, puntúa y asigna con cupos | Reglas + OR-Tools (flujo de costo mínimo: óptimo exacto en tiempo polinomial) | Listo |
 | **Ruta de formación** | Elige cursos que cierran la brecha de habilidades | OR-Tools CP-SAT con cupos, turnos, traslado y presupuesto | Listo |
 | **Auditor** | Bloquea ofertas discriminatorias y hace pruebas contrafactuales de sesgo | Reglas determinísticas; el LLM solo como segunda opinión | *(en desarrollo)* |
@@ -214,6 +214,7 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `GET` | `/perfil/preguntas` | Preguntas de la entrevista corta (público) |
 | `POST` | `/perfil/cv` | CV en PDF, foto o texto → habilidades con evidencia (público, no guarda nada) |
 | `POST` | `/perfil/entrevista` | Respuestas de la entrevista → habilidades con evidencia (público, no guarda nada) |
+| `POST` | `/perfil/transcribir` | Nota de voz o foto (CV o volante) → texto para que la persona lo revise; no decide nada (público) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
