@@ -19,5 +19,5 @@ class AuditorProvisional:
     def auditar_oferta(self, vacante: Vacante) -> ResultadoAuditoria:
         return ResultadoAuditoria(tipo="oferta", objeto_id=vacante.id, aprobado=True)
 
-    def auditar_matching(self, resultado, jovenes, datos, vacantes, matriz) -> list[ResultadoAuditoria]:
+    def auditar_matching(self, resultado, jovenes, datos, vacantes, matriz, pesos=None) -> list[ResultadoAuditoria]:
         return []

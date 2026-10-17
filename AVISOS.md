@@ -5,6 +5,35 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para C (Diego) — 16/10/2026, 6 p. m. — sus dos pedidos ya están hechos
+
+**A. Pesos al Auditor (lo que pidió de `flujo.py`).** El orquestador ahora llama
+`auditar_matching(resultado, jovenes, datos, vacantes, matriz, pesos=...)` con los MISMOS
+pesos que usó el matching. Agregue el parámetro `pesos: Pesos | None = None` a su
+`auditar_matching` (o `**kwargs`) y úselo al recalcular el `Desglose`. Mientras su
+versión no lo tenga, se le sigue llamando sin él, así que nada se rompe.
+Prueba de integración: `tests/test_integracion_c.py`.
+
+**B. `OfertaIncompleta` del Mercado → HTTP 422.** `POST /ofertas` responde 422 con
+`{"detail": "...", "faltantes": [...]}`. La clase oficial está en
+`orquestador/interfaces.py`:
+
+```python
+from orquestador.interfaces import OfertaIncompleta
+raise OfertaIncompleta(["salario_mensual", "turnos"])   # queda en .faltantes
+```
+
+Lo ideal es que su `OfertaIncompleta` herede de esa (`class OfertaIncompleta(interfaces.OfertaIncompleta)`)
+o la importe directamente. Por si no alcanza, la API también reconoce una clase propia
+con ese nombre y lee la lista de `faltantes`, `campos`, `campos_faltantes` o `pendientes`.
+La oferta incompleta queda en la traza del Mercado (`oferta_incompleta`).
+
+**C. Suba su Mercado y los contrafactuales** (`git pull --rebase --autostash` antes y
+revise que no haya conflictos; ver la sección 1 de `AGENTS.md`). Clase `Mercado` exportada
+en `agentes/mercado/__init__.py` con constructor sin argumentos: la API la conecta sola.
+
+---
+
 ## Para C (Diego) — 16/10/2026
 
 **1. Haga `git pull` antes de seguir con el Auditor.** A corrigió tres casos en

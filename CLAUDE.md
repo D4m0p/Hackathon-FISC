@@ -161,6 +161,9 @@ cd frontend && npm install && npm run dev
 - **Mercado y Auditor (C):** implementar los métodos de `orquestador/interfaces.py` y exportar
   la clase `Mercado` en `agentes/mercado/__init__.py` y `Auditor` en `agentes/auditor/__init__.py`.
   La API las usa sola si existen (constructor sin argumentos); si no, usa las provisionales.
+  `auditar_matching` recibe `pesos=` (los mismos del matching). Si faltan campos en una
+  oferta, el Mercado lanza `orquestador.interfaces.OfertaIncompleta(faltantes)` y la API
+  responde 422 con `{detail, faltantes}`.
   `GET /salud` muestra cuál está conectada.
 - **Contrafactuales (C):** el corregimiento solo puede mover los componentes `traslado` y
   `salario` del `Desglose`; `habilidades` no depende del lugar (ver `agentes/matching/puntaje.py`).

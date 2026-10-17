@@ -21,6 +21,7 @@ from orquestador import ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, 
 from agentes.perfil import ClienteLLM, cliente_desde_entorno
 from agentes.perfil.rutas import crear_router as rutas_perfil
 from orquestador.arranque import orquestador_desde_entorno
+from orquestador.interfaces import es_oferta_incompleta, faltantes_de
 
 from .seguridad import Identidad, Rol, dependencias, nuevo_token, sin_permiso
 
@@ -203,6 +204,11 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None) -> FastAP
             v, r = orq.publicar_oferta(oferta.texto, oferta.empresa_id)
         except NotImplementedError as e:
             raise HTTPException(status_code=501, detail=str(e))
+        except Exception as e:
+            if es_oferta_incompleta(e):   # 422 con la lista para que la empresa complete
+                return JSONResponse(status_code=422,
+                                    content={"detail": str(e), "faltantes": faltantes_de(e)})
+            raise
         return ResultadoPublicacion(vacante=v, auditoria=r)
 
     @app.post("/vacantes")

@@ -10,6 +10,7 @@ Flujo:
 from __future__ import annotations
 
 import functools
+import inspect
 import threading
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -27,7 +28,7 @@ from contrato.modelos import (
 
 from .agenda import proxima_entrevista
 from .almacen import Almacen, clave_asignacion
-from .interfaces import AgenteAuditor, AgenteMercado, Notificador
+from .interfaces import AgenteAuditor, AgenteMercado, Notificador, es_oferta_incompleta, faltantes_de
 from .notificador import NotificadorRegistro
 from .provisionales import AuditorProvisional, MercadoProvisional
 
@@ -123,7 +124,14 @@ class Orquestador:
 
     # ---------- empresas ----------
     def publicar_oferta(self, texto: str, empresa_id: str) -> tuple[Vacante, ResultadoAuditoria]:
-        vacante = self.mercado.normalizar_oferta(texto, empresa_id)
+        try:
+            vacante = self.mercado.normalizar_oferta(texto, empresa_id)
+        except Exception as e:
+            if es_oferta_incompleta(e):
+                self._traza(Agente.mercado, "oferta_incompleta", str(e),
+                            entrada={"empresa_id": empresa_id, "texto": texto[:500]},
+                            salida={"faltantes": faltantes_de(e)})
+            raise
         self._traza(Agente.mercado, "normalizar_oferta",
                     f"Oferta normalizada con {len(vacante.habilidades_requeridas)} habilidades",
                     entrada={"empresa_id": empresa_id, "texto": texto[:500]},
@@ -279,6 +287,15 @@ class Orquestador:
                 vacantes.append(v.model_copy(update={"cupos": v.cupos - usados}))
         return jovenes, vacantes, self.almacen.interes_mutuo() - excluidos
 
+    def _auditar_matching(self, resultado, jovenes, datos, vacantes, matriz, pesos):
+        """El Auditor recibe los MISMOS pesos que usó el matching. Si su versión todavía
+        no acepta `pesos` (transición), se le llama sin ellos."""
+        f = self.auditor.auditar_matching
+        params = inspect.signature(f).parameters
+        acepta = "pesos" in params or any(x.kind == x.VAR_KEYWORD for x in params.values())
+        extra = {"pesos": pesos} if acepta else {}
+        return f(resultado, jovenes, datos, vacantes, matriz, **extra)
+
     @_exclusivo
     def ejecutar_matching(self) -> ResultadoMatching:
         matriz = self.matriz()
@@ -287,7 +304,8 @@ class Orquestador:
                 self.almacen.borrar(Asignacion, clave_asignacion(a))
         jovenes, vacantes, permitidos = self._entradas_matching()
 
-        resultado = asignar(jovenes, vacantes, matriz, permitidos=permitidos, pesos=self.pesos())
+        pesos = self.pesos()
+        resultado = asignar(jovenes, vacantes, matriz, permitidos=permitidos, pesos=pesos)
         for a in resultado.asignaciones:
             self.almacen.guardar(a)
             self.almacen.borrar(PlanFormacion, a.joven_id)   # ya no lo necesita
@@ -300,7 +318,7 @@ class Orquestador:
                     salida={"sin_asignar": resultado.sin_asignar})
 
         datos = {d.joven_id: d for d in self.almacen.listar(DatosPersonales)}
-        for r in self.auditor.auditar_matching(resultado, jovenes, datos, vacantes, matriz):
+        for r in self._auditar_matching(resultado, jovenes, datos, vacantes, matriz, pesos):
             self._traza(Agente.auditor, "auditar_matching",
                         "Sin sesgo detectado" if r.aprobado else
                         "; ".join(h.detalle for h in r.hallazgos),
