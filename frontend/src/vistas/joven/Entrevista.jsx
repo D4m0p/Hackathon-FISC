@@ -22,7 +22,8 @@ export default function Entrevista({ onResultado, onVolver }) {
     if (!lista.length) return onResultado({ habilidades: [] });
     setEnviando(true);
     try {
-      onResultado(await api.perfilDesdeEntrevista(lista));
+      const r = await api.perfilDesdeEntrevista(lista);
+      onResultado({ ...r, fuente: lista.map((x) => x.texto).join("\n") });
     } catch (e) {
       setError(e.message);
       setEnviando(false);

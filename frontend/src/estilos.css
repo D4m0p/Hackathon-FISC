@@ -444,3 +444,18 @@ legend { padding: 0 6px; font-weight: 600; }
   .kpis.tres .kpi-valor { font-size: 1.5rem; }
   .kpis.tres .kpi-sub { display: none; }
 }
+
+/* Registro: revisar habilidades, respuestas de un toque y código de acceso */
+.de-donde summary { cursor: pointer; list-style: none; }
+.de-donde summary::-webkit-details-marker { display: none; }
+.de-donde .enlace-texto { color: var(--primario); font-size: .8rem; text-decoration: underline; }
+.de-donde p { margin: 6px 0 0; padding: 8px 10px; background: var(--fondo); border-radius: 8px; font-size: .85rem; color: var(--suave); }
+.de-donde mark { background: var(--primario-claro); color: var(--texto); padding: 0 2px; border-radius: 3px; }
+.nivel-select { font-size: .78rem; padding: 2px 6px; border-radius: 99px; border: 1px solid var(--borde); background: var(--primario-claro); color: var(--primario); width: auto; }
+.agregar-habilidad { margin-top: 10px; padding: 12px; border: 1px dashed var(--borde); border-radius: 10px; }
+.rapidas { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 10px; }
+.rapidas .chip { padding: 5px 12px; font-size: .85rem; }
+.codigo-acceso { display: flex; align-items: center; gap: 10px; }
+.codigo-acceso .token { flex: 1; margin: 12px 0; }
+.lista-corta { padding-left: 18px; }
+.cita-propia { margin: 3px 0 0; color: var(--suave); font-size: .85rem; } .cita-propia q { display: inline; }

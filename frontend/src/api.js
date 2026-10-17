@@ -67,6 +67,7 @@ export const api = {
   preguntas: () => pedir("GET", "/perfil/preguntas"),
   perfilDesdeCv: (cuerpo) => pedir("POST", "/perfil/cv", cuerpo),
   perfilDesdeEntrevista: (respuestas) => pedir("POST", "/perfil/entrevista", { respuestas }),
+  declararHabilidad: (codigo, evidencia) => pedir("POST", "/perfil/declarar", { codigo, evidencia }),
   // Nota de voz o foto → texto para revisar (no decide nada)
   transcribir: (tipo, contenido_base64, tipo_mime, documento = "cv") =>
     pedir("POST", "/perfil/transcribir", { tipo, contenido_base64, tipo_mime, documento }),

@@ -35,7 +35,8 @@ export default function SubirCv({ onResultado, onVolver }) {
     }
     setLeyendo(true);
     try {
-      onResultado(await api.perfilDesdeCv(cuerpo));
+      const r = await api.perfilDesdeCv(cuerpo);
+      onResultado({ ...r, fuente: modo === "texto" ? texto : r.texto_leido });
     } catch (err) {
       setError(err.estado === 404 ? "El agente Perfil aún no está conectado a la API." : err.message);
       setLeyendo(false);
