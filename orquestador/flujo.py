@@ -190,8 +190,11 @@ def _json(obj: Any) -> Any:
 class Orquestador:
     def __init__(self, almacen: Almacen, mercado: AgenteMercado | None = None,
                  auditor: AgenteAuditor | None = None, notificador: Notificador | None = None,
-                 reloj: Callable[[], datetime] | None = None):
+                 reloj: Callable[[], datetime] | None = None, automatico: bool = False):
+        """`automatico`: el matching se dispara solo (vacante publicada, joven nuevo, interés
+        mutuo). La API lo enciende; la carga de datos de demo y las pruebas lo dejan apagado."""
         self.almacen = almacen
+        self.automatico = automatico
         self.mercado = mercado or MercadoProvisional()
         self.auditor = auditor or AuditorProvisional()
         self.notificador = notificador or NotificadorRegistro()
@@ -296,6 +299,8 @@ class Orquestador:
             motivo = "Bloqueada: " + "; ".join(h.detalle for h in resultado.hallazgos)
         self._traza(Agente.auditor, "auditar_oferta", motivo,
                     entrada={"vacante_id": vacante.id}, salida={"resultado": resultado})
+        if estado == EstadoVacante.publicada:
+            self._automatico("vacante_publicada", vacante.id, f"Se publicó «{vacante.titulo}»")
         return vacante, resultado
 
     @_exclusivo
@@ -309,6 +314,7 @@ class Orquestador:
         vacante = vacante.model_copy(update={"estado": EstadoVacante.publicada})
         self.almacen.guardar(vacante)
         self._traza(Agente.orientador, "publicar_bloqueada", motivo, entrada={"vacante_id": vacante_id})
+        self._automatico("vacante_publicada", vacante.id, f"Se publicó «{vacante.titulo}»")
         return vacante
 
     # ---------- jóvenes ----------
@@ -334,6 +340,8 @@ class Orquestador:
                     f"Perfil con {len(joven.habilidades)} habilidades",
                     entrada={"joven_id": joven.id},
                     salida={"habilidades": [h.codigo for h in joven.habilidades]})
+        if not existia:
+            self._automatico("joven_nuevo", joven.id, f"Se registró {joven.id}")
         return joven
 
     # ---------- tarjetas y deslizamientos ----------
@@ -369,7 +377,42 @@ class Orquestador:
         if mutuo and le_interesa:
             self._traza(Agente.orquestador, "interes_mutuo", "El joven y la empresa dijeron que sí",
                         entrada={"joven_id": joven_id, "vacante_id": vacante_id})
+            self._automatico("interes_mutuo", f"{joven_id}|{vacante_id}",
+                             f"{joven_id} y la empresa de {vacante_id} dijeron que sí", joven_id=joven_id)
         return mutuo
+
+    # ---------- autonomía: el sistema actúa solo, el humano sigue aprobando ----------
+    def _automatico(self, disparador: str, objeto_id: str, descripcion: str,
+                    joven_id: str | None = None) -> None:
+        """Reacciona a un cambio sin esperar al orientador. El matching solo empareja pares con
+        interés mutuo: con un joven nuevo no hay nada que emparejar todavía, así que en ese caso
+        solo se le arma la ruta de formación si no tiene ninguna vacante a su alcance."""
+        if not self.automatico:
+            return
+        entrada = {"disparador": disparador, "objeto_id": objeto_id}
+        if disparador == "joven_nuevo":
+            joven = self._joven(objeto_id)
+            entrada["joven_id"] = joven.id
+            vacantes, matriz = self.almacen.listar(Vacante), self.matriz()
+            if tiene_alguna_factible(joven, vacantes, matriz):
+                motivo = (f"{descripcion}: tiene vacantes a su alcance para revisar; las propuestas "
+                          "llegarán solas cuando haya interés mutuo")
+            else:
+                plan = planificar_grupo([joven], vacantes, self.almacen.listar(Curso), matriz)[0]
+                self.almacen.guardar(plan)
+                motivo = (f"{descripcion}: ninguna vacante le queda a su alcance; el sistema le armó "
+                          f"una ruta de formación con {len(plan.cursos)} curso(s)")
+            self._traza(Agente.matching, "auto_matching", motivo, entrada=entrada, salida={"nuevas": []})
+            return
+        if joven_id:
+            entrada["joven_id"] = joven_id
+        antes = self._pendientes()
+        self.ejecutar_matching(planificar=disparador != "interes_mutuo")
+        nuevas = sorted(clave for clave in self._pendientes() if clave not in antes)
+        self._traza(Agente.matching, "auto_matching",
+                    f"{descripcion}: el sistema buscó candidatos solo. Propuestas nuevas: "
+                    + (", ".join(c.replace("|", "→") for c in nuevas) or "ninguna"),
+                    entrada=entrada, salida={"nuevas": nuevas})
 
     # ---------- matching ----------
     def _entradas_matching(self) -> tuple[list[Joven], list[Vacante], set[tuple[str, str]]]:
@@ -399,7 +442,10 @@ class Orquestador:
         return f(resultado, jovenes, datos, vacantes, matriz, **extra)
 
     @_exclusivo
-    def ejecutar_matching(self) -> ResultadoMatching:
+    def ejecutar_matching(self, planificar: bool = True) -> ResultadoMatching:
+        """`planificar=False` omite rearmar las rutas de formación: sirve cuando lo único que cambió
+        es un interés mutuo (crea propuestas pendientes, que no ocupan cupo ni cambian qué
+        vacantes le sirven a cada joven, así que los planes no pueden cambiar)."""
         matriz = self.matriz()
         for a in self.almacen.listar(Asignacion):   # las pendientes vigentes se recalculan
             if a.aprobada is None and a.vigente:
@@ -426,6 +472,8 @@ class Orquestador:
                         "; ".join(h.detalle for h in r.hallazgos),
                         entrada={"objeto_id": r.objeto_id}, salida={"resultado": r})
 
+        if not planificar:
+            return resultado
         # Ruta de formación solo para quien no tiene NINGUNA vacante factible; quien sí
         # tiene pero aún no logró interés mutuo sigue deslizando.
         libres = set(resultado.sin_asignar)

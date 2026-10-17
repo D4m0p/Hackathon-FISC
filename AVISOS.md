@@ -5,36 +5,17 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para A (Damo) — 17/10/2026 — pedido de B: que el matching se dispare solo (autonomía)
+## Para B (Anna) — 17/10/2026 — matching automático listo
 
-**Por qué.** La rúbrica de "Diseño agéntico" (25 %) evalúa **autonomía** y la regla de oro pide
-agentes que "perciben, deciden y actúan". Hoy casi todo ya reacciona solo (Auditor al publicar,
-reacomodo al liberar un cupo, aviso al aprobar), pero el **matching solo corre cuando el
-orientador toca el botón**: una vacante nueva, un joven nuevo o un interés mutuo no generan
-propuestas hasta ese clic. Queremos que el sistema tome la iniciativa y el humano siga
-aprobando (las propuestas quedan pendientes como hoy).
-
-**Lo que le pedimos (orquestador):**
-1. Un ayudante tipo `_reacomodar`, p. ej. `_matching_automatico(disparador, objeto_id)`, que
-   corra `ejecutar_matching()`, calcule las propuestas **nuevas** pendientes y registre traza:
-   agente `matching`, **acción `auto_matching`**, `entrada = {disparador, objeto_id}`,
-   `salida = {nuevas: ["j03|v05", ...]}` y un `motivo` listo para mostrar, p. ej.
-   *"Se publicó «Asistente de ventas»: el sistema buscó candidatos solo. Propuestas nuevas: j11→v05"*
-   o *"…Propuestas nuevas: ninguna"*.
-2. Llamarlo en tres momentos (`disparador`):
-   - `vacante_publicada`: al final de `publicar_vacante` cuando queda **publicada** (y en
-     `orientador_publicar_bloqueada`).
-   - `joven_nuevo`: al final de `registrar_joven` cuando el joven es nuevo.
-   - `interes_mutuo`: en `deslizar` cuando devuelve `True`.
-3. Que la semilla pueda apagarlo durante la carga masiva (p. ej. `Orquestador(..., automatico=False)`
-   o un parámetro), para no correr 20 matchings al sembrar. En la API, encendido.
-4. Opcional (si sobra tiempo): un "vigía" que, al correr, deje trazas `auto_aviso` para el
-   orientador ("vacante sin candidatos", "joven sin opciones y el curso X tiene cupo").
-
-**Frontend (B):** la pestaña Propuestas del orientador ya tiene el panel "Lo que el sistema hizo
-solo", que lee `/trazas` y muestra las acciones automáticas (auditoría al publicar, reacomodo,
-interés mutuo, rutas de formación, revisión de sesgo). Las trazas `auto_matching` y `auto_aviso`
-aparecerán solas apenas existan; no hace falta otro endpoint.
+El pedido de autonomía ya está en `main` (encendido en la API, apagado en la semilla):
+- **Interés mutuo** → corre el matching y la propuesta aparece al instante, pendiente del orientador.
+- **Vacante publicada** (también al publicar una bloqueada) → corre el matching.
+- **Joven nuevo** → como el matching solo empareja pares con interés mutuo, con un joven recién
+  registrado no hay nada que emparejar: si no tiene ninguna vacante a su alcance, el sistema le
+  arma su ruta de formación al momento; si tiene, la traza lo dice.
+- Traza: agente `matching`, acción `auto_matching`, `entrada = {disparador, objeto_id, joven_id?}`,
+  `salida = {nuevas: ["j03|v05"]}`, `motivo` listo para mostrar.
+- El "vigía" opcional (`auto_aviso`) no se hizo todavía.
 
 ---
 
@@ -53,6 +34,17 @@ aparecerán solas apenas existan; no hace falta otro endpoint.
   primero).
 
 Formato exacto en la sección 7 de `AGENTS.md`. Puede borrar esta sección cuando lo vea.
+
+---
+
+## Para C (Diego) — 17/10/2026 — una línea en su Auditor (rendimiento)
+
+Con el matching automático, el Auditor corre en cada interés mutuo, y `desgloses_de_joven`
+armaba la explicación de rechazo de cada par imposible para después descartarla (el 97 % del
+tiempo del matching con 300 jóvenes). A agregó un filtro con `es_factible` antes de llamar a
+`evaluar`: mismo resultado, sus pruebas (`test_auditor_matching.py`, incluida la de
+`evaluar_tramposo`) y sus 40 evals siguen pasando. En la prueba de carga, la ráfaga bajó de
+35 s a 9 s. Haga `git pull` antes de seguir con `agentes/auditor/`.
 
 ---
 

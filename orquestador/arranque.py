@@ -24,7 +24,7 @@ def agente_real(modulo: str, clase: str):
     return cls() if cls is not None else None
 
 
-def orquestador_desde_entorno(ruta_base: str | None = None) -> Orquestador:
+def orquestador_desde_entorno(ruta_base: str | None = None, automatico: bool = True) -> Orquestador:
     load_dotenv()
     almacen = Almacen(ruta_base or os.getenv("RUTA_BASE_DATOS", "datos_app.db"))
     clave = os.getenv("CLAVE_ORIENTADOR")
@@ -33,4 +33,4 @@ def orquestador_desde_entorno(ruta_base: str | None = None) -> Orquestador:
     return Orquestador(almacen,
                        mercado=agente_real("agentes.mercado", "Mercado"),
                        auditor=agente_real("agentes.auditor", "Auditor"),
-                       notificador=desde_entorno())
+                       notificador=desde_entorno(), automatico=automatico)

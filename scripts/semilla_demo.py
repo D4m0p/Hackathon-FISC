@@ -81,7 +81,7 @@ def main() -> None:
 
     if args.reiniciar and args.base != ":memory:" and Path(args.base).exists():
         Path(args.base).unlink()
-    orq = orquestador_desde_entorno(args.base)
+    orq = orquestador_desde_entorno(args.base, automatico=False)   # carga masiva: sin disparos
     datos = json.loads(DATOS.read_text(encoding="utf-8"))
     resumen = cargar(orq, datos, args.matching)
     tokens = credenciales_demo(orq, datos)

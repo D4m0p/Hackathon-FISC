@@ -198,3 +198,16 @@ class Recorridos(RuleBasedStateMachine):
 Recorridos.TestCase.settings = settings(max_examples=300, stateful_step_count=50, deadline=None,
                                         suppress_health_check=[HealthCheck.too_slow])
 TestRecorridos = Recorridos.TestCase
+
+
+class RecorridosAutomaticos(Recorridos):
+    """Los mismos recorridos con el matching automático encendido (como en la API)."""
+
+    def __init__(self):
+        super().__init__()
+        self.orq.automatico = True
+
+
+RecorridosAutomaticos.TestCase.settings = settings(max_examples=150, stateful_step_count=40, deadline=None,
+                                                   suppress_health_check=[HealthCheck.too_slow])
+TestRecorridosAutomaticos = RecorridosAutomaticos.TestCase

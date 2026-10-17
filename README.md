@@ -35,6 +35,10 @@ decisión importante.
   cuánto le falta ("le faltan B/.1.00 por semana para el pasaje") y qué hacer; si lo que
   falta es una habilidad, el curso que la cubre y que cabe en su horario y presupuesto.
 - Cuando hay interés mutuo, un solver de optimización asigna respetando los cupos.
+- **Autonomía:** el sistema no espera un clic. Al haber interés mutuo o publicarse una vacante,
+  corre el matching solo; a un joven nuevo sin ninguna vacante a su alcance le arma su ruta de
+  formación al registrarse. Cada reacción queda trazada (`auto_matching`) y las propuestas
+  siguen esperando la aprobación del orientador.
 - **Pesos ajustables:** el orientador decide cuánto pesan habilidades, traslado y salario
   (con límites: ninguno puede anularse ni dominar del todo). Antes de cambiarlos puede
   simular qué propuestas entrarían y cuáles saldrían; cada cambio queda trazado con su motivo.

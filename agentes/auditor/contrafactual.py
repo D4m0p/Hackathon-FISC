@@ -23,7 +23,7 @@ legítimos:
 """
 from __future__ import annotations
 
-from agentes.matching import asignar, evaluar
+from agentes.matching import asignar, es_factible, evaluar
 from contrato.modelos import (
     Desglose, EstadoVacante, Hallazgo, Joven, Pesos, ResultadoMatching, Vacante,
 )
@@ -46,8 +46,8 @@ def desgloses_de_joven(joven: Joven, vacantes: list[Vacante], matriz,
     """Desglose real por vacante publicada y factible para ese joven."""
     desgloses: dict[str, Desglose] = {}
     for v in vacantes:
-        if v.estado != EstadoVacante.publicada:
-            continue
+        if v.estado != EstadoVacante.publicada or not es_factible(joven, v, matriz):
+            continue   # sin armar la explicación de un par imposible (mismo resultado, mucho más rápido)
         d = evaluar(joven, v, matriz, pesos)
         if isinstance(d, Desglose):
             desgloses[v.id] = d
