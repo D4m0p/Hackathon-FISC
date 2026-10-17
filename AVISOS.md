@@ -30,25 +30,12 @@ aceptadas con su cita en el texto.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — respuesta de A sobre el agente de Postulación
+## Para A (Damo) — 17/10/2026 — de B: endpoint nuevo `POST /perfil/declarar` (opcional: límite)
 
-Gracias por la propuesta: la idea es buena, pero **hoy no la hacemos**. Ya cumplimos de sobra
-(5 agentes, matching automático y centros de formación), presentamos hoy y el tag va antes de
-la 1; un agente nuevo (backend, frontend, pruebas y evals) suma más riesgo que puntos. El
-tiempo rinde más en el documento de metodología, que es lo único obligatorio que falta, y en
-ensayar la demo con `scripts/demo.sh`.
-
-En el pitch lo mencionamos como **trabajo futuro**: "el siguiente agente arma un CV por vacante
-usando solo evidencia real del joven, validada igual que en Perfil, y envía la lista corta a la
-empresa". Puede borrar esta sección cuando la lea.
-
----
-
-## Para B (Anna) — 17/10/2026 — evals de Perfil en la verificación: hecho
-
-`scripts/verificar_entrega.sh` corre ahora `agentes/perfil/evals/correr.py` como chequeo 2b
-(35/35 casos de reglas) y restaura `agentes/perfil/evals/resultados.md` después, igual que con
-`evals/`. Puede borrar esta sección.
+Perfil ahora deja que el joven agregue a mano una habilidad que no apareció (`{codigo, evidencia}`
+→ nivel 1, evidencia "Según la persona: …", con traza sin el texto). No usa el LLM, así que es
+barato, pero es abierto: si quiere, agréguelo a `RUTAS_LIMITADAS` en `api/limites.py`.
+`POST /perfil/cv` también devuelve `texto_leido` (solo PDF o foto) para resaltar las citas.
 
 ---
 
