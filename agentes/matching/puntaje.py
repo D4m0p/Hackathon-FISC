@@ -131,7 +131,9 @@ def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
 
     motivos = [f"Tiene {r.codigo}" for r in vacante.habilidades_requeridas
                if niveles.get(r.codigo, 0) >= r.nivel_minimo]
-    motivos.append(f"Traslado de {viaje.minutos} min, B/.{costo_semanal(viaje, vacante.dias_por_semana):.2f} por semana")
+    estimado = getattr(matriz, "es_estimado", lambda *_: False)(joven.corregimiento, vacante.corregimiento)
+    motivos.append(f"Traslado de {viaje.minutos} min, B/.{costo_semanal(viaje, vacante.dias_por_semana):.2f} por semana"
+                   + (" (estimado por distancia: no hay ruta en la tabla)" if estimado else ""))
     motivos.append(f"Salario neto de transporte: B/.{neto:.2f} al mes")
 
     p = pesos or PESOS

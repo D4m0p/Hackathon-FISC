@@ -137,6 +137,13 @@ class Almacen:
             self._con.execute("DELETE FROM entidades WHERE tipo = ?", (_TIPOS[modelo],))
 
     # ---------- traslados (tabla de referencia) ----------
+    def vaciar(self) -> None:
+        """Borra todos los datos. Solo para reiniciar la simulación de la demo."""
+        self._traslados = None
+        with self._lock, self._con:
+            for tabla in ("entidades", "deslizamientos", "trazas", "credenciales", "reservas", "fotos", "mensajes"):
+                self._con.execute(f"DELETE FROM {tabla}")
+
     def guardar_traslados(self, traslados: list[Traslado]) -> None:
         self._traslados = None
         with self._lock, self._con:

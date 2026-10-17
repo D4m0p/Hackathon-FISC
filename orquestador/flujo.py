@@ -24,6 +24,7 @@ from agentes.matching import (
     MatrizTraslados, asignar, es_factible, motivos_infactible, ranking_para_joven, ranking_para_vacante,
     tiene_alguna_factible,
 )
+from agentes.matching.traslados import coordenadas_osm
 from contrato.modelos import (
     Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad, Hallazgo,
     Joven, Pesos, PlanFormacion, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traza, Vacante,
@@ -211,7 +212,8 @@ class Orquestador:
             salida={k: _json(v) for k, v in (salida or {}).items()}))
 
     def matriz(self) -> MatrizTraslados:
-        return MatrizTraslados(self.almacen.traslados())
+        # con las coordenadas de OpenStreetMap, un viaje que falta en la tabla se estima por distancia
+        return MatrizTraslados(self.almacen.traslados(), coordenadas_osm())
 
     def pesos(self) -> Pesos:
         return self.almacen.obtener(Pesos, "pesos") or Pesos()
