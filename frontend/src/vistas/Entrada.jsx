@@ -1,10 +1,12 @@
 import { useState } from "react";
 
-const DEMO = [
+// Accesos de demostración, en el orden de la historia que se cuenta en la demo.
+export const DEMO = [
   { token: "demo-j11", texto: "Joven (Lucía)" },
-  { token: "demo-j07", texto: "Joven sin match (j07)" },
-  { token: "demo-e_super", texto: "Empresa (e_super)" },
+  { token: "demo-e_tienda", texto: "Empresa (Tienda)" },
+  { token: "demo-e_hotel", texto: "Empresa (Hotel)" },
   { token: "demo-orientador", texto: "Orientador" },
+  { token: "demo-j07", texto: "Joven sin match" },
 ];
 
 export default function Entrada({ onEntrar, onNuevo, error }) {
@@ -15,7 +17,7 @@ export default function Entrada({ onEntrar, onNuevo, error }) {
       <h1>Encuentre trabajo cerca de usted</h1>
       <p className="suave">
         Deslice vacantes que de verdad le convienen: el sistema calcula traslado, pasaje y salario
-        por usted.
+        por usted, y una persona orientadora revisa cada match antes de la entrevista.
       </p>
 
       <button className="boton grande" onClick={onNuevo}>Soy joven y quiero registrarme</button>

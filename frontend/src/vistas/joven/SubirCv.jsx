@@ -60,6 +60,7 @@ export default function SubirCv({ onResultado, onVolver }) {
                   placeholder="Ejemplo: Desde 2022 ayudo en la fonda de mi abuela: preparo almuerzos y cobro…" />
       )}
       <p className="nota">Solo leemos su CV para encontrar habilidades; no guardamos el texto.</p>
+      {leyendo && <p className="aviso" role="status">Leyendo su CV… puede tardar unos segundos.</p>}
       {error && <p className="error">{error}</p>}
       <div className="acciones">
         <button type="button" className="enlace" onClick={onVolver}>Volver</button>

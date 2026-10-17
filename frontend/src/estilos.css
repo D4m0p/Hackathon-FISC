@@ -187,3 +187,17 @@ legend { padding: 0 6px; font-weight: 600; }
 .simulacion { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--borde); }
 .linea-tiempo.panel { padding-left: 36px; }
 .linea-tiempo .hora { color: var(--suave); font-size: .8rem; margin-right: 6px; }
+
+/* Selector de rol de la barra superior (demo) */
+.cambiar-rol { width: auto; max-width: 170px; margin: 0; padding: 4px 8px; font-size: .85rem; border-radius: 99px; background: var(--primario-claro); color: var(--primario); border-color: transparent; }
+
+/* Tarjeta de candidato compacta y burbuja del mensaje al joven */
+.habilidades.compacta { gap: 4px; }
+.habilidades.compacta li { padding: 6px 10px; }
+.habilidades.compacta q { display: inline; margin-left: 6px; }
+.mutuo-item { border: 2px solid var(--primario); }
+.etiqueta-mutuo { display: inline-block; font-size: .78rem; font-weight: 700; color: var(--primario); background: var(--primario-claro); padding: 2px 10px; border-radius: 99px; margin-bottom: 8px; }
+.mensaje-enviado { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 10px 14px; margin-bottom: 12px; }
+.burbuja { background: var(--primario-claro); border-radius: 14px 14px 14px 4px; padding: 10px 14px; margin: 6px 0; }
+.por-que { margin-top: 8px; }
+.por-que summary { cursor: pointer; color: var(--primario); font-weight: 600; font-size: .9rem; }

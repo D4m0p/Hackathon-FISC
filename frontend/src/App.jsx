@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, guardarToken, leerToken } from "./api.js";
-import Entrada from "./vistas/Entrada.jsx";
+import Entrada, { DEMO } from "./vistas/Entrada.jsx";
 import VistaJoven from "./vistas/joven/VistaJoven.jsx";
 import Registro from "./vistas/joven/Registro.jsx";
 import VistaEmpresa from "./vistas/empresa/VistaEmpresa.jsx";
@@ -8,6 +8,7 @@ import VistaOrientador from "./vistas/orientador/VistaOrientador.jsx";
 
 export default function App() {
   const [yo, setYo] = useState(null);         // {rol, sujeto}
+  const [token, setToken] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [registrando, setRegistrando] = useState(false);
   const [error, setError] = useState("");
@@ -17,7 +18,10 @@ export default function App() {
     try {
       const ident = await api.yo(token);
       guardarToken(token);
+      setToken(token);
       setYo(ident);
+      setRegistrando(false);
+      window.scrollTo(0, 0);
     } catch (e) {
       // Solo se olvida el código si la API lo rechaza; si está caída, se conserva.
       if (e.estado === 401) guardarToken(null);
@@ -27,6 +31,7 @@ export default function App() {
 
   function salir() {
     guardarToken(null);
+    setToken(null);
     setYo(null);
     setRegistrando(false);
   }
@@ -42,9 +47,9 @@ export default function App() {
     contenido = <Registro onListo={(token) => { setRegistrando(false); entrar(token); }}
                           onCancelar={() => setRegistrando(false)} />;
   else if (!yo) contenido = <Entrada onEntrar={entrar} onNuevo={() => setRegistrando(true)} error={error} />;
-  else if (yo.rol === "joven") contenido = <VistaJoven jovenId={yo.sujeto} />;
-  else if (yo.rol === "empresa") contenido = <VistaEmpresa empresaId={yo.sujeto} />;
-  else contenido = <VistaOrientador />;
+  else if (yo.rol === "joven") contenido = <VistaJoven key={token} jovenId={yo.sujeto} />;
+  else if (yo.rol === "empresa") contenido = <VistaEmpresa key={token} empresaId={yo.sujeto} />;
+  else contenido = <VistaOrientador key={token} />;
 
   return (
     <div className="app">
@@ -52,7 +57,12 @@ export default function App() {
         <span className="marca">Empleo<b>Joven</b></span>
         {yo && (
           <span className="sesion">
-            <span className="etiqueta">{ROLES[yo.rol]}{yo.sujeto ? ` · ${yo.sujeto}` : ""}</span>
+            {/* Cambiar de rol en un clic durante la demo */}
+            <select className="cambiar-rol" aria-label="Ver como" value={DEMO.some((d) => d.token === token) ? token : ""}
+                    onChange={(e) => e.target.value && entrar(e.target.value)}>
+              {!DEMO.some((d) => d.token === token) && <option value="">{ROLES[yo.rol]}{yo.sujeto ? ` · ${yo.sujeto}` : ""}</option>}
+              {DEMO.map((d) => <option key={d.token} value={d.token}>{d.texto}</option>)}
+            </select>
             <button className="enlace" onClick={salir}>Salir</button>
           </span>
         )}

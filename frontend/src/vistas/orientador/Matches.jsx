@@ -19,15 +19,31 @@ export default function Matches({ cat }) {
   const [error, setError] = useState("");
   const [corriendo, setCorriendo] = useState(false);
   const [abierto, setAbierto] = useState(null);   // {clave, accion}
+  const [mensaje, setMensaje] = useState(null);   // el último aviso enviado a un joven
+  const [mutuos, setMutuos] = useState(new Set());
 
+  // Interés mutuo = el joven y la empresa dijeron que sí (sale de la historia de cada joven).
   const cargar = useCallback(() => {
     setLista(null);
-    api.asignacionesEstado(filtro).then(setLista).catch((e) => setError(e.message));
+    api.asignacionesEstado(filtro).then(async (as) => {
+      const jovenes = [...new Set(as.map((a) => a.joven_id))];
+      const historias = await Promise.all(jovenes.map((j) => api.historia(j).catch(() => null)));
+      const m = new Set();
+      for (const h of historias.filter(Boolean)) {
+        const si = (actor) => new Set(h.deslizamientos.filter((d) => d.actor === actor && d.le_interesa).map((d) => d.vacante_id));
+        const joven = si("joven"), empresa = si("empresa");
+        for (const v of joven) if (empresa.has(v)) m.add(`${h.joven.id}|${v}`);
+      }
+      setMutuos(m);
+      const orden = (a) => (m.has(`${a.joven_id}|${a.vacante_id}`) ? 1 : 0);
+      setLista([...as].sort((a, b) => orden(b) - orden(a) || b.desglose.total - a.desglose.total));
+    }).catch((e) => setError(e.message));
   }, [filtro]);
   useEffect(cargar, [cargar]);
 
   async function correrMatching() {
     setCorriendo(true);
+    setMensaje(null);
     setError("");
     try {
       const r = await api.matching();
@@ -45,7 +61,11 @@ export default function Matches({ cat }) {
     setError("");
     try {
       const r = await api.decidir(a.joven_id, a.vacante_id, true);
-      setAviso(`Aprobado. Entrevista el ${fecha(r.entrevista)}; se avisó al joven.`);
+      // El mensaje que el sistema le mandó al joven (Telegram o, sin bot, solo registrado).
+      const ultimo = (await api.mensajes().catch(() => [])).at(-1);
+      setAviso(`Aprobado: entrevista el ${fecha(r.entrevista)}`);
+      setMensaje(ultimo ? { ...ultimo, texto: conNombres(ultimo.texto, cat.habilidades) } : null);
+      window.scrollTo(0, 0);
       cargar();
     } catch (e) {
       setError(e.message);
@@ -64,10 +84,17 @@ export default function Matches({ cat }) {
       </div>
       <div className="chips filtros">
         {FILTROS.map(([k, t]) => (
-          <button key={k} className={"chip" + (filtro === k ? " activo" : "")} onClick={() => { setAviso(""); setFiltro(k); }}>{t}</button>
+          <button key={k} className={"chip" + (filtro === k ? " activo" : "")} onClick={() => { setAviso(""); setMensaje(null); setFiltro(k); }}>{t}</button>
         ))}
       </div>
       {aviso && <p className="aviso" role="status">{aviso}</p>}
+      {mensaje && (
+        <div className="mensaje-enviado">
+          <span className="nota">{mensaje.enviado ? "Mensaje enviado por Telegram" : "Mensaje para el joven (registrado; sin bot de Telegram configurado)"}</span>
+          <p className="burbuja">{mensaje.texto}</p>
+          <button className="enlace" onClick={() => setMensaje(null)}>Cerrar</button>
+        </div>
+      )}
       {error && <p className="error">{error}</p>}
       {!lista ? <p className="centro">Cargando…</p> : lista.length === 0 ? (
         <p className="vacio">{filtro === "pendiente" ? "No hay matches por aprobar. Corra el matching para generar propuestas." : "No hay nada aquí."}</p>
@@ -77,7 +104,8 @@ export default function Matches({ cat }) {
             const clave = `${a.joven_id}|${a.vacante_id}`;
             const v = cat.vacantes[a.vacante_id];
             return (
-              <li key={clave} className="item">
+              <li key={clave} className={"item" + (mutuos.has(clave) ? " mutuo-item" : "")}>
+                {mutuos.has(clave) && <span className="etiqueta-mutuo">Interés mutuo: los dos dijeron que sí</span>}
                 <div className="tarjeta-cabeza">
                   <div>
                     <h3>{a.joven_id} → {titulo(a.vacante_id)}</h3>
@@ -85,9 +113,11 @@ export default function Matches({ cat }) {
                   </div>
                   <span className="puntaje">{Math.round(a.desglose.total * 100)}<small>/100</small></span>
                 </div>
-                <h4>Por qué el sistema lo propone</h4>
-                <ul className="motivos">{a.desglose.motivos.map((m) => <li key={m}>{conNombres(m, cat.habilidades)}</li>)}</ul>
                 <Barras desglose={a.desglose} />
+                <details className="por-que">
+                  <summary>Por qué el sistema lo propone</summary>
+                  <ul className="motivos">{a.desglose.motivos.map((m) => <li key={m}>{conNombres(m, cat.habilidades)}</li>)}</ul>
+                </details>
                 {filtro === "aprobada" && a.entrevista && <p>Entrevista: <b>{fecha(a.entrevista)}</b></p>}
                 {a.motivo_orientador && <p className="suave">Motivo del orientador: {a.motivo_orientador}</p>}
                 {filtro === "cerrada" && <p className="suave">{CIERRES[a.tipo_cierre] || "Cerrada"}{a.motivo_cierre ? ` · ${a.motivo_cierre}` : ""}</p>}

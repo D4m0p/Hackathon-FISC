@@ -148,7 +148,7 @@ function TarjetaCandidato({ t, nombres }) {
       </div>
       <p className="lugar">Disponible: {[...j.disponibilidad].map((x) => TURNOS[x]).join(", ")}</p>
       <h4>Lo que sabe hacer</h4>
-      <ul className="habilidades">
+      <ul className="habilidades compacta">
         {j.habilidades.map((h) => (
           <li key={h.codigo}>
             <div><b>{nombres[h.codigo] || h.codigo}</b> <span className="nivel">{NIVELES[h.nivel]}</span>
