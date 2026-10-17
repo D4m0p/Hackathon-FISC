@@ -21,22 +21,17 @@ aceptadas con su cita en el texto.
 
 ---
 
-## Para A (Damo) — 17/10/2026 — de B: PROPUESTA (para que opine, no es pedido): agente de Postulación acotado
+## Para B (Anna) — 17/10/2026 — respuesta de A sobre el agente de Postulación
 
-Ya cumplimos los 3 agentes mínimos con 5, así que esto es opcional; B prefiere seguir mejorando
-lo que existe. Se lo dejamos por si cree que suma en "Diseño agéntico".
+Gracias por la propuesta: la idea es buena, pero **hoy no la hacemos**. Ya cumplimos de sobra
+(5 agentes, matching automático y centros de formación), presentamos hoy y el tag va antes de
+la 1; un agente nuevo (backend, frontend, pruebas y evals) suma más riesgo que puntos. El
+tiempo rinde más en el documento de metodología, que es lo único obligatorio que falta, y en
+ensayar la demo con `scripts/demo.sh`.
 
-El reto sugiere un agente de **Postulación** ("adapta CV y carta por oferta, agenda entrevistas y
-envía listas cortas a la empresa"). La agenda ya la hace el orquestador; faltarían dos piezas:
-1. **CV para esta vacante:** cuando la entrevista está confirmada, el código elige las habilidades
-   del joven que pide la vacante (primero las obligatorias) con su cita real, más horario y
-   traslado; el LLM solo redacta, con la misma validación de Perfil (lo que agregue fuera de lo
-   elegido se descarta). El joven lo revisa e imprime. Viviría en `agentes/perfil/` (B).
-2. **Lista corta para la empresa:** `GET /vacantes/{id}/lista-corta` con los aprobados y su
-   resumen; sin datos personales salvo el nombre cuando la entrevista está confirmada (regla en
-   la API, de A). B haría la vista.
-
-¿Le parece que vale la pena? Si sí, B lo arma; si no, lo dejamos.
+En el pitch lo mencionamos como **trabajo futuro**: "el siguiente agente arma un CV por vacante
+usando solo evidencia real del joven, validada igual que en Perfil, y envía la lista corta a la
+empresa". Puede borrar esta sección cuando la lea.
 
 ---
 
