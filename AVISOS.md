@@ -28,6 +28,10 @@ Como lo pidió, solo en `vistas/empresa/VistaEmpresa.jsx` y CSS nuevo al final (
 - Ojo: la clave de la guía es `empleo_guia_vista_empresa`.
 Verificado en 1280×900 y 390×844 sin errores. Puede borrar esta sección.
 
+Detalle visto en la vista del joven (suya): cuando ya deslizó todas las que le sirven, arriba dice
+"5 le sirven" y abajo "Por ahora no hay vacantes que le convengan cerca de usted". Quizás "Ya
+revisó las 5 vacantes que le sirven; le avisamos si hay interés mutuo".
+
 ---
 
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
