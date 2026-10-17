@@ -215,7 +215,7 @@ por qué un portal que ignora la geografía manda a los jóvenes a trabajos a lo
 
 | Qué | Resultado |
 |---|---|
-| Pruebas automáticas (pytest) | 465 |
+| Pruebas automáticas (pytest) | 471 |
 | Evals de Matching, Auditor y Mercado (`evals/`) | 40 casos en 8 categorías, todos cumplen |
 | Evals del agente Perfil (`agentes/perfil/evals/`) | 35 casos de reglas, todos cumplen |
 | Casos aleatorios (Hypothesis) | El Matching y la Ruta de formación se comparan contra búsqueda exhaustiva en instancias pequeñas, con cualquier combinación válida de pesos: el solver nunca pierde |
@@ -238,7 +238,9 @@ turnos, presupuesto, el arco "quedarse sin vacante") y se verificó que alguna p
 - **Roles con token** (joven, empresa, centro, orientador): cada actor solo toca lo suyo; las
   decisiones clave son del orientador. En la base solo se guarda el hash del token.
 - **Anonimato:** la empresa ve habilidades y niveles, nunca nombre, género, edad, contacto ni la
-  evidencia textual del CV.
+  evidencia textual del CV. La foto es opcional y la empresa solo la ve cuando su entrevista con esa
+  persona ya está aprobada (el servidor lo verifica en cada petición); antes de eso decide por
+  habilidades, y el Auditor bloquea a quien exige foto en una oferta.
 - **Entradas:** límites de forma y tamaño en todo el contrato; el texto de CVs y ofertas se trata
   como dato, nunca como instrucción; límite de peticiones por minuto para quien no tiene token en
   las rutas que usan el modelo de lenguaje.

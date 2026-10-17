@@ -8,6 +8,7 @@ import Contador from "../../componentes/Contador.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import LogoEmpresa from "../../componentes/LogoEmpresa.jsx";
+import SubirFoto from "../../componentes/SubirFoto.jsx";
 import MapaPanama from "../../componentes/MapaPanama.jsx";
 import { AGENTES, NIVELES, TURNOS, conNombres, corregimiento, dinero, enPalabras, nombreEmpresa } from "../../nombres.js";
 import Entrevistas from "./Entrevistas.jsx";
@@ -406,6 +407,7 @@ function Estado({ jovenId, nombres }) {
   return (
     <section className="panel">
       <h2>Dónde va su proceso</h2>
+      <SubirFoto jovenId={jovenId} />
       <Camino pasos={PASOS} actual={paso} />
       <p className="aviso">{QUE_SIGUE[paso]}</p>
       <Entrevistas jovenId={jovenId} asignaciones={datos.asignaciones} onCambio={recargar} />

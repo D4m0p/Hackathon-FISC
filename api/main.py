@@ -10,7 +10,7 @@ from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from contrato.modelos import (
@@ -115,6 +115,22 @@ class PedidoReserva(BaseModel):
 class ResultadoReserva(BaseModel):
     curso: Curso
     reserva: Reserva
+
+
+MAX_BYTES_FOTO = 2 * 1024 * 1024
+_FIRMAS_FOTO = {"image/jpeg": (b"\xff\xd8\xff",), "image/png": (b"\x89PNG\r\n\x1a\n",), "image/webp": (b"RIFF",)}
+
+
+class FotoSubida(BaseModel):
+    tipo_mime: Literal["image/jpeg", "image/png", "image/webp"]
+    contenido_base64: str = Field(min_length=8, max_length=2_800_000)
+
+
+def _imagen_valida(tipo: str, datos: bytes) -> bool:
+    """La foto debe ser de verdad del tipo que dice (no se confía en la extensión ni en el MIME)."""
+    if not datos.startswith(_FIRMAS_FOTO[tipo]):
+        return False
+    return tipo != "image/webp" or datos[8:12] == b"WEBP"
 
 
 class Liberacion(BaseModel):
@@ -329,6 +345,43 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
     def listar_planes(_: Identidad = Depends(solo_orientador)) -> list[PlanFormacion]:
         """Todos los planes de formación de una vez (para la pestaña «Sin match»)."""
         return orq.almacen.listar(PlanFormacion)
+
+    # ----- foto del joven: la ven él, el orientador y SOLO la empresa con entrevista aprobada -----
+    @app.put("/jovenes/{joven_id}/foto", status_code=204)
+    def subir_foto(joven_id: str, foto: FotoSubida, ident: Identidad = Depends(requerida)):
+        exigir_joven(ident, joven_id)
+        orq._joven(joven_id)
+        import base64
+        import binascii
+        try:
+            datos = base64.b64decode(foto.contenido_base64, validate=True)
+        except (binascii.Error, ValueError):
+            raise HTTPException(status_code=400, detail="La foto llegó dañada")
+        if len(datos) > MAX_BYTES_FOTO:
+            raise HTTPException(status_code=413, detail="La foto pesa más de 2 MB")
+        if not _imagen_valida(foto.tipo_mime, datos):
+            raise HTTPException(status_code=400, detail="El archivo no es una imagen JPG, PNG o WebP válida")
+        orq.almacen.guardar_foto(joven_id, foto.tipo_mime, datos)
+
+    @app.delete("/jovenes/{joven_id}/foto", status_code=204)
+    def borrar_foto(joven_id: str, ident: Identidad = Depends(requerida)):
+        exigir_joven(ident, joven_id)
+        orq.almacen.borrar_foto(joven_id)
+
+    @app.get("/jovenes/{joven_id}/foto")
+    def ver_foto(joven_id: str, ident: Identidad = Depends(requerida)):
+        """La empresa solo la ve si tiene una entrevista APROBADA y vigente con esa persona: decide
+        por habilidades y conoce a la persona para la cita. A los demás, 404 (no se revela nada)."""
+        permitido = ident.es_joven(joven_id) or (
+            ident.rol == "empresa" and any(
+                a.vigente and a.aprobada and orq.almacen.obtener(Vacante, a.vacante_id) is not None
+                and orq.almacen.obtener(Vacante, a.vacante_id).empresa_id == ident.sujeto
+                for a in orq.almacen.asignaciones(joven_id=joven_id)))
+        foto = orq.almacen.foto(joven_id) if permitido else None
+        if foto is None:
+            raise HTTPException(status_code=404, detail="Sin foto")
+        return Response(content=foto[1], media_type=foto[0],
+                        headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
     @app.get("/jovenes/{joven_id}/historia")
     def historia(joven_id: str, ident: Identidad = Depends(requerida)) -> HistoriaJoven:

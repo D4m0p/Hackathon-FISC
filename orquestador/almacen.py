@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS reservas (
     curso_id TEXT NOT NULL, joven_id TEXT NOT NULL, fecha TEXT NOT NULL, motivo TEXT NOT NULL,
     PRIMARY KEY (curso_id, joven_id)
 );
+CREATE TABLE IF NOT EXISTS fotos (
+    joven_id TEXT PRIMARY KEY, tipo TEXT NOT NULL, datos BLOB NOT NULL, fecha TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS mensajes (
     n INTEGER PRIMARY KEY AUTOINCREMENT, destino TEXT, texto TEXT NOT NULL,
     enviado INTEGER NOT NULL, fecha TEXT NOT NULL
@@ -302,6 +305,22 @@ class Almacen:
         with self._lock:
             filas = self._con.execute(consulta + " ORDER BY fecha, curso_id, joven_id", params).fetchall()
         return [dict(curso_id=c, joven_id=j, fecha=f, motivo=m) for c, j, f, m in filas]
+
+    # ---------- foto del joven (dato personal: solo la ve quien tiene permiso) ----------
+    def guardar_foto(self, joven_id: str, tipo: str, datos: bytes) -> None:
+        with self._lock, self._con:
+            self._con.execute("INSERT INTO fotos VALUES (?, ?, ?, ?) ON CONFLICT (joven_id) DO UPDATE SET "
+                              "tipo = excluded.tipo, datos = excluded.datos, fecha = excluded.fecha",
+                              (joven_id, tipo, datos, _ahora()))
+
+    def foto(self, joven_id: str) -> tuple[str, bytes] | None:
+        with self._lock:
+            fila = self._con.execute("SELECT tipo, datos FROM fotos WHERE joven_id = ?", (joven_id,)).fetchone()
+        return (fila[0], bytes(fila[1])) if fila else None
+
+    def borrar_foto(self, joven_id: str) -> None:
+        with self._lock, self._con:
+            self._con.execute("DELETE FROM fotos WHERE joven_id = ?", (joven_id,))
 
     # ---------- mensajes enviados ----------
     def registrar_mensaje(self, destino: str | None, texto: str, enviado: bool) -> None:

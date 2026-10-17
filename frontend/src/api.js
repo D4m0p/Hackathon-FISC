@@ -57,7 +57,20 @@ async function pedir(metodo, ruta, cuerpo, token = leerToken()) {
   return datos;
 }
 
+// Foto del joven: se pide con el token y se devuelve como URL local (o null si no hay o no se puede ver).
+export async function urlFoto(jovenId) {
+  const token = leerToken();
+  try {
+    const r = await fetch(`${BASE}/jovenes/${encodeURIComponent(jovenId)}/foto`,
+      { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!r.ok) return null;
+    return URL.createObjectURL(await r.blob());
+  } catch { return null; }
+}
+
 export const api = {
+  subirFoto: (id, contenido_base64, tipo_mime) => pedir("PUT", `/jovenes/${id}/foto`, { contenido_base64, tipo_mime }),
+  borrarFoto: (id) => pedir("DELETE", `/jovenes/${id}/foto`),
   yo: (token) => pedir("GET", "/yo", undefined, token),
   habilidades: () => pedir("GET", "/habilidades"),
   traslados: () => pedir("GET", "/traslados"),

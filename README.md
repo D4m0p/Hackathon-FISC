@@ -114,7 +114,9 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 - **Los datos personales viven aparte.** `Joven` no tiene nombre, género ni edad; esos
   campos están en `DatosPersonales`. Los solvers reciben solo `Joven`, así que no pueden
   usarlos aunque quisieran. La empresa ve habilidades y niveles **sin la evidencia textual**
-  del CV, que puede traer nombre, cédula o teléfono (hay una prueba que lo verifica con un
+  del CV, que puede traer nombre, cédula o teléfono. La foto es opcional y la empresa solo la ve cuando
+  su entrevista con esa persona ya está aprobada (hasta entonces decide por habilidades; el Auditor
+  bloquea a quien exige foto) (hay una prueba que lo verifica con un
   CV real de ejemplo).
 - **El puntaje separa lo geográfico.** El corregimiento solo puede mover los componentes
   de traslado y salario neto; el de habilidades no depende del lugar. Así el Auditor puede
@@ -255,6 +257,8 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `POST` | `/perfil/declarar` | Habilidad que el joven agrega a mano `{codigo, evidencia}`: solo de la taxonomía, nivel básico y marcada «Según la persona» (público) |
 | `POST` | `/perfil/transcribir` | Nota de voz o foto (CV o volante) → texto para que la persona lo revise; no decide nada (público) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
+| `PUT` / `DELETE` | `/jovenes/{id}/foto` | El joven sube (JPG, PNG o WebP, hasta 2 MB, validada por su contenido) o quita su foto |
+| `GET` | `/jovenes/{id}/foto` | La ven el propio joven, el orientador y **solo la empresa con una entrevista aprobada y vigente con esa persona**; para cualquier otro, 404 |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
 | `GET` | `/jovenes/{id}/historia` | Todo lo que el sistema hizo con el joven: estado actual y qué agente decidió qué, en orden |
@@ -306,7 +310,7 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-465 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+471 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 

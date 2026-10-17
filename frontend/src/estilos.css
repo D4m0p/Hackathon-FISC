@@ -525,3 +525,14 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
   .joven-principal .botones-deslizar button { pointer-events: auto; }
   .joven-grilla { padding-bottom: 96px; }   /* que lo último no quede tapado por los botones */
 }
+
+/* Foto del joven: solo para él, el orientador y la empresa con entrevista aprobada */
+.foto-persona { border-radius: 50%; object-fit: cover; flex: none; display: inline-flex; align-items: center;
+  justify-content: center; background: var(--primario-claro); color: var(--primario); font-weight: 700; }
+.foto-persona.revelar { animation: revelar-foto .9s cubic-bezier(.2, .8, .2, 1) both, anillo-foto 1.6s ease-out .5s 1; }
+@keyframes revelar-foto { from { opacity: 0; transform: scale(.6); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes anillo-foto { from { box-shadow: 0 0 0 0 rgba(46, 211, 193, .7); } to { box-shadow: 0 0 0 18px rgba(46, 211, 193, 0); } }
+.persona-cabeza { display: flex; align-items: center; gap: 12px; }
+.subir-foto { display: flex; align-items: center; gap: 14px; margin: 6px 0 14px; }
+.subir-foto label.boton { display: inline-block; cursor: pointer; margin-right: 10px; }
+@media (prefers-reduced-motion: reduce) { .foto-persona.revelar { animation: none; } }
