@@ -5,8 +5,9 @@ import Barras from "../../componentes/Barras.jsx";
 import Camino from "../../componentes/Camino.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
+import LogoEmpresa from "../../componentes/LogoEmpresa.jsx";
 import MapaPanama from "../../componentes/MapaPanama.jsx";
-import { AGENTES, NIVELES, TURNOS, conNombres, corregimiento, dinero, enPalabras } from "../../nombres.js";
+import { AGENTES, NIVELES, TURNOS, conNombres, corregimiento, dinero, enPalabras, nombreEmpresa } from "../../nombres.js";
 import Entrevistas from "./Entrevistas.jsx";
 
 const PESTANAS = [["vacantes", "Vacantes"], ["casi", "Le falta poco"], ["plan", "Cursos"], ["estado", "Mi proceso"]];
@@ -192,7 +193,13 @@ function TarjetaVacante({ t, nombres }) {
           llegar y cuánto le queda después del pasaje. Toque «Ver cómo se calculó» para el detalle.
         </Ayuda>
       </span>
-      <h3 className="titulo-vacante">{v.titulo}</h3>
+      <div className="cabeza-vacante">
+        <LogoEmpresa empresaId={v.empresa_id} />
+        <div>
+          <h3 className="titulo-vacante">{v.titulo}</h3>
+          <p className="nombre-empresa">{nombreEmpresa(v.empresa_id)}</p>
+        </div>
+      </div>
       <p className="lugar">{corregimiento(v.corregimiento)} · {[...v.turnos].map((x) => TURNOS[x]).join(", ")} · {v.dias_por_semana} días a la semana</p>
 
       <ul className="datos-clave">

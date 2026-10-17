@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
 import Contador from "../../componentes/Contador.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
-import { TURNOS, corregimiento, dinero } from "../../nombres.js";
+import LogoEmpresa from "../../componentes/LogoEmpresa.jsx";
+import { TURNOS, corregimiento, dinero, nombreEmpresa } from "../../nombres.js";
 import DetalleVacante from "./DetalleVacante.jsx";
 import FormVacante from "./FormVacante.jsx";
 import Hallazgos from "./Hallazgos.jsx";
@@ -91,7 +92,7 @@ export default function VistaEmpresa({ empresaId }) {
       {guia && <Guia titulo="Así funciona para su empresa" pasos={PASOS_GUIA}
                      onCerrar={() => { marcarGuiaVista("empresa"); setGuia(false); }} />}
       <div className="barra-ayuda">
-        <span />
+        <span className="cabeza-vacante"><LogoEmpresa empresaId={empresaId} tamano={36} /><b>{nombreEmpresa(empresaId)}</b></span>
         <button className="enlace" onClick={() => setGuia(true)}>¿Cómo funciona?</button>
       </div>
       <ResumenEmpresa vacantes={vacantes} />

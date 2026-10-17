@@ -459,3 +459,10 @@ legend { padding: 0 6px; font-weight: 600; }
 .codigo-acceso .token { flex: 1; margin: 12px 0; }
 .lista-corta { padding-left: 18px; }
 .cita-propia { margin: 3px 0 0; color: var(--suave); font-size: .85rem; } .cita-propia q { display: inline; }
+
+/* Logo generado de la empresa (iniciales sobre color fijo) */
+.logo-empresa { display: inline-flex; align-items: center; justify-content: center; flex: none;
+  border-radius: 12px; color: #fff; font-weight: 700; letter-spacing: .02em; user-select: none; }
+.cabeza-vacante { display: flex; align-items: center; gap: 12px; }
+.cabeza-vacante .titulo-vacante { margin: 0; }
+.nombre-empresa { margin: 2px 0 0; color: var(--suave); font-size: .9rem; }
