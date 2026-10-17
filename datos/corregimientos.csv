@@ -1,0 +1,22 @@
+codigo,nombre,distrito,lat,lon,tipo_punto,fuente_url,fecha_consulta
+amelia_denis_icaza,Amelia Denis de Icaza,San Miguelito,9.040409,-79.513224,punto_osm,https://www.openstreetmap.org/relation/11482516,2026-10-17
+ancon,Ancón,Panamá,9.039752,-79.586422,punto_osm,https://www.openstreetmap.org/relation/11382233,2026-10-17
+arnulfo_arias,Arnulfo Arias,San Miguelito,9.066545,-79.482050,punto_osm,https://www.openstreetmap.org/relation/11483078,2026-10-17
+arraijan,Arraiján cabecera,Arraiján,8.945324,-79.642276,punto_osm,https://www.openstreetmap.org/relation/11491018,2026-10-17
+belisario_frias,Belisario Frías,San Miguelito,9.077165,-79.488736,punto_osm,https://www.openstreetmap.org/relation/10583752,2026-10-17
+belisario_porras,Belisario Porras,San Miguelito,9.053952,-79.499893,punto_osm,https://www.openstreetmap.org/relation/11482888,2026-10-17
+bella_vista,Bella Vista,Panamá,8.985295,-79.524019,punto_osm,https://www.openstreetmap.org/relation/11381324,2026-10-17
+betania,Betania,Panamá,9.012569,-79.529247,punto_osm,https://www.openstreetmap.org/relation/11385188,2026-10-17
+burunga,Burunga,Arraiján,8.967081,-79.665772,nodo_lugar_osm,https://www.openstreetmap.org/node/4412467275,2026-10-17
+calidonia,Calidonia,Panamá,8.968530,-79.535720,punto_osm,https://www.openstreetmap.org/relation/11381614,2026-10-17
+jose_domingo_espinar,José Domingo Espinar,San Miguelito,9.046939,-79.477307,punto_osm,https://www.openstreetmap.org/relation/11482967,2026-10-17
+juan_diaz,Juan Díaz,Panamá,9.032559,-79.459495,punto_osm,https://www.openstreetmap.org/relation/11378663,2026-10-17
+las_cumbres,Las Cumbres,Panamá,9.092346,-79.555627,punto_osm,https://www.openstreetmap.org/relation/11480386,2026-10-17
+mateo_iturralde,Mateo Iturralde,San Miguelito,9.033996,-79.497136,punto_osm,https://www.openstreetmap.org/relation/8389284,2026-10-17
+omar_torrijos,Omar Torrijos,San Miguelito,9.062518,-79.519710,punto_osm,https://www.openstreetmap.org/relation/10583798,2026-10-17
+rufina_alfaro,Rufina Alfaro,San Miguelito,9.069196,-79.453957,punto_osm,https://www.openstreetmap.org/relation/11483091,2026-10-17
+san_francisco,San Francisco,Panamá,8.989120,-79.505873,punto_osm,https://www.openstreetmap.org/relation/11381034,2026-10-17
+tocumen,Tocumen,Panamá,9.122325,-79.394221,punto_osm,https://www.openstreetmap.org/relation/11377914,2026-10-17
+veinticuatro_diciembre,24 de Diciembre,Panamá,9.139575,-79.396349,punto_osm,https://www.openstreetmap.org/relation/11377429,2026-10-17
+victoriano_lorenzo,Victoriano Lorenzo,San Miguelito,9.032233,-79.508086,punto_osm,https://www.openstreetmap.org/relation/8389112,2026-10-17
+vista_alegre,Vista Alegre,Arraiján,8.929341,-79.700516,nodo_lugar_osm,https://www.openstreetmap.org/node/8034299478,2026-10-17
