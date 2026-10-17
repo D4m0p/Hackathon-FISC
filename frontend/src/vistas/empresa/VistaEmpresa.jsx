@@ -268,19 +268,25 @@ function ResumenEmpresa({ vacantes, datos }) {
 function TableroEmpresa({ vacantes, datos, nombres }) {
   const [zona, setZona] = useState(null);
   const publicadas = vacantes.filter((v) => v.estado === "publicada");
-  if (!publicadas.length || !datos) return null;
+  // Se muestra siempre, también si la empresa aún no publica o tiene vacantes bloqueadas.
+  const vivas = vacantes.filter((v) => v.estado !== "cerrada");
+  const bloqueadas = vacantes.filter((v) => v.estado === "bloqueada");
+  if (!datos) return null;
 
   const candidatos = Object.values(datos.listas).flat().map((t) => t.joven);
   const pedidas = new Set(publicadas.flatMap((v) => v.habilidades_requeridas.map((r) => r.codigo)));
-  const zonas = [...new Set([...publicadas.map((v) => v.corregimiento), ...candidatos.map((j) => j.corregimiento)])];
+  const zonas = [...new Set([...vivas.map((v) => v.corregimiento), ...candidatos.map((j) => j.corregimiento)])];
   const puntos = zonas.map((z) => {
     const vs = publicadas.filter((v) => v.corregimiento === z);
+    const bl = bloqueadas.filter((v) => v.corregimiento === z);
     const cupos = vs.reduce((s, v) => s + v.cupos, 0);
     const n = candidatos.filter((j) => j.corregimiento === z).length;
     return {
-      codigo: z, radio: vs.length ? 7 + cupos * 3 : 6 + Math.min(n, 8) * 1.5,
-      color: vs.length ? "var(--aqua)" : "var(--celeste)", anillo: n ? "var(--celeste)" : null,
-      lineas: [...(vs.length ? [`${vs.length} vacante(s) · ${cupos} cupo(s)`] : []), ...(n ? [`${n} ${n === 1 ? "candidato" : "candidatos"}`] : [])],
+      codigo: z, radio: vs.length ? 7 + cupos * 3 : bl.length ? 9 : 6 + Math.min(n, 8) * 1.5,
+      color: vs.length ? "var(--aqua)" : bl.length ? "#f2b84b" : "var(--celeste)", anillo: n ? "var(--celeste)" : null,
+      lineas: [...(vs.length ? [`${vs.length} vacante(s) · ${cupos} cupo(s)`] : []),
+               ...(bl.length ? [`${bl.length} bloqueada(s) por el Auditor: corríjala(s) para recibir candidatos`] : []),
+               ...(n ? [`${n} ${n === 1 ? "candidato" : "candidatos"}`] : [])],
     };
   });
 
@@ -290,11 +296,13 @@ function TableroEmpresa({ vacantes, datos, nombres }) {
     clave: c, etiqueta: nombres[c] || c, valor: n, color: pedidas.has(c) ? "var(--aqua)" : "var(--celeste)",
   }));
 
-  const zonasVacante = [...new Set(publicadas.map((v) => v.corregimiento))];
-  const zonaTend = zona && zonasVacante.includes(zona) ? zona : null;
+  const zonasVacante = [...new Set(vivas.map((v) => v.corregimiento))];
+  const zonaTend = zona && datos.tend?.por_zona[zona] ? zona : null;
+  // sin vacantes propias, lo que más se pide en todo el sistema
+  const zonasTend = zonasVacante.length ? zonasVacante : Object.keys(datos.tend?.por_zona || {});
   const piden = zonaTend
     ? datos.tend?.por_zona[zonaTend] || []
-    : Object.values(zonasVacante.flatMap((z) => datos.tend?.por_zona[z] || []).reduce((acc, h) => {
+    : Object.values(zonasTend.flatMap((z) => datos.tend?.por_zona[z] || []).reduce((acc, h) => {
       acc[h.codigo] = { ...h, vacantes: (acc[h.codigo]?.vacantes || 0) + h.vacantes };
       return acc;
     }, {})).sort((a, b) => b.vacantes - a.vacantes).slice(0, 5);
@@ -307,21 +315,25 @@ function TableroEmpresa({ vacantes, datos, nombres }) {
           {zona && <button className="chip claro" onClick={() => setZona(null)}>Ver todo · quitar {corregimiento(zona)}</button>}
         </div>
         <MapaPanama puntos={puntos} seleccionado={zona} onSeleccion={setZona}
-                    leyenda={<><i className="punto aqua" /> vacantes (tamaño) <i className="punto anillo" /> viven candidatos</>} />
+                    leyenda={<><i className="punto aqua" /> vacantes (tamaño) <i className="punto ambar" /> bloqueada <i className="punto anillo" /> viven candidatos</>} />
         <p className="nota">Toque un corregimiento para ver qué piden otras empresas ahí.</p>
       </section>
 
       <div className="panorama-lado">
         <section className="panel">
           <h3>Lo que saben sus candidatos</h3>
-          {filas.length ? <BarrasH filas={filas} /> : <p className="suave">Todavía no hay candidatos para sus vacantes.</p>}
+          {filas.length ? <BarrasH filas={filas} /> : (
+            <p className="suave">{publicadas.length ? "Todavía no hay candidatos para sus vacantes."
+              : bloqueadas.length ? "Su vacante está bloqueada por el Auditor: corríjala para empezar a recibir candidatos."
+              : "Publique su primera vacante para ver aquí lo que saben sus candidatos."}</p>
+          )}
           <p className="nota"><i className="punto aqua" /> la piden sus vacantes · <i className="punto celeste" /> otras habilidades.
             Candidatos que cumplen y pueden llegar a tiempo; sin nombre, género ni edad.</p>
         </section>
 
         {piden.length > 0 && (
           <section className="panel">
-            <h3>Qué piden otras empresas en {zonaTend ? corregimiento(zonaTend) : "su zona"}</h3>
+            <h3>Qué piden otras empresas {zonaTend ? `en ${corregimiento(zonaTend)}` : zonasVacante.length ? "en su zona" : "en Panamá y Panamá Oeste"}</h3>
             <BarrasH filas={piden.map((h) => ({ clave: h.codigo, etiqueta: nombres[h.codigo] || h.nombre, valor: h.vacantes }))} sufijo=" vac." />
             {datos.tend?.nota && <p className="nota">{datos.tend.nota}</p>}
           </section>
