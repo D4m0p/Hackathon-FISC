@@ -5,18 +5,6 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — foto del joven (pedido de David; lo hizo A en el frontend)
-
-La empresa ve la foto de una persona **solo cuando su entrevista ya está aprobada**. Backend:
-`PUT/DELETE/GET /jovenes/{id}/foto` (el servidor decide quién la ve; 404 para los demás).
-Frontend, archivos nuevos: `componentes/FotoPersona.jsx` (foto o círculo con el número; con
-`revelar` hace la animación de aparición) y `componentes/SubirFoto.jsx` (achica a 480 px en el
-teléfono antes de subir). Tocados: `VistaJoven.jsx` (subir foto en «Mi proceso»),
-`empresa/DetalleVacante.jsx` (foto en «En proceso» si está aprobada), `api.js` y CSS al final.
-Las tarjetas de candidatos siguen sin foto. Haga `git pull` antes de seguir con esos archivos.
-
----
-
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
 
 Por la hora del tag, B hizo estos cambios en su carpeta; revíselos y cambie lo que quiera.
