@@ -38,78 +38,21 @@ aparecerán solas apenas existan; no hace falta otro endpoint.
 
 ---
 
-## Para A (Damo) — 17/10/2026 — pedido de B: cifra de impacto y un límite
+## Para B (Anna) — 17/10/2026 — sus pedidos a A ya están en `main`
 
-**1. `GET /impacto` (orientador) — la cifra que muestra el problema de la geografía.**
-Por qué: el sistema descarta en silencio lo que no le conviene a cada joven y eso no se ve en
-ningún lado; para "Impacto" (30 %) conviene una línea tipo *"de 121 combinaciones joven–vacante,
-38 son viables; descartamos 31 por tiempo de viaje, 12 por pasaje…"*. Recalcularlo en el
-frontend sería duplicar una decisión, por eso se lo pedimos.
-```
-GET /impacto → {jovenes, vacantes_publicadas, pares, viables,
-                descartes: {traslado, presupuesto, horario, salario, habilidad, sin_datos},
-                pares_con_un_solo_motivo}
-```
-- Un par cuenta en cada motivo que incumple (los motivos pueden sumar más que los descartados).
-- Usar la misma función del Matching (`motivos_infactible` / los tipos de `Incumplimiento`).
-- Ideal además: `GET /jovenes/{id}/impacto` → `{publicadas, viables, descartes: {...}}`. Hoy la vista
-  del joven ya muestra "De 11 vacantes publicadas, 5 le sirven…" calculándolo con tarjetas,
-  deslizamientos y casi-califica; con este endpoint daría el motivo también de las que fallan en
-  varias cosas.
+- **`GET /impacto`** y **`GET /jovenes/{id}/impacto`** con el formato que pidió. En la demo:
+  de 121 pares joven–vacante, 13 viables; descartes: traslado 33, pasaje 42, horario 34,
+  salario 5, habilidad 103 (un par cuenta en cada motivo que incumple).
+- **Límite para anónimos en `POST /perfil/transcribir`**.
+- **Centros de formación:** rol `centro` (token `demo-inadeh`, sujeto `INADEH`),
+  `GET /centros/{centro}/demanda` y `POST /cursos/{curso_id}/reservas` con su formato y el orden
+  determinístico que propuso (primero quienes pueden asistir). La reserva descuenta el cupo en
+  una sola operación atómica, deja traza (`formacion · reservar_cupo`) y avisa al joven; 400 si
+  no hay cupos o ya está reservado, 403 si el curso es de otro centro. `HistoriaJoven.reservas`
+  ya viene. En la demo, "Marketing digital y redes sociales" tiene 1 cupo y 3+ interesados (j07
+  primero).
 
-**2. Límite para anónimos:** agregar `("POST", "/perfil/transcribir")` a `RUTAS_LIMITADAS` en
-`api/limites.py`. Es el endpoint nuevo de notas de voz y fotos (ya está en `main`); cada llamada
-gasta en Groq, igual que `/perfil/cv`.
-
----
-
-## Para A (Damo) — 17/10/2026 — pedido de B: centros de formación como tercer actor
-
-**Por qué.** Evaluamos el proyecto contra la rúbrica y el punto más flojo de "Impacto" es que el
-reto pide un mercado de **tres lados** (jóvenes, empresas y **centros de formación**) y los
-centros hoy solo son datos: no ven nada ni deciden nada. El reto dice que quieren "llenar
-cursos con quien los aprovecha". Proponemos una sola pantalla con una sola decisión, sin
-inventar lógica nueva: reutiliza lo que ya calculan Formación (`PlanFormacion`) y
-`casi_califica`. Suma a la vez orden determinístico, acción real (descontar cupo, traza,
-aviso) y humano en el ciclo (el centro decide). En la demo son ~20 s.
-
-**Lo que le pedimos (backend; B hace todo el frontend contra este formato):**
-
-1. **Rol `centro`** en `api/seguridad.py` (`Rol = Literal["joven","empresa","orientador","centro"]`),
-   con `sujeto` = el valor de `Curso.centro` (p. ej. `"INADEH"`). `/yo` → `{rol: "centro", sujeto: "INADEH"}`.
-   En la semilla, token de demo **`demo-inadeh`** (rol centro, sujeto `INADEH`).
-2. **`GET /centros/{centro}/demanda`** (ese centro u orientador) →
-   ```
-   [{curso: Curso,
-     reservas: [{joven_id, fecha}],
-     interesados: [{joven_id, corregimiento, en_plan: bool,
-                    vacantes_que_abre: [{vacante_id, titulo}],
-                    minutos: int | null, costo_semanal: float | null,
-                    cabe_en_horario: bool, motivo: str}]}]
-   ```
-   - Interesados = jóvenes cuyo `PlanFormacion` incluye el curso **∪** jóvenes con un
-     `CasiCalifica` de tipo `habilidad` cuyo código está en `habilidades_otorgadas`.
-     Sin los que ya tienen reserva en ese curso.
-   - `vacantes_que_abre`: vacantes que el joven pasaría a cumplir con ese curso
-     (las de su plan o su casi-califica).
-   - `minutos` / `costo_semanal`: traslado del joven al corregimiento del curso (null si no hay dato).
-   - **Orden determinístico**: primero quienes **pueden asistir** (`cabe_en_horario` y traslado
-     dentro de su `max_minutos_traslado`), luego más `vacantes_que_abre`, luego `en_plan`, luego
-     menos `minutos`, luego `joven_id`. (Lo probamos con datos de demo: sin el primer criterio,
-     el #1 de "Marketing digital" era un joven al que el curso le choca con el horario.)
-   - `motivo`: frase lista para mostrar, p. ej. "Le abre 1 vacante; 15 min de su casa".
-   - Sin datos personales (igual que las tarjetas de empresa).
-3. **`POST /cursos/{curso_id}/reservas`** `{joven_id, motivo}` (el centro dueño del curso u
-   orientador) → `{curso, reserva: {joven_id, curso_id, fecha}}`. Descuenta
-   `cupos_disponibles`, registra traza (agente `formacion`, acción `reservar_cupo`, motivo
-   "Centro INADEH reservó cupo en «…» para j07: …") y notifica al joven
-   ("Tiene un cupo reservado en «Marketing digital…»"). 400 si no hay cupos o ya está
-   reservado; 403 si el curso es de otro centro.
-4. **Que el joven vea su reserva:** agregar a `HistoriaJoven` un campo
-   `reservas: [{curso_id, fecha}]` (opcional, no rompe nada).
-
-Si algo del formato le complica, cámbielo y avísenos: lo ajustamos en el frontend. Cuando esté,
-quiten esta sección.
+Formato exacto en la sección 7 de `AGENTS.md`. Puede borrar esta sección cuando lo vea.
 
 ---
 

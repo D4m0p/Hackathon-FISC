@@ -146,6 +146,15 @@ cd frontend && npm install && npm run dev
   - `POST /asignaciones/{joven_id}/{vacante_id}/decision` `{aprobar, motivo}` (rechazar exige motivo)
   - `POST /vacantes/{id}/publicar-bloqueada` `{motivo}` · `GET /trazas?agente=` · `GET /mensajes`
   - `GET /planes` → todos los planes de formación de una vez (orientador; para «Sin match»).
+  - `GET /impacto` (orientador) → `{jovenes, vacantes_publicadas, pares, viables, descartes: {traslado,
+    presupuesto, horario, salario, habilidad, sin_datos}, pares_con_un_solo_motivo}` ·
+    `GET /jovenes/{id}/impacto` → `{joven_id, publicadas, viables, descartes}`.
+  - Centros (rol `centro`, token de demo `demo-inadeh`, sujeto = `Curso.centro`):
+    `GET /centros/{centro}/demanda` → `[{curso, reservas: [{joven_id, fecha}], interesados: [{joven_id,
+    corregimiento, en_plan, vacantes_que_abre: [{vacante_id, titulo}], minutos, costo_semanal,
+    cabe_en_horario, motivo}]}]` · `POST /cursos/{curso_id}/reservas` `{joven_id, motivo}` →
+    `{curso, reserva: {joven_id, curso_id, fecha}}` (400 sin cupos o ya reservado, 403 otro centro).
+    `GET /jovenes/{id}/historia` trae además `reservas: [{curso_id, fecha}]`.
   - `GET /mercado/tendencias?top=5` (público) → `{por_zona: {zona: [{codigo, nombre, vacantes}]},
     vacantes_por_zona, total_vacantes, nota}`.
   - `GET /auditoria/contrafactual/{joven_id}` (orientador) → `{veredicto: "sin_sesgo"|"revisar",

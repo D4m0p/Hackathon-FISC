@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from orquestador.almacen import Almacen
 
-Rol = Literal["joven", "empresa", "orientador"]
+Rol = Literal["joven", "empresa", "orientador", "centro"]
 
 
 class Identidad(BaseModel):
@@ -31,6 +31,9 @@ class Identidad(BaseModel):
 
     def es_empresa(self, empresa_id: str) -> bool:
         return self.es_orientador or (self.rol == "empresa" and self.sujeto == empresa_id)
+
+    def es_centro(self, centro: str) -> bool:
+        return self.es_orientador or (self.rol == "centro" and self.sujeto == centro)
 
 
 def nuevo_token() -> str:

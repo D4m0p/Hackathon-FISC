@@ -31,8 +31,12 @@ CREATE TABLE IF NOT EXISTS trazas (
 );
 CREATE TABLE IF NOT EXISTS credenciales (
     token_hash TEXT PRIMARY KEY,
-    rol TEXT NOT NULL CHECK (rol IN ('joven', 'empresa', 'orientador')),
+    rol TEXT NOT NULL CHECK (rol IN ('joven', 'empresa', 'orientador', 'centro')),
     sujeto TEXT
+);
+CREATE TABLE IF NOT EXISTS reservas (
+    curso_id TEXT NOT NULL, joven_id TEXT NOT NULL, fecha TEXT NOT NULL, motivo TEXT NOT NULL,
+    PRIMARY KEY (curso_id, joven_id)
 );
 CREATE TABLE IF NOT EXISTS mensajes (
     n INTEGER PRIMARY KEY AUTOINCREMENT, destino TEXT, texto TEXT NOT NULL,
@@ -76,7 +80,22 @@ class Almacen:
                 # WAL: escrituras más rápidas y lecturas que no esperan a las escrituras
                 self._con.execute("PRAGMA journal_mode=WAL")
                 self._con.execute("PRAGMA synchronous=NORMAL")
+            self._migrar_credenciales()
             self._con.executescript(_ESQUEMA)
+
+    def _migrar_credenciales(self) -> None:
+        """Bases creadas antes del rol «centro»: rehace la tabla con el CHECK nuevo, sin perder filas."""
+        fila = self._con.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'credenciales'").fetchone()
+        if fila and "'centro'" not in fila[0]:
+            with self._con:
+                self._con.execute("ALTER TABLE credenciales RENAME TO credenciales_vieja")
+                self._con.execute("""CREATE TABLE credenciales (
+                    token_hash TEXT PRIMARY KEY,
+                    rol TEXT NOT NULL CHECK (rol IN ('joven', 'empresa', 'orientador', 'centro')),
+                    sujeto TEXT)""")
+                self._con.execute("INSERT INTO credenciales SELECT * FROM credenciales_vieja")
+                self._con.execute("DROP TABLE credenciales_vieja")
 
     def responde(self) -> bool:
         """La base contesta una consulta mínima (para /salud)."""
@@ -251,6 +270,38 @@ class Almacen:
                 "SELECT actor, vacante_id, le_interesa, fecha FROM deslizamientos "
                 "WHERE joven_id = ? ORDER BY fecha, actor, vacante_id", (joven_id,)).fetchall()
         return [dict(actor=a, vacante_id=v, le_interesa=bool(i), fecha=f) for a, v, i, f in filas]
+
+    # ---------- reservas de cupo en cursos ----------
+    def reservar(self, curso_id: str, joven_id: str, motivo: str) -> str:
+        """Reserva y descuenta el cupo en una sola transacción. Devuelve "ok",
+        "ya_reservado", "sin_cupos" o "sin_curso"."""
+        with self._lock, self._con:
+            if self._con.execute("SELECT 1 FROM reservas WHERE curso_id = ? AND joven_id = ?",
+                                 (curso_id, joven_id)).fetchone():
+                return "ya_reservado"
+            cur = self._con.execute(
+                "UPDATE entidades SET datos = json_set(datos, '$.cupos_disponibles', "
+                "json_extract(datos, '$.cupos_disponibles') - 1) "
+                "WHERE tipo = 'curso' AND id = ? AND json_extract(datos, '$.cupos_disponibles') > 0",
+                (curso_id,))
+            if cur.rowcount == 0:
+                existe = self._con.execute("SELECT 1 FROM entidades WHERE tipo = 'curso' AND id = ?",
+                                           (curso_id,)).fetchone()
+                return "sin_cupos" if existe else "sin_curso"
+            self._con.execute("INSERT INTO reservas VALUES (?, ?, ?, ?)", (curso_id, joven_id, _ahora(), motivo))
+            return "ok"
+
+    def reservas(self, curso_id: str | None = None, joven_id: str | None = None) -> list[dict]:
+        consulta, params = "SELECT curso_id, joven_id, fecha, motivo FROM reservas WHERE 1 = 1", []
+        if curso_id is not None:
+            consulta += " AND curso_id = ?"
+            params.append(curso_id)
+        if joven_id is not None:
+            consulta += " AND joven_id = ?"
+            params.append(joven_id)
+        with self._lock:
+            filas = self._con.execute(consulta + " ORDER BY fecha, curso_id, joven_id", params).fetchall()
+        return [dict(curso_id=c, joven_id=j, fecha=f, motivo=m) for c, j, f, m in filas]
 
     # ---------- mensajes enviados ----------
     def registrar_mensaje(self, destino: str | None, texto: str, enviado: bool) -> None:

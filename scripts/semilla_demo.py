@@ -36,6 +36,9 @@ def credenciales_demo(orq: Orquestador, datos: dict) -> dict[str, str]:
         j = r["joven"]["id"]
         tokens[j] = f"demo-{j}"
         orq.almacen.guardar_credencial(tokens[j], "joven", j)
+    for centro in sorted({c["centro"] for c in datos["cursos"]}):
+        tokens[centro] = f"demo-{centro.lower()}"
+        orq.almacen.guardar_credencial(tokens[centro], "centro", centro)
     for e in sorted({v["empresa_id"] for v in datos["vacantes"]}):
         tokens[e] = f"demo-{e}"
         orq.almacen.guardar_credencial(tokens[e], "empresa", e)

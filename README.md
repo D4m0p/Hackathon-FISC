@@ -183,6 +183,7 @@ demostración crea estos, **predecibles a propósito y solo para la demo**:
 |---|---|---|
 | Orientador | `demo-orientador` (o el valor de `CLAVE_ORIENTADOR`) | Todo: matching, aprobar o rechazar, inasistencias, ofertas bloqueadas, trazas |
 | Joven | `demo-j01` … `demo-j11` (`demo-j11` = Lucía, sin deslizar nada: para la demo en vivo) | Solo lo suyo: perfil, tarjetas, plan, casi califica, deslizar, cancelar, reprogramar |
+| Centro de formación | `demo-inadeh` | Ver quién necesita cada curso y reservar cupos |
 | Empresa | `demo-e_super`, `demo-e_call`, `demo-e_logis`, `demo-e_resto`, `demo-e_tienda`, `demo-e_tec`, `demo-e_agencia`, `demo-e_hotel` | Solo sus vacantes: publicar, ver candidatos anonimizados, deslizar, retirar, cerrar |
 
 Un joven nuevo que se registra con `POST /jovenes` recibe su propio token aleatorio en la
@@ -231,6 +232,10 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `POST` | `/asignaciones/{joven}/{vacante}/liberar` | Cancelación, inasistencia o retiro: libera el cupo y propone reemplazo |
 | `POST` | `/asignaciones/{joven}/{vacante}/reprogramar` | Mueve la entrevista al siguiente espacio libre |
 | `POST` | `/vacantes/{id}/cerrar` | Cierra la vacante y reubica a los afectados |
+| `GET` | `/impacto` | Cifra de impacto: de todos los pares joven–vacante, cuántos son viables y cuántos se descartan por cada motivo (orientador) |
+| `GET` | `/jovenes/{id}/impacto` | Lo mismo para un joven (él mismo u orientador) |
+| `GET` | `/centros/{centro}/demanda` | Por curso: quiénes lo necesitan (plan de formación o casi califica), en orden determinístico, sin datos personales (centro u orientador) |
+| `POST` | `/cursos/{curso}/reservas` | El centro reserva un cupo: lo descuenta, deja traza y avisa al joven |
 | `GET` | `/mercado/tendencias` | Habilidades más pedidas por zona entre las vacantes publicadas (agente de Mercado, público) |
 | `GET` | `/auditoria/contrafactual/{joven}` | El mismo joven en cada corregimiento: solo cambian traslado y salario; veredicto del Auditor (orientador) |
 | `GET` | `/pesos` | Pesos actuales del puntaje (público) |

@@ -44,6 +44,7 @@ class HistoriaJoven(BaseModel):
     plan: PlanFormacion | None
     deslizamientos: list[dict]
     eventos: list[Traza]                # cronológico: qué agente decidió qué y por qué
+    reservas: list[dict] = []           # cupos reservados en cursos: [{curso_id, fecha}]
 
 
 class CambioPropuesto(BaseModel):
@@ -109,6 +110,40 @@ class Tendencias(BaseModel):
     vacantes_por_zona: dict[str, int]
     total_vacantes: int
     nota: str
+
+
+class VacanteAbierta(BaseModel):
+    vacante_id: str
+    titulo: str
+
+
+class Interesado(BaseModel):
+    """Un joven al que el curso le sirve, sin datos personales (lo ve el centro)."""
+    joven_id: str
+    corregimiento: str
+    en_plan: bool
+    vacantes_que_abre: list[VacanteAbierta]
+    minutos: int | None
+    costo_semanal: float | None
+    cabe_en_horario: bool
+    motivo: str
+
+
+class ReservaVista(BaseModel):
+    joven_id: str
+    fecha: str
+
+
+class DemandaCurso(BaseModel):
+    curso: Curso
+    reservas: list[ReservaVista]
+    interesados: list[Interesado]
+
+
+class Reserva(BaseModel):
+    joven_id: str
+    curso_id: str
+    fecha: str
 
 
 class ErrorDeFlujo(ValueError):
@@ -646,6 +681,88 @@ class Orquestador:
                           nota="Calculado sobre las vacantes publicadas en el sistema; con pocas "
                                "vacantes es ilustrativo, no evidencia del mercado.")
 
+    # ---------- centros de formación (tercer lado del mercado) ----------
+    def demanda_centro(self, centro: str) -> list[DemandaCurso]:
+        """Para cada curso del centro: quiénes lo necesitan, en orden determinístico.
+        Interesados = jóvenes con el curso en su plan de formación ∪ jóvenes a los que solo les
+        falta una habilidad que el curso otorga (casi califica). Sin los ya reservados."""
+        cursos = sorted((c for c in self.almacen.listar(Curso) if c.centro == centro), key=lambda c: c.id)
+        if not cursos:
+            return []
+        matriz = self.matriz()
+        vacantes = {v.id: v for v in self.almacen.listar(Vacante)}
+        jovenes = self.almacen.listar(Joven)
+        planes = {p.joven_id: p for p in self.almacen.listar(PlanFormacion)}
+        casi = {j.id: self.casi_califica(j.id) for j in jovenes}
+        demanda = []
+        for curso in cursos:
+            otorga = {h.codigo: h.nivel for h in curso.habilidades_otorgadas}
+            reservados = {r["joven_id"]: r["fecha"] for r in self.almacen.reservas(curso_id=curso.id)}
+            interesados = []
+            for j in jovenes:
+                if j.id in reservados:
+                    continue
+                plan = planes.get(j.id)
+                en_plan = bool(plan and curso.id in plan.cursos)
+                abre = set(plan.vacantes_objetivo) if en_plan else set()
+                for c in casi[j.id]:
+                    falla = c.incumplimiento
+                    if falla.tipo.value != "habilidad" or falla.codigo not in otorga:
+                        continue
+                    v = vacantes.get(c.vacante_id)
+                    req = next((r for r in v.habilidades_requeridas if r.codigo == falla.codigo), None) if v else None
+                    if req and otorga[falla.codigo] >= req.nivel_minimo:
+                        abre.add(c.vacante_id)
+                if not en_plan and not abre:
+                    continue
+                viaje = matriz.viaje(j.corregimiento, curso.corregimiento)
+                minutos = viaje.minutos if viaje else None
+                costo = round(viaje.costo * 2 * curso.sesiones_por_semana, 2) if viaje else None
+                cabe = curso.turnos <= j.disponibilidad
+                llega = minutos is not None and minutos <= j.max_minutos_traslado
+                partes = [f"Le abre {len(abre)} vacante{'s' if len(abre) != 1 else ''}"] if abre else ["Está en su plan de formación"]
+                partes.append(f"{minutos} min de su casa" if minutos is not None else "sin datos de traslado")
+                if not cabe:
+                    partes.append("el horario del curso no le coincide")
+                elif not llega and minutos is not None:
+                    partes.append(f"queda más lejos de lo que acepta ({j.max_minutos_traslado} min)")
+                interesados.append((not (cabe and llega), -len(abre), not en_plan,
+                                    minutos if minutos is not None else 10**9, j.id, Interesado(
+                    joven_id=j.id, corregimiento=j.corregimiento, en_plan=en_plan,
+                    vacantes_que_abre=[VacanteAbierta(vacante_id=vid, titulo=vacantes[vid].titulo)
+                                       for vid in sorted(abre) if vid in vacantes],
+                    minutos=minutos, costo_semanal=costo, cabe_en_horario=cabe, motivo="; ".join(partes))))
+            interesados.sort(key=lambda t: t[:5])
+            demanda.append(DemandaCurso(
+                curso=curso, reservas=[ReservaVista(joven_id=jid, fecha=f) for jid, f in reservados.items()],
+                interesados=[t[5] for t in interesados]))
+        return demanda
+
+    @_exclusivo
+    def reservar_cupo(self, curso_id: str, joven_id: str, motivo: str = "") -> tuple[Curso, Reserva]:
+        """El centro reserva un cupo: descuenta el cupo (atómico), deja traza y avisa al joven."""
+        curso = self.almacen.obtener(Curso, curso_id)
+        if curso is None:
+            raise NoEncontrado(f"No existe el curso {curso_id}")
+        self._joven(joven_id)
+        estado = self.almacen.reservar(curso_id, joven_id, motivo)
+        if estado == "ya_reservado":
+            raise ErrorDeFlujo("Ese joven ya tiene un cupo reservado en este curso")
+        if estado == "sin_cupos":
+            raise ErrorDeFlujo("El curso no tiene cupos disponibles")
+        if estado == "sin_curso":
+            raise NoEncontrado(f"No existe el curso {curso_id}")
+        curso = self.almacen.obtener(Curso, curso_id)
+        reserva = next(r for r in self.almacen.reservas(curso_id=curso_id, joven_id=joven_id))
+        self._traza(Agente.formacion, "reservar_cupo",
+                    f"Centro {curso.centro} reservó cupo en «{curso.nombre}» para {joven_id}"
+                    + (f": {motivo}" if motivo.strip() else ""),
+                    entrada={"joven_id": joven_id, "curso_id": curso_id},
+                    salida={"cupos_disponibles": curso.cupos_disponibles})
+        self._notificar(joven_id, f"Tiene un cupo reservado en «{curso.nombre}» ({curso.centro}), "
+                                  f"{curso.semanas} semanas. El centro le contactará para empezar.")
+        return curso, Reserva(joven_id=joven_id, curso_id=curso_id, fecha=reserva["fecha"])
+
     def casi_califica(self, joven_id: str) -> list[CasiCalifica]:
         nombres = {h.codigo: h.nombre for h in self.almacen.listar(Habilidad)}
         return casi_califica(self._joven(joven_id), self.almacen.listar(Vacante),
@@ -673,7 +790,9 @@ class Orquestador:
                 estado += f" y {casi} donde le falta una sola cosa"
         return HistoriaJoven(joven=joven, estado=estado, asignaciones=asignaciones, plan=plan,
                              deslizamientos=self.almacen.deslizamientos_de(joven_id),
-                             eventos=self.almacen.trazas_de_joven(joven_id))
+                             eventos=self.almacen.trazas_de_joven(joven_id),
+                             reservas=[{"curso_id": r["curso_id"], "fecha": r["fecha"]}
+                                       for r in self.almacen.reservas(joven_id=joven_id)])
 
     def plan_de(self, joven_id: str) -> PlanFormacion | None:
         return self.almacen.obtener(PlanFormacion, joven_id)

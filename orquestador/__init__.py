@@ -1,7 +1,7 @@
 from .almacen import Almacen
 from .flujo import (
-    DemostracionContrafactual, ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion, Tendencias,
+    DemandaCurso, DemostracionContrafactual, ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Reserva, Simulacion, Tendencias,
 )
 
-__all__ = ["Almacen", "DemostracionContrafactual", "ErrorDeFlujo", "HistoriaJoven", "NoEncontrado",
-           "Orquestador", "Simulacion", "Tendencias"]
+__all__ = ["Almacen", "DemandaCurso", "DemostracionContrafactual", "ErrorDeFlujo", "HistoriaJoven", "NoEncontrado",
+           "Orquestador", "Reserva", "Simulacion", "Tendencias"]

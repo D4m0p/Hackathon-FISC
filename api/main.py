@@ -18,7 +18,7 @@ from contrato.modelos import (
     Pesos, ResultadoAuditoria, ResultadoMatching, TipoCierre, Traslado, Traza, Vacante, Habilidad,
 )
 from orquestador import (
-    DemostracionContrafactual, ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion, Tendencias,
+    DemandaCurso, DemostracionContrafactual, Reserva, ErrorDeFlujo, HistoriaJoven, NoEncontrado, Orquestador, Simulacion, Tendencias,
 )
 from agentes.perfil import ClienteLLM, cliente_desde_entorno
 from agentes.perfil.rutas import crear_router as rutas_perfil
@@ -28,6 +28,7 @@ from orquestador.interfaces import es_oferta_incompleta, faltantes_de
 from .limites import LimiteAnonimos, tope_desde_entorno
 from .registro import RegistroPeticiones, error_inesperado
 from .seguridad import Identidad, Rol, dependencias, nuevo_token, sin_permiso
+from .rutas_impacto import crear_router as rutas_impacto
 
 MAX_TEXTO = 5000   # guardrail: ofertas y CVs más largos se rechazan antes de llegar al LLM
 
@@ -106,6 +107,16 @@ class CambioPesos(BaseModel):
     motivo: str = Field(min_length=1, max_length=1000)
 
 
+class PedidoReserva(BaseModel):
+    joven_id: str = Field(pattern=r"^[A-Za-z0-9_.-]+$", max_length=64)
+    motivo: str = Field(default="", max_length=500)
+
+
+class ResultadoReserva(BaseModel):
+    curso: Curso
+    reserva: Reserva
+
+
 class Liberacion(BaseModel):
     tipo: Literal["cancelacion_joven", "inasistencia", "retiro_empresa"]
     motivo: str = Field(min_length=1, max_length=1000)
@@ -157,6 +168,9 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
         if not ident.es_empresa(v.empresa_id):
             raise sin_permiso()
         return v
+
+    # Cifra de impacto: cuántos pares joven–vacante descarta el sistema y por qué.
+    app.include_router(rutas_impacto(orq, solo_orientador, requerida))
 
     @app.exception_handler(NoEncontrado)
     async def _no_encontrado(_: Request, e: NoEncontrado):
@@ -380,6 +394,25 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
                     ident: Identidad = Depends(requerida)) -> Asignacion:
         exigir_joven(ident, joven_id)
         return orq.reprogramar_entrevista(joven_id, vacante_id, cuerpo.motivo)
+
+    # ----- centros de formación (tercer lado del mercado) -----
+    @app.get("/centros/{centro}/demanda")
+    def demanda_del_centro(centro: str, ident: Identidad = Depends(requerida)) -> list[DemandaCurso]:
+        """Quiénes necesitan cada curso del centro, en orden determinístico (sin datos personales)."""
+        if not ident.es_centro(centro):
+            raise sin_permiso()
+        return orq.demanda_centro(centro)
+
+    @app.post("/cursos/{curso_id}/reservas")
+    def reservar_cupo(curso_id: str, pedido: PedidoReserva, ident: Identidad = Depends(requerida)) -> ResultadoReserva:
+        """El centro dueño del curso (o el orientador) reserva un cupo para un joven."""
+        curso = orq.almacen.obtener(Curso, curso_id)
+        if curso is None:
+            raise NoEncontrado(f"No existe el curso {curso_id}")
+        if not ident.es_centro(curso.centro):
+            raise sin_permiso("Solo el centro dueño del curso puede reservar cupos")
+        curso, reserva = orq.reservar_cupo(curso_id, pedido.joven_id, pedido.motivo)
+        return ResultadoReserva(curso=curso, reserva=reserva)
 
     # ----- transparencia de los agentes -----
     @app.get("/mercado/tendencias")
