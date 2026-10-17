@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
+import Contador from "../../componentes/Contador.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import { TURNOS, corregimiento, dinero } from "../../nombres.js";
 import DetalleVacante from "./DetalleVacante.jsx";
@@ -93,6 +94,7 @@ export default function VistaEmpresa({ empresaId }) {
         <span />
         <button className="enlace" onClick={() => setGuia(true)}>¿Cómo funciona?</button>
       </div>
+      <ResumenEmpresa vacantes={vacantes} />
       <div className="opciones">
         <button className="opcion" onClick={() => setPantalla({ tipo: "nueva" })}>
           <b>Publicar vacante</b><span>Con un formulario</span>
@@ -195,5 +197,32 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
         <button className="boton" disabled={enviando}>{enviando ? "Leyendo…" : "Publicar"}</button>
       </div>
     </form>
+  );
+}
+
+// Cifras de la empresa: vacantes publicadas, candidatos por revisar y personas en proceso.
+function ResumenEmpresa({ vacantes }) {
+  const [extra, setExtra] = useState({ candidatos: 0, proceso: 0 });
+  const publicadas = vacantes.filter((v) => v.estado === "publicada");
+  const bloqueadas = vacantes.filter((v) => v.estado === "bloqueada").length;
+  useEffect(() => {
+    Promise.all([Promise.all(publicadas.map((v) => api.candidatos(v.id).catch(() => []))), api.asignaciones().catch(() => [])])
+      .then(([listas, asig]) => setExtra({
+        candidatos: listas.reduce((s, l) => s + l.length, 0),
+        proceso: asig.filter((a) => a.vigente && a.aprobada !== false).length,
+      }));
+  }, [vacantes]); // eslint-disable-line react-hooks/exhaustive-deps
+  const kpis = [
+    ["Vacantes publicadas", publicadas.length, bloqueadas ? `${bloqueadas} bloqueada(s) por corregir` : "todas revisadas por el Auditor"],
+    ["Candidatos por revisar", extra.candidatos, "cumplen y pueden llegar a tiempo"],
+    ["Personas en proceso", extra.proceso, "en revisión o con entrevista"],
+  ];
+  return (
+    <div className="kpis tres">
+      {kpis.map(([titulo, valor, sub]) => (
+        <div key={titulo} className="kpi"><span className="kpi-titulo">{titulo}</span>
+          <b className="kpi-valor"><Contador valor={valor} /></b><span className="kpi-sub">{sub}</span></div>
+      ))}
+    </div>
   );
 }

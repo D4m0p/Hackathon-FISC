@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
 import Ayuda from "../../componentes/Ayuda.jsx";
+import Contador from "../../componentes/Contador.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import { TURNOS, corregimiento, dinero, etiquetaJoven, numeroCorto } from "../../nombres.js";
@@ -43,10 +44,10 @@ export default function VistaCentro({ centro }) {
         <h2>{centro} · Mis cursos</h2>
         <button className="enlace" onClick={() => setGuia(true)}>¿Cómo funciona?</button>
       </div>
-      <div className="resumen-centro">
-        <div><b>{datos.length}</b><span>cursos</span></div>
-        <div><b>{cupos}</b><span>cupos libres</span></div>
-        <div><b>{interesados}</b><span>jóvenes que los necesitan</span></div>
+      <div className="kpis tres">
+        <div className="kpi"><span className="kpi-titulo">Cursos</span><b className="kpi-valor"><Contador valor={datos.length} /></b><span className="kpi-sub">de {centro}</span></div>
+        <div className="kpi"><span className="kpi-titulo">Cupos libres</span><b className="kpi-valor"><Contador valor={cupos} /></b><span className="kpi-sub">en todos sus cursos</span></div>
+        <div className="kpi"><span className="kpi-titulo">Jóvenes que los necesitan</span><b className="kpi-valor"><Contador valor={interesados} /></b><span className="kpi-sub">según su plan o lo que les falta</span></div>
       </div>
       {aviso && <p className="aviso" role="status">{aviso}</p>}
       <ul className="lista">

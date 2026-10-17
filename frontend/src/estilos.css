@@ -415,3 +415,9 @@ legend { padding: 0 6px; font-weight: 600; }
 .ahorro[open] .ahorro-abrir { display: none; }
 .mapa-joven { margin: 10px 0; padding: 10px 12px; }
 .mapa-joven .mapa-globo { max-width: 85%; }
+
+.kpis.tres { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 600px) { .kpis.tres { grid-template-columns: 1fr; } }
+.app.ancho .vista > .lista, .app.ancho .vista > .opciones { max-width: none; }
+
+.mapa-pulso { transform-box: fill-box; transform-origin: center; }

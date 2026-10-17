@@ -6,7 +6,7 @@ import { conNombres, etiquetaJoven } from "../../nombres.js";
 // Acciones que ningún humano disparó: el sistema reaccionó a algo que pasó.
 // Se leen de /trazas; las que agregue el orquestador (auto_matching, auto_aviso) aparecen solas.
 const ACCIONES = {
-  auto_matching: ["⚡", (t) => t.motivo],
+  auto_matching: ["⚡", (t, c) => c.ids(t.motivo)],
   auto_aviso: ["🔔", (t) => t.motivo],
   reacomodar: ["🔄", (t) => `Se liberó un cupo y el sistema volvió a buscar solo.${t.motivo.includes("Propuestas nuevas:")
     ? " Propuestas nuevas:" + t.motivo.split("Propuestas nuevas:")[1] : ""}`],
@@ -44,6 +44,11 @@ export default function Automaticas({ cat, refrescar }) {
   const c = {
     titulo: (id) => cat.vacantes[id]?.titulo || "una vacante",
     joven: (id) => (id ? etiquetaJoven(id, cat.jovenes) : "un joven"),
+    // Cambia ids sueltos del motivo (j11, v05) por nombres legibles.
+    ids: (texto) => texto
+      .replace(/la empresa de (v[\w-]+)/g, (m, v) => `la empresa de «${cat.vacantes[v]?.titulo || v}»`)
+      .replace(/\b(j[\w-]*\d[\w-]*)→(v[\w-]+)\b/g, (m, j, v) => `${etiquetaJoven(j, cat.jovenes)} → «${cat.vacantes[v]?.titulo || v}»`)
+      .replace(/\b(j\d+|j-[\w]+)\b/g, (m, j) => (cat.jovenes[j] ? etiquetaJoven(j, cat.jovenes) : j)),
   };
   const visibles = trazas.slice(0, todas ? 15 : 4);
   return (
