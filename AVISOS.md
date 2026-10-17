@@ -5,6 +5,15 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para C (Diego) — 17/10/2026 — borrador de `docs/metodologia.md` para revisar
+
+A escribió un borrador del documento de metodología (despliegue, funcionamiento y arquitectura),
+que era lo único obligatorio que faltaba. Está en `docs/metodologia.md`. Revise sobre todo las
+secciones de sus agentes (2.2, 3.5 y 4: Mercado, Auditor y datos) y corrija lo que no
+coincida. Se sube al repo oficial antes del tag de la 1.
+
+---
+
 ## Para C (Diego) — 17/10/2026 — de B: evals del agente Perfil (para sumarlos a los suyos)
 
 B armó evals para Perfil con **su mismo formato** en `agentes/perfil/evals/` (43 casos: extracción,
