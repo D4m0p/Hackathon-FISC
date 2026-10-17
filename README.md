@@ -276,6 +276,10 @@ paso. Estas pruebas encontraron 6 errores que los ejemplos fijos no veían (por 
 una propuesta que seguía viva después de que la empresa cambió su respuesta a "no"); cada
 uno quedó corregido y fijado en `tests/test_regresiones.py`.
 
+**Antes de entregar:** `scripts/verificar_entrega.sh` corre pruebas, evals y compilación del
+frontend, revisa la higiene del repositorio y lista los entregables del reglamento con lo que
+falta (`--rapido` omite pruebas y evals).
+
 **Carga y concurrencia** (`scripts/prueba_carga.py`, contra la API en ejecución): más de
 1000 peticiones en ráfagas de hasta 378 simultáneas, mezclando registros, deslizamientos,
 10 corridas de matching a la vez, decisiones del orientador enviadas dos veces en paralelo
