@@ -490,3 +490,38 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
 .emp-avance-proceso { background: var(--aqua); height: 100%; transition: width .6s ease; }
 .emp-avance-texto { font-size: .8rem; color: var(--suave); }
 .emp-grilla .panel .nota .punto { margin-right: 3px; }
+
+/* ===== App para teléfonos: aprovechar toda la pantalla ===== */
+/* Muesca y bordes redondeados del teléfono (viewport-fit=cover) */
+.app { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.barra { padding-top: max(14px, env(safe-area-inset-top)); }
+
+@media (max-width: 480px) {
+  /* 1. Sin márgenes desperdiciados */
+  .app { padding-left: max(8px, env(safe-area-inset-left)); padding-right: max(8px, env(safe-area-inset-right)); }
+  .barra { padding-bottom: 8px; }
+  .pestanas { margin-bottom: 10px; }
+  .panel, .panel-oscuro { padding: 14px; border-radius: 14px; }
+  .tarjeta { padding: 16px; border-radius: 16px; }
+  .kpis { gap: 8px; }
+  .kpi { padding: 10px 10px 10px 12px; }
+  p.ahorro { padding: 10px 12px; font-size: .92rem; }
+}
+
+@media (max-width: 600px) {
+  /* 2. La tarjeta casi a pantalla completa y ✕ / ✓ fijos abajo, al alcance del pulgar */
+  .joven-principal .tarjeta { min-height: calc(100dvh - 330px); display: flex; flex-direction: column; }
+  .joven-principal .tarjeta > article { flex: 1; display: flex; flex-direction: column; }
+  .joven-principal .tarjeta .datos-clave { flex: 1; align-content: start; gap: 18px; margin-top: 18px; }
+  .joven-principal .tarjeta .datos-clave li { font-size: 1.08rem; }
+  .joven-principal .tarjeta > article > .etiqueta-opcion { align-self: flex-start; }
+  .vista > .joven-grilla { animation: none; }   /* una animación con transform rompe position: fixed */
+  .joven-principal .botones-deslizar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; gap: 36px;
+    padding: 12px 0 max(14px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--fondo) 55%, transparent);
+    pointer-events: none;
+  }
+  .joven-principal .botones-deslizar button { pointer-events: auto; }
+  .joven-grilla { padding-bottom: 96px; }   /* que lo último no quede tapado por los botones */
+}
