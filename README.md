@@ -107,7 +107,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Humano en el ciclo | El orientador aprueba o rechaza cada asignación (rechazar exige motivo), decide sobre ofertas bloqueadas y ajusta los pesos del puntaje después de simular su efecto |
 | Explicabilidad | Cada asignación trae su desglose (habilidades, traslado, salario) y sus motivos en texto |
 | Trazabilidad | Tabla `trazas`, `GET /trazas?agente=` y la historia de cada joven de punta a punta (`GET /jovenes/{id}/historia`) |
-| Evals (≥15 casos) | *(en desarrollo)* en `evals/` |
+| Evals (≥15 casos) | 40 casos en `evals/` (Matching, Auditor, Mercado) y 43 del agente Perfil en `agentes/perfil/evals/` (extracción, validación de lo que propone el LLM y guardrails, con modo en vivo); resultados en `evals/resultados.md` y `agentes/perfil/evals/resultados.md` |
 | Guardrails | Límites de forma y tamaño en todo el contrato (ids sin caracteres que rompan la URL, nombres, textos y listas con tope); tokens por rol: cada actor solo toca lo suyo y las decisiones clave son del orientador; validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
 
 ### Decisiones de diseño
