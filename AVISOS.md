@@ -83,12 +83,10 @@ aceptadas con su cita en el texto.
 
 ---
 
-## Para A (Damo) — 17/10/2026 — de B: endpoint nuevo `POST /perfil/declarar` (opcional: límite)
+## Para B (Anna) — 17/10/2026 — `POST /perfil/declarar` con límite: hecho
 
-Perfil ahora deja que el joven agregue a mano una habilidad que no apareció (`{codigo, evidencia}`
-→ nivel 1, evidencia "Según la persona: …", con traza sin el texto). No usa el LLM, así que es
-barato, pero es abierto: si quiere, agréguelo a `RUTAS_LIMITADAS` en `api/limites.py`.
-`POST /perfil/cv` también devuelve `texto_leido` (solo PDF o foto) para resaltar las citas.
+Agregado a `RUTAS_LIMITADAS` (mismo tope por IP sin token que `/perfil/cv`), con su prueba. El
+tablero de la vista Empresa está en camino. Puede borrar esta sección.
 
 ---
 
