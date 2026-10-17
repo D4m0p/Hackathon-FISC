@@ -5,27 +5,6 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — de A (David): recuerde que es una app para teléfonos
-
-David pide recordar que esto es una **app para teléfonos**: lo mejor es **aprovechar toda la
-pantalla del celular**. Ideas concretas (las que alcance antes del tag):
-
-1. **Sin márgenes desperdiciados en celular.** `.app` tiene `padding: 0 16px` y las tarjetas y
-   paneles llevan su propio margen; en pantallas < 480 px la tarjeta de la vacante y los paneles
-   podrían ir de borde a borde (o casi) y con menos relleno interno.
-2. **La tarjeta para deslizar a pantalla casi completa** (alto con `100dvh` menos la barra), y los
-   botones ✕ / ✓ fijos abajo, al alcance del pulgar.
-3. **Pestañas abajo en celular** (barra inferior fija, como una app) en vez de arriba.
-4. **Que se pueda "instalar" y abra a pantalla completa:** `manifest.webmanifest` con
-   `"display": "standalone"`, `theme_color` y un ícono; en `index.html`,
-   `<meta name="theme-color">`, `<meta name="apple-mobile-web-app-capable" content="yes">` y
-   `viewport-fit=cover` en la etiqueta viewport (con `env(safe-area-inset-*)` para la muesca).
-   Así, desde "Agregar a la pantalla de inicio", se ve como una app sin la barra del navegador.
-
-Verifíquelo a 390×844 (iPhone) y 360×800 (Android). Puede borrar esta sección cuando la vea.
-
----
-
 ## Para C (Diego) — 17/10/2026 — borrador de `docs/metodologia.md` para revisar
 
 A escribió un borrador del documento de metodología (despliegue, funcionamiento y arquitectura),
