@@ -4,7 +4,7 @@ import Ayuda from "../../componentes/Ayuda.jsx";
 import Barras from "../../componentes/Barras.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
-import { NIVELES, TURNOS, conNombres, corregimiento, dinero } from "../../nombres.js";
+import { NIVELES, TURNOS, conNombres, corregimiento, dinero, numeroCorto } from "../../nombres.js";
 
 const ESTADOS = { publicada: "Publicada", bloqueada: "Bloqueada", cerrada: "Cerrada", borrador: "Borrador" };
 
@@ -189,7 +189,7 @@ function EnProceso({ vacante }) {
         return (
           <li key={a.joven_id} className={"item entrevista " + estado}>
             <div className="entrevista-cabeza">
-              <h3>Candidato/a {a.joven_id}</h3>
+              <h3>Candidato/a {numeroCorto(a.joven_id)}</h3>
               <span className={"estado-chip " + estado}>{ETIQUETAS[estado]}</span>
             </div>
             {a.entrevista && estado === "aprobada" && (

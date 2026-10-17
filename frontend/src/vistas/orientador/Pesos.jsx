@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
+import { etiquetaJoven } from "../../nombres.js";
 
 const MIN = 0.05, MAX = 0.8;
 const r2 = (x) => Math.round(x * 100) / 100;
@@ -62,9 +63,9 @@ export default function Pesos({ cat }) {
         <div className="simulacion">
           <p><b>{sim.se_mantienen}</b> propuesta(s) se mantienen.</p>
           {sim.entran.length > 0 && <><h4>Entrarían</h4><ul className="motivos">{sim.entran.map((c) =>
-            <li key={c.joven_id + c.vacante_id}>{c.joven_id} → {titulo(c.vacante_id)} ({Math.round(c.total_nuevo * 100)}/100)</li>)}</ul></>}
+            <li key={c.joven_id + c.vacante_id}>{etiquetaJoven(c.joven_id, cat.jovenes)} → {titulo(c.vacante_id)} ({Math.round(c.total_nuevo * 100)}/100)</li>)}</ul></>}
           {sim.salen.length > 0 && <><h4>Saldrían</h4><ul className="motivos">{sim.salen.map((c) =>
-            <li key={c.joven_id + c.vacante_id}>{c.joven_id} → {titulo(c.vacante_id)} (hoy {Math.round(c.total_actual * 100)}/100)</li>)}</ul></>}
+            <li key={c.joven_id + c.vacante_id}>{etiquetaJoven(c.joven_id, cat.jovenes)} → {titulo(c.vacante_id)} (hoy {Math.round(c.total_actual * 100)}/100)</li>)}</ul></>}
           {!sim.entran.length && !sim.salen.length && <p className="suave">Las propuestas serían las mismas; solo cambian los puntajes.</p>}
         </div>
       )}

@@ -3,7 +3,7 @@ import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import Barras from "../../componentes/Barras.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
-import { conNombres, corregimiento } from "../../nombres.js";
+import { conNombres, corregimiento, etiquetaJoven, nombreEmpresa } from "../../nombres.js";
 
 const FILTROS = [["pendiente", "Por aprobar"], ["aprobada", "Aprobadas"], ["rechazada", "Rechazadas"], ["cerrada", "Cerradas"]];
 const CIERRES = { cancelacion_joven: "El joven canceló", inasistencia: "No se presentó", retiro_empresa: "La empresa lo retiró", vacante_cerrada: "Vacante cerrada" };
@@ -113,8 +113,9 @@ export default function Matches({ cat }) {
                 {mutuos.has(clave) && <span className="etiqueta-mutuo">Interés mutuo: los dos dijeron que sí</span>}
                 <div className="tarjeta-cabeza">
                   <div>
-                    <h3>{a.joven_id} → {titulo(a.vacante_id)}</h3>
-                    {v && <p className="suave">{corregimiento(v.corregimiento)} · empresa {v.empresa_id}</p>}
+                    <h3>{titulo(a.vacante_id)}</h3>
+                    <p><b>{etiquetaJoven(a.joven_id, cat.jovenes)}</b></p>
+                    {v && <p className="suave">{nombreEmpresa(v.empresa_id)}, en {corregimiento(v.corregimiento)}</p>}
                   </div>
                   <span className="puntaje">{Math.round(a.desglose.total * 100)}<small>/100</small></span>
                 </div>
@@ -143,7 +144,7 @@ export default function Matches({ cat }) {
                                   const r = await api.inasistencia(a.joven_id, a.vacante_id, m);
                                   setAbierto(null);
                                   setAviso(r.nuevas.length
-                                    ? `Cupo liberado. Nuevas propuestas: ${r.nuevas.map((n) => `${n.joven_id} → ${titulo(n.vacante_id)}`).join(", ")}.`
+                                    ? `Cupo liberado. Nuevas propuestas: ${r.nuevas.map((n) => `${etiquetaJoven(n.joven_id, cat.jovenes)} → ${titulo(n.vacante_id)}`).join(", ")}.`
                                     : "Cupo liberado. El matching no generó propuestas nuevas (revise «Por aprobar»).");
                                   cargar();
                                 }} />

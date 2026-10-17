@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
-import { conNombres, corregimiento, dinero } from "../../nombres.js";
+import { conNombres, dinero, etiquetaJoven } from "../../nombres.js";
 
 // Jóvenes que no tienen match viable y la ruta de cursos que calculó el agente de Formación.
 export default function SinMatch({ cat }) {
@@ -29,7 +29,7 @@ export default function SinMatch({ cat }) {
       {planes.map(({ joven, plan }) => (
         <li key={joven.id} className="item">
           <div className="entrevista-cabeza">
-            <h3>{joven.id} · {corregimiento(joven.corregimiento)}</h3>
+            <h3>{etiquetaJoven(joven.id, { [joven.id]: joven })}</h3>
             <span className="estado-chip">{plan.semanas_total} sem · {dinero(plan.costo_total)}</span>
           </div>
           <p className="suave">Para: {plan.vacantes_objetivo.map((id) => cat.vacantes[id]?.titulo || id).join(", ")}</p>

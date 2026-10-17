@@ -5,6 +5,30 @@ const CORREGIMIENTOS = {
   san_miguelito: "San Miguelito", tocumen: "Tocumen",
 };
 
+// Solo para mostrar: por dentro todo sigue usando los ids. Las empresas no tienen nombre
+// en el contrato, así que se muestra su rubro (datos de demo) o el id legible.
+const EMPRESAS = {
+  e_super: "Supermercado", e_call: "Centro de llamadas", e_logis: "Empresa de logística",
+  e_resto: "Restaurante", e_tienda: "Tienda", e_tec: "Empresa de tecnología",
+  e_agencia: "Agencia de marketing", e_hotel: "Hotel",
+};
+
+export function nombreEmpresa(id) {
+  return EMPRESAS[id] || id.replace(/^e[_-]/, "").replace(/[_-]/g, " ").replace(/^\w/, (l) => l.toUpperCase());
+}
+
+// "j11" → "#11"; ids generados como "j-a1b2c3d4" → "#c3d4".
+export function numeroCorto(id) {
+  const demo = id.match(/^[a-z](\d+)$/i);
+  return "#" + (demo ? Number(demo[1]) : id.slice(-4));
+}
+
+// "Joven de La Chorrera · #11" (el número distingue a dos del mismo lugar).
+export function etiquetaJoven(id, jovenes = {}) {
+  const j = jovenes[id];
+  return j ? `Joven de ${corregimiento(j.corregimiento)} · ${numeroCorto(id)}` : `Joven ${numeroCorto(id)}`;
+}
+
 export const TURNOS = {
   manana: "Mañana", tarde: "Tarde", noche: "Noche", fin_de_semana: "Fin de semana",
 };

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
-import { corregimiento, dinero } from "../../nombres.js";
+import { corregimiento, dinero, nombreEmpresa } from "../../nombres.js";
 import { nombreRegla } from "../empresa/Hallazgos.jsx";
 
 // Ofertas que el Auditor bloqueó. Los hallazgos salen de su última traza; el orientador
@@ -47,7 +47,7 @@ export default function Bloqueadas() {
                   <h3>{v.titulo}</h3>
                   <span className="estado-chip bloqueada">Bloqueada</span>
                 </div>
-                <p className="suave">{v.empresa_id} · {corregimiento(v.corregimiento)} · {dinero(v.salario_mensual)}</p>
+                <p className="suave">{nombreEmpresa(v.empresa_id)} · {corregimiento(v.corregimiento)} · {dinero(v.salario_mensual)}</p>
                 {v.texto_original && <p className="cita">{v.texto_original}</p>}
                 {r?.hallazgos?.length > 0 && (
                   <ul className="lista">

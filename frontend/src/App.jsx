@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, guardarToken, leerToken } from "./api.js";
+import { nombreEmpresa } from "./nombres.js";
 import Entrada, { DEMO } from "./vistas/Entrada.jsx";
 import VistaJoven from "./vistas/joven/VistaJoven.jsx";
 import Registro from "./vistas/joven/Registro.jsx";
@@ -60,7 +61,7 @@ export default function App() {
             {/* Cambiar de rol en un clic durante la demo */}
             <select className="cambiar-rol" aria-label="Ver como" value={DEMO.some((d) => d.token === token) ? token : ""}
                     onChange={(e) => e.target.value && entrar(e.target.value)}>
-              {!DEMO.some((d) => d.token === token) && <option value="">{ROLES[yo.rol]}{yo.sujeto ? ` · ${yo.sujeto}` : ""}</option>}
+              {!DEMO.some((d) => d.token === token) && <option value="">{yo.rol === "empresa" ? `Empresa · ${nombreEmpresa(yo.sujeto)}` : ROLES[yo.rol]}</option>}
               {DEMO.map((d) => <option key={d.token} value={d.token}>{d.texto}</option>)}
             </select>
             <button className="enlace" onClick={salir}>Salir</button>

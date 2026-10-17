@@ -11,13 +11,14 @@ const PESTANAS = [["matches", "Propuestas"], ["bloqueadas", "Bloqueadas"], ["sin
 // Catálogos que usan varias pestañas: nombres de habilidades, vacantes y cursos.
 export default function VistaOrientador() {
   const [pestana, setPestana] = useState("matches");
-  const [cat, setCat] = useState({ habilidades: {}, vacantes: {}, cursos: {} });
+  const [cat, setCat] = useState({ habilidades: {}, vacantes: {}, cursos: {}, jovenes: {} });
 
   useEffect(() => {
-    Promise.all([api.habilidades(), api.vacantes(), api.cursos()]).then(([hs, vs, cs]) => setCat({
+    Promise.all([api.habilidades(), api.vacantes(), api.cursos(), api.jovenes()]).then(([hs, vs, cs, js]) => setCat({
       habilidades: Object.fromEntries(hs.map((h) => [h.codigo, h.nombre])),
       vacantes: Object.fromEntries(vs.map((v) => [v.id, v])),
       cursos: Object.fromEntries(cs.map((c) => [c.id, c])),
+      jovenes: Object.fromEntries(js.map((j) => [j.id, j])),
     })).catch(() => {});
   }, [pestana]);
 
