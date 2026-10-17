@@ -12,7 +12,7 @@ import MapaPanama from "../../componentes/MapaPanama.jsx";
 import { AGENTES, NIVELES, TURNOS, conNombres, corregimiento, dinero, enPalabras, nombreEmpresa } from "../../nombres.js";
 import Entrevistas from "./Entrevistas.jsx";
 
-const PESTANAS = [["vacantes", "Vacantes"], ["casi", "Le falta poco"], ["plan", "Cursos"], ["estado", "Mi proceso"]];
+const PESTANAS = [["vacantes", "Vacantes"], ["casi", "Casi clasifica"], ["plan", "Cursos"], ["estado", "Mi proceso"]];
 
 const PASOS_GUIA = [
   ["👉", "Le mostramos vacantes que le quedan cerca, en su horario y que le dejan dinero después del pasaje."],
@@ -109,8 +109,10 @@ function Vacantes({ jovenId, nombres, onGuia, onIr }) {
       {errDeslizar && <p className="error">{errDeslizar}</p>}
       {restantes.length === 0 ? (
         <div className="vacio">
-          <p>{vistas ? "Ya revisó todas las vacantes por ahora." : "Por ahora no hay vacantes que le convengan cerca de usted."}</p>
-          <p className="suave">Mire «Le falta poco»: puede que le falte una sola cosa para otras vacantes.</p>
+          <p>{resumen?.impacto.viables
+            ? `Ya revisó las ${resumen.impacto.viables} vacantes que le sirven. Si a una empresa también le interesa, le avisamos.`
+            : vistas ? "Ya revisó todas las vacantes por ahora." : "Por ahora no hay vacantes que le convengan cerca de usted."}</p>
+          <p className="suave">Mire «Casi clasifica»: puede que le falte una sola cosa para otras vacantes.</p>
           <button className="boton secundario" onClick={() => { setVistas(0); recargar(); }}>Buscar de nuevo</button>
         </div>
       ) : (
@@ -149,7 +151,7 @@ function Ahorro({ datos }) {
           Le ahorramos <b>{otras}</b> postulaciones que no le convenían.</>
       ) : (
         <>Ninguna de las <b>{i.publicadas}</b> vacantes publicadas le sirve todavía.
-          Mire «Le falta poco» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
+          Mire «Casi clasifica» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
       )}
     </p>
   );
@@ -165,7 +167,7 @@ function PanelJoven({ jovenId, datos, tarjetas, nombres, onIr }) {
   const cursosQueAbren = new Set(datos.casi.flatMap((c) => c.cursos)).size;
   const kpis = [
     ["Le sirven", i.viables, "cerca, en su horario y le dejan dinero", "vacantes"],
-    ["Le falta poco", datos.casi.length, "les falta una sola cosa", "casi"],
+    ["Casi clasifica", datos.casi.length, "les falta una sola cosa", "casi"],
     ["Cursos útiles", cursosQueAbren, "gratuitos, para lo que le falta", "plan"],
     ["En proceso", enProceso, "con interés mutuo o entrevista", "estado"],
   ];
