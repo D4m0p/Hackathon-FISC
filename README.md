@@ -137,11 +137,35 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 
 - **Backend:** Python 3.12+, FastAPI, Pydantic 2, SQLite.
 - **Optimización:** Google OR-Tools: flujo de costo mínimo para el Matching y CP-SAT para la Ruta de formación.
-- **Modelo de lenguaje:** Groq (`openai/gpt-oss-120b`), solo para extraer datos de texto e
-  imágenes *(en desarrollo)*.
+- **Modelo de lenguaje:** Groq, solo para extraer datos y redactar: `openai/gpt-oss-120b` (texto),
+  `qwen/qwen3.8-27b` (fotos de CV y volantes) y `whisper-large-v3-turbo` (notas de voz).
 - **Mensajería:** API de bots de Telegram.
-- **Frontend:** React + Vite *(en desarrollo)*.
+- **Frontend:** React + Vite; mapa y gráficos en SVG propio, sin librerías extra.
 - **Pruebas:** pytest.
+
+## La página
+
+Una sola página (`frontend/`, en `http://localhost:5173`) con una vista por rol; el selector de
+arriba cambia de rol en un clic durante la demo y el botón ☀️/🌙 elige tema claro u oscuro.
+
+- **Joven:** registro con CV (PDF, foto o texto) o entrevista escrita o por **nota de voz**;
+  tarjetas para deslizar que dicen en palabras cuánto le queda después del pasaje y cuántos
+  minutos tarda; "de 11 vacantes publicadas, 5 le sirven" con un **mapa** de su casa y cada
+  vacante; "Le falta poco", "Cursos" (con cupo reservado por un centro) y "Mi proceso" con los
+  pasos y sus entrevistas (cambiar fecha o cancelar).
+- **Empresa:** publicar con formulario, pegando el texto o el mensaje de WhatsApp, o con la
+  **foto del volante**; ver y corregir lo que bloquea el Auditor; candidatos anónimos para
+  deslizar; personas en proceso; cerrar vacantes.
+- **Centro de formación:** sus cursos, cupos y los jóvenes que los necesitan en el orden del
+  sistema; reservar cupos.
+- **Orientador:** tablero **Panorama** (cifras, mapa por corregimiento, por qué se descartan las
+  combinaciones, lo que piden las empresas y "lo que el sistema hizo solo"), propuestas para
+  aprobar o rechazar, ofertas bloqueadas, jóvenes sin opción, prioridades del puntaje con
+  simulación, **auditoría contrafactual** e historial de decisiones.
+
+El mapa es **esquemático**: usa posiciones aproximadas de los corregimientos
+(`frontend/src/geo.js`) y así lo indica en pantalla; los tiempos y costos de viaje salen de la
+tabla de traslados.
 
 ## Fuentes de datos
 
