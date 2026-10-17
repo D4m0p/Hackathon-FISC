@@ -6,6 +6,16 @@ from contrato.modelos import Traslado
 # Si la tabla no trae el viaje dentro del mismo corregimiento, se asume esto.
 MISMO_CORREGIMIENTO = dict(minutos=15, costo=0.0)
 
+# Ids que NO son corregimientos (zonas administrativas que agrupan varios, p. ej. un
+# distrito). A estos no se les aplica el supuesto de "mismo corregimiento": si el joven y
+# la vacante coinciden en un id así, no se confirma una coincidencia geográfica y `viaje()`
+# devuelve `None`, de modo que el matching usa su mecanismo existente `sin_datos` (no se
+# inventa un viaje local de 15 min ni una ruta). Hoy solo `san_miguelito`, que es el
+# distrito de San Miguelito (9 corregimientos), no un corregimiento concreto; ver
+# `datos/FUENTES_TRANSPORTE.md` y `datos/cargar_transporte.py::AMBIGUOS_DEMO` (hay una
+# prueba de consistencia que mantiene ambas listas sincronizadas).
+ZONAS_AMBIGUAS = frozenset({"san_miguelito"})
+
 SEMANAS_POR_MES = 4.33
 
 
@@ -21,7 +31,7 @@ class MatrizTraslados:
         t = self._tabla.get((origen, destino)) or self._tabla.get((destino, origen))
         if t is not None:
             return t
-        if origen == destino:
+        if origen == destino and origen not in ZONAS_AMBIGUAS:
             return Traslado(origen=origen, destino=destino, **MISMO_CORREGIMIENTO)
         return None
 

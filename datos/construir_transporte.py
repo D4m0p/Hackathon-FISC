@@ -90,6 +90,9 @@ ZONAS: dict[str, tuple[str, str, str | None, str | None, float | None]] = {
     "rufina_alfaro": ("Rufina Alfaro", "San Miguelito", "cerro_viento", "metro", 13),
     "belisario_frias": ("Belisario Frías", "San Miguelito", "san_miguelito", "metro", 12),
     "omar_torrijos": ("Omar Torrijos", "San Miguelito", None, None, None),
+    "mateo_iturralde": ("Mateo Iturralde", "San Miguelito", "paraiso", "metro", 3),
+    "victoriano_lorenzo": ("Victoriano Lorenzo", "San Miguelito", "san_miguelito", "metro", 4),
+    "arnulfo_arias": ("Arnulfo Arias", "San Miguelito", None, None, None),
     # Distrito de La Chorrera (Panamá Oeste)
     "barrio_colon": ("Barrio Colón", "La Chorrera", "la_chorrera", "bus", 6),
     "barrio_balboa": ("Barrio Balboa", "La Chorrera", "la_chorrera", "bus", 8),

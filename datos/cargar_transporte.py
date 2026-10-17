@@ -36,11 +36,24 @@ COLUMNAS_OBLIGATORIAS = {
 }
 FRANJAS = {"pico", "valle"}
 
-# Identificadores de corregimiento que usa el stack de demo y no coinciden 1 a 1 con los
-# corregimientos verificados de la tabla. Solo se traduce lo que tiene equivalencia clara;
-# lo demás se deja sin traducir (el matching, que no se toca, lo trata como `sin_datos`).
-#   - la_chorrera: la ciudad de La Chorrera la forman los barrios Colón y Balboa.
+# Identificadores que usa el stack de demo y no coinciden 1 a 1 con los corregimientos
+# verificados de la tabla.
+#
+# `ALIAS_DEMO`: se traducen porque tienen una equivalencia clara y acotada. `la_chorrera` es
+# la ciudad de La Chorrera, formada por los barrios Colón y Balboa (dos corregimientos del
+# mismo núcleo urbano); se toma Barrio Colón como su centro. Aproximación pequeña y
+# documentada (ver `datos/FUENTES_TRANSPORTE.md`).
 ALIAS_DEMO = {"la_chorrera": "barrio_colon"}
+
+# `AMBIGUOS_DEMO`: ids que designan una zona administrativa (p. ej. un DISTRITO) y no una
+# ubicación puntual, así que NO se traducen a un corregimiento: hacerlo presentaría una
+# ubicación genérica como si fuera exacta y produciría tiempos de viaje engañosos.
+#   - san_miguelito: es el distrito de San Miguelito (9 corregimientos, ~50 km²). Su hub de
+#     transporte (estación de intercambio San Miguelito L1/L2) está en Victoriano Lorenzo,
+#     pero un joven en "san_miguelito" puede estar en cualquiera de los 9 corregimientos y
+#     algunos (Omar Torrijos, Arnulfo Arias) no tienen nodo verificado. Se deja sin traducir:
+#     el matching, sin cambios, lo trata como `sin_datos` (el cargador no inventa datos).
+AMBIGUOS_DEMO = {"san_miguelito": "San Miguelito"}
 
 # Ids de corregimiento usados por los datos de demostración (para el chequeo de cobertura).
 IDS_DEMO = ("arraijan", "bella_vista", "betania", "juan_diaz", "la_chorrera",
@@ -112,19 +125,26 @@ def zonas(ruta: str | Path | None = None) -> set[str]:
 def cobertura(ids=IDS_DEMO, ruta: str | Path | None = None) -> dict:
     """Cómo se relaciona un conjunto de ids con los corregimientos de la tabla.
 
-    Devuelve `cubiertos` (id tal cual existe en la tabla), `alias` (id -> id de la tabla)
-    y `faltantes` (ids sin equivalente; el matching los tratará como `sin_datos`).
+    Devuelve:
+      - `cubiertos`: id que existe tal cual como corregimiento en la tabla;
+      - `alias`: id -> corregimiento con equivalencia clara y acotada (`ALIAS_DEMO`);
+      - `ambiguos`: id -> zona administrativa que NO se traduce porque no es una ubicación
+        puntual (p. ej. un distrito con varios corregimientos posibles);
+      - `faltantes`: ids sin equivalente (el matching los trata como `sin_datos`).
     """
     disponibles = zonas(ruta)
-    cubiertos, alias, faltantes = set(), {}, []
+    cubiertos, alias, ambiguos, faltantes = set(), {}, {}, []
     for i in ids:
         if i in disponibles:
             cubiertos.add(i)
         elif ALIAS_DEMO.get(i) in disponibles:
             alias[i] = ALIAS_DEMO[i]
+        elif i in AMBIGUOS_DEMO:
+            ambiguos[i] = AMBIGUOS_DEMO[i]
         else:
             faltantes.append(i)
-    return {"cubiertos": sorted(cubiertos), "alias": alias, "faltantes": sorted(faltantes)}
+    return {"cubiertos": sorted(cubiertos), "alias": alias,
+            "ambiguos": ambiguos, "faltantes": sorted(faltantes)}
 
 
 def cargar_para_demo(ruta: str | Path | None = None, franja: str = "valle") -> list[Traslado]:

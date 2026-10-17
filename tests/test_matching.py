@@ -1,7 +1,7 @@
 import pytest
 
 from agentes.matching import (
-    MatrizTraslados, asignar, evaluar, motivos_infactible, ranking_para_joven,
+    MatrizTraslados, asignar, es_factible, evaluar, motivos_infactible, ranking_para_joven,
     ranking_para_vacante,
 )
 from contrato.modelos import (
@@ -46,6 +46,29 @@ def test_traslado_se_busca_en_ambos_sentidos():
 def test_mismo_corregimiento_tiene_valor_por_defecto():
     v = MATRIZ.viaje("tocumen", "tocumen")
     assert (v.minutos, v.costo) == (15, 0.0)
+
+
+def test_un_corregimiento_valido_ausente_de_la_matriz_conserva_el_valor_por_defecto():
+    # Un corregimiento real que no aparece en la tabla sigue recibiendo el supuesto de
+    # viaje local (varios casos de `evals` dependen de esto: san_francisco fuera de la
+    # matriz). La corrección de `san_miguelito` no debe tocar este comportamiento.
+    v = MATRIZ.viaje("san_francisco", "san_francisco")
+    assert (v.minutos, v.costo) == (15, 0.0)
+
+
+def test_el_id_ambiguo_no_se_trata_como_mismo_corregimiento():
+    # `san_miguelito` es un distrito, no un corregimiento: coincidir consigo mismo no es una
+    # coincidencia geográfica confirmada. Debe caer en el mecanismo `sin_datos`, no en 15 min.
+    assert MATRIZ.viaje("san_miguelito", "san_miguelito") is None
+
+
+def test_par_en_ubicacion_ambigua_es_infactible_por_sin_datos():
+    j = joven(corregimiento="san_miguelito")
+    v = vacante(corregimiento="san_miguelito")
+    assert not es_factible(j, v, MATRIZ)
+    motivos = motivos_infactible(j, v, MATRIZ)
+    assert any("No hay datos" in m for m in motivos)
+    assert isinstance(evaluar(j, v, MATRIZ), Infactible)
 
 
 # ---------- Factibilidad ----------

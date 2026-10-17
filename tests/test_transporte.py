@@ -40,8 +40,13 @@ DISTRITOS = {"Panamá", "San Miguelito", "La Chorrera", "Arraiján"}
 DOMINIOS = ("https://elmetrodepanama.com/", "https://www.mibus.com.pa/")
 PATRON_ID = re.compile(r"^[A-Za-z0-9_.-]+$")
 
-ZONAS_ESPERADAS = 21
+ZONAS_ESPERADAS = 24
 FILAS_ESPERADAS = ZONAS_ESPERADAS * (ZONAS_ESPERADAS - 1) * 2
+CORREGIMIENTOS_SAN_MIGUELITO = {
+    "amelia_denis_icaza", "belisario_porras", "jose_domingo_espinar", "rufina_alfaro",
+    "belisario_frias", "omar_torrijos", "mateo_iturralde", "victoriano_lorenzo",
+    "arnulfo_arias",
+}
 
 
 def _leer() -> list[dict[str, str]]:
@@ -141,12 +146,33 @@ def test_representacion_por_distrito():
     for dist in zonas.values():
         por_distrito[dist] = por_distrito.get(dist, 0) + 1
     assert por_distrito.get("Panamá") == 9, por_distrito
-    assert por_distrito.get("San Miguelito") == 6, por_distrito
+    assert por_distrito.get("San Miguelito") == 9, por_distrito
     assert por_distrito.get("La Chorrera") == 3, por_distrito
     assert por_distrito.get("Arraiján") == 3, por_distrito
 
 
-def test_san_francisco_es_zona_con_ida_y_vuelta_a_las_otras_veinte():
+def test_san_miguelito_tiene_sus_nueve_corregimientos():
+    zonas_sm = {f["origen"] for f in _leer() if f["distrito_origen"] == "San Miguelito"}
+    assert zonas_sm == CORREGIMIENTOS_SAN_MIGUELITO, sorted(zonas_sm)
+
+
+def test_nodos_de_los_corregimientos_nuevos_de_san_miguelito():
+    filas = _leer()
+    # Mateo Iturralde (nodo Paraíso) y Victoriano Lorenzo (nodo San Miguelito) tienen datos.
+    for zona in ("mateo_iturralde", "victoriano_lorenzo"):
+        pares = [f for f in filas if f["origen"] == zona and f["tipo_dato"] == "estimado"]
+        assert pares, f"{zona} debería tener pares con datos estimados"
+        hacia_bella_vista = next(f for f in pares if f["destino"] == "bella_vista")
+        assert hacia_bella_vista["modo"] == "metro", zona
+        assert 0 < int(hacia_bella_vista["tiempo_min"]) <= 1440, zona
+    # Arnulfo Arias no tiene nodo verificado: queda desconocido, sin inventar datos.
+    arnulfo = [f for f in filas if f["origen"] == "arnulfo_arias"]
+    assert arnulfo and all(f["tipo_dato"] == "desconocido" for f in arnulfo), \
+        "Arnulfo Arias no debe tener tiempos inventados"
+    assert all(f["tiempo_min"] == "" and f["tarifa_usd"] == "" for f in arnulfo)
+
+
+def test_san_francisco_es_zona_con_ida_y_vuelta_a_las_otras_veintitres():
     zonas = {f["origen"] for f in _leer()}
     assert "san_francisco" in zonas
     assert len(zonas) == ZONAS_ESPERADAS
@@ -161,12 +187,13 @@ def test_san_francisco_tiene_datos_estimados_solo_donde_corresponde():
     filas = [f for f in _leer() if "san_francisco" in (f["origen"], f["destino"])]
     con_datos = [f for f in filas if f["tipo_dato"] == "estimado"]
     sin_datos = [f for f in filas if f["tipo_dato"] == "desconocido"]
-    assert len(filas) == 80
-    assert len(con_datos) == 76 and len(sin_datos) == 4
-    # San Francisco tiene nodo (Fernández de Córdoba), así que solo queda sin datos
-    # frente a la zona sin nodo (Omar Torrijos), en ambos sentidos y franjas.
+    assert len(filas) == 92
+    assert len(con_datos) == 84 and len(sin_datos) == 8
+    # San Francisco tiene nodo (Fernández de Córdoba), así que solo queda sin datos frente
+    # a las zonas sin nodo (Omar Torrijos y Arnulfo Arias), en ambos sentidos y franjas.
     assert {frozenset((f["origen"], f["destino"])) for f in sin_datos} == \
-        {frozenset(("san_francisco", "omar_torrijos"))}
+        {frozenset(("san_francisco", "omar_torrijos")),
+         frozenset(("san_francisco", "arnulfo_arias"))}
     for f in con_datos:
         assert 0 < int(f["tiempo_min"]) <= 1440, f
         assert float(f["tarifa_usd"]) >= 0, f
@@ -196,6 +223,7 @@ def test_el_cargador_usa_la_franja_pedida_y_omite_desconocidos():
     assert all(pico[k] >= valle[k] for k in valle)
     zonas = {f["origen"] for f in _leer()}
     assert not any("omar_torrijos" in par for par in valle), "una pareja desconocida no debe cargarse"
+    assert not any("arnulfo_arias" in par for par in valle), "una pareja desconocida no debe cargarse"
 
 
 def test_una_zona_sin_datos_llega_al_mecanismo_sin_datos():
@@ -229,12 +257,14 @@ def test_cobertura_de_los_ids_de_la_demo_queda_documentada():
 
     ids = _ids_del_stack_demo()
     cob = cargar_transporte.cobertura(sorted(ids))
-    assert set(cob["cubiertos"]) | set(cob["alias"]) | set(cob["faltantes"]) == ids, \
-        "todo id del stack de demo debe clasificarse como cubierto, alias o faltante"
+    assert set(cob["cubiertos"]) | set(cob["alias"]) | set(cob["ambiguos"]) | set(cob["faltantes"]) == ids, \
+        "todo id del stack de demo debe clasificarse como cubierto, alias, ambiguo o faltante"
     assert set(cob["cubiertos"]) >= {"arraijan", "bella_vista", "betania", "juan_diaz",
                                      "san_francisco", "tocumen"}
     assert cob["alias"] == {"la_chorrera": "barrio_colon"}, cob["alias"]
-    assert set(cob["faltantes"]) == {"san_miguelito"}, cob["faltantes"]
+    # `san_miguelito` es un DISTRITO: se marca como ambiguo, no se traduce a un corregimiento
+    assert cob["ambiguos"] == {"san_miguelito": "San Miguelito"}, cob["ambiguos"]
+    assert cob["faltantes"] == [], cob["faltantes"]
 
 
 def test_los_alias_de_demo_conectan_la_chorrera_sin_tocar_el_matching():
@@ -244,6 +274,8 @@ def test_los_alias_de_demo_conectan_la_chorrera_sin_tocar_el_matching():
     base = MatrizTraslados(cargar_transporte.cargar_traslados(CSV, "valle"))
     assert base.viaje("la_chorrera", "bella_vista") is None, \
         "el id antiguo no está en la tabla: por defecto queda en `sin_datos`"
+    assert base.viaje("san_miguelito", "bella_vista") is None, \
+        "el id de distrito no es una zona de la tabla: por defecto queda en `sin_datos`"
 
     con_alias = MatrizTraslados(cargar_transporte.cargar_para_demo(CSV, "valle"))
     assert con_alias.viaje("la_chorrera", "bella_vista") is not None
@@ -251,7 +283,8 @@ def test_los_alias_de_demo_conectan_la_chorrera_sin_tocar_el_matching():
     assert con_alias.viaje("la_chorrera", "bella_vista").minutos > 0
     # san_francisco ya es zona de la tabla: ahora sí tiene par con Bella Vista
     assert con_alias.viaje("san_francisco", "bella_vista") is not None
-    # sin equivalente claro no se inventa: san_miguelito sigue en `sin_datos`
+    # san_miguelito es un distrito (zona ambigua): NO se traduce a Victoriano Lorenzo, así
+    # que sigue sin datos en vez de heredar tiempos de un corregimiento que quizá no le toca
     assert con_alias.viaje("san_miguelito", "bella_vista") is None
 
 
@@ -320,19 +353,75 @@ def test_complementar_es_idempotente_y_sin_duplicados():
         "repetir la integración no debe cambiar ni duplicar los traslados"
 
 
-def test_los_ids_sin_correspondencia_no_reciben_datos_inventados():
+def test_el_distrito_san_miguelito_no_se_traduce_a_un_corregimiento():
     import cargar_transporte
     from agentes.matching import MatrizTraslados
+
+    # cobertura: se clasifica como ZONA AMBIGUA (distrito), no como alias ni faltante
+    cob = cargar_transporte.cobertura(["san_miguelito"])
+    assert cob["ambiguos"] == {"san_miguelito": "San Miguelito"}, cob
+    assert cob["alias"] == {} and cob["faltantes"] == [] and cob["cubiertos"] == []
 
     almacen = _almacen()
     cargar_transporte.cargar_en(almacen, CSV, "valle", complementar=True)
     pares = {(t.origen, t.destino) for t in almacen.traslados()}
-    # san_miguelito es un DISTRITO en la tabla (6 corregimientos), no un corregimiento:
-    # no se le asignan pares propios ni se inventan datos.
-    assert not any("san_miguelito" in p for p in pares)
 
+    # no se inventan pares propios para el distrito ni se copia el hub de Victoriano Lorenzo
+    assert not any("san_miguelito" in p for p in pares), "no debe fabricarse el distrito"
     matriz = MatrizTraslados(almacen.traslados())
     assert matriz.viaje("san_miguelito", "bella_vista") is None
+
+    # las zonas sin nodo tampoco reciben pares inventados
+    assert not any("omar_torrijos" in p or "arnulfo_arias" in p for p in pares)
+    assert matriz.viaje("ancon", "omar_torrijos") is None
+    assert matriz.viaje("ancon", "arnulfo_arias") is None
+
+
+def test_san_miguelito_no_es_una_zona_de_la_tabla():
+    zonas = {f["origen"] for f in _leer()}
+    assert "san_miguelito" not in zonas, "el distrito no es un corregimiento de la tabla"
+    assert CORREGIMIENTOS_SAN_MIGUELITO <= zonas, sorted(CORREGIMIENTOS_SAN_MIGUELITO - zonas)
+
+
+def test_el_id_ambiguo_no_es_mismo_corregimiento_aunque_aparezca_en_la_demo():
+    # La demo curada usa `san_miguelito` como extremo de sus traslados. Aun así, coincidir
+    # consigo mismo no debe resolverse como un viaje local de 15 min.
+    import cargar_transporte
+    from agentes.matching import MatrizTraslados
+
+    demo = json.loads((RAIZ / "scripts" / "demo" / "datos_demo.json").read_text(encoding="utf-8"))
+    curados = [Traslado(**t) for t in demo["traslados"]]
+    assert any("san_miguelito" in (t.origen, t.destino) for t in curados)
+    matriz = MatrizTraslados(curados)
+    assert matriz.viaje("san_miguelito", "san_miguelito") is None
+    # ...pero los pares curados entre san_miguelito y otro id se conservan tal cual
+    assert matriz.viaje("san_miguelito", "betania") is not None
+    assert matriz.viaje("san_miguelito", "betania").minutos == 20
+
+
+def test_las_zonas_ambiguas_del_cargador_estan_declaradas_en_el_matching():
+    # Evita que la lista del cargador (datos) y la del matching se desincronicen.
+    import cargar_transporte
+    from agentes.matching.traslados import ZONAS_AMBIGUAS
+
+    assert set(cargar_transporte.AMBIGUOS_DEMO) <= set(ZONAS_AMBIGUAS)
+
+
+def test_corregimientos_que_comparten_nodo_no_quedan_con_tiempo_cero():
+    # Betania y San Francisco comparten el nodo Fernández de Córdoba (L1). El modelo lo
+    # resuelve como viaje local (artefacto de un nodo por corregimiento), nunca como la
+    # misma ubicación: se documenta con `bus_local` y `confianza` baja, y jamás 0 minutos.
+    filas = _leer()
+    bet_sf = [f for f in filas
+              if f["origen"] == "betania" and f["destino"] == "san_francisco"]
+    assert bet_sf, "se esperaban filas Betania↔San Francisco"
+    for f in bet_sf:
+        assert f["tipo_dato"] == "estimado"
+        assert f["modo"] == "bus_local", f
+        assert f["confianza"] == "baja", f
+        assert int(f["tiempo_min"]) > 0, "compartir nodo no significa tiempo cero"
+    # ningún par estimado de la tabla queda en 0 minutos
+    assert all(int(f["tiempo_min"]) > 0 for f in filas if f["tipo_dato"] == "estimado")
 
 
 def test_la_integracion_conserva_los_28_traslados_de_la_demo():
