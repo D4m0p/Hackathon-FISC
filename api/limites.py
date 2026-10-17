@@ -12,7 +12,8 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from orquestador.almacen import Almacen
 
-RUTAS_LIMITADAS = {("POST", "/perfil/cv"), ("POST", "/perfil/entrevista"), ("POST", "/jovenes")}
+RUTAS_LIMITADAS = {("POST", "/perfil/cv"), ("POST", "/perfil/entrevista"), ("POST", "/perfil/transcribir"),
+                   ("POST", "/jovenes")}
 VENTANA_S = 60.0
 POR_DEFECTO = 30
 MENSAJE = "Demasiadas solicitudes seguidas. Espere un momento e intente de nuevo."
