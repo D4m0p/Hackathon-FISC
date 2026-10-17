@@ -2,8 +2,7 @@
 
 Hackathon FISC 2026 · Reto 3: Empleabilidad · Universidad Tecnológica de Panamá
 
-> **Estado:** versión de trabajo. Las secciones marcadas *(en desarrollo)* se completan
-> durante el evento.
+> **Estado:** versión de entrega del Hackathon FISC 2026 (tag `final-24h`).
 
 ## El problema
 
@@ -91,11 +90,11 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 
 | Agente | Qué hace | Cómo decide | Estado |
 |---|---|---|---|
-| **Inteligencia de mercado** | Normaliza ofertas a una taxonomía de habilidades y extrae tendencias | El LLM extrae; el código valida contra la taxonomía | *(en desarrollo)* |
+| **Inteligencia de mercado** | Normaliza ofertas en texto libre a una taxonomía de habilidades y extrae tendencias por zona | El LLM extrae con esquema estricto (sin LLM, por palabras clave); el código valida contra la taxonomía y el contrato, y avisa qué campos faltan | Listo |
 | **Perfil** | Lee el CV (PDF, foto o texto) y hace una entrevista corta, escrita o por nota de voz, para descubrir habilidades no declaradas; también lee fotos de volantes de ofertas | El LLM solo propone; el código acepta una habilidad solo si existe en la taxonomía y su cita aparece en el texto original; la experiencia informal llega como máximo a nivel 2; sin LLM funciona con palabras clave | Listo |
 | **Matching** | Filtra pares imposibles, puntúa y asigna con cupos | Reglas + OR-Tools (flujo de costo mínimo: óptimo exacto en tiempo polinomial) | Listo |
 | **Ruta de formación** | Elige cursos que cierran la brecha de habilidades | OR-Tools CP-SAT con cupos, turnos, traslado y presupuesto | Listo |
-| **Auditor** | Bloquea ofertas discriminatorias y hace pruebas contrafactuales de sesgo | Reglas determinísticas; el LLM solo como segunda opinión | *(en desarrollo)* |
+| **Auditor** | Bloquea ofertas discriminatorias y hace pruebas contrafactuales de sesgo en cada matching | Solo reglas en código, sin LLM: patrones con manejo de negaciones y contexto; los contrafactuales se recalculan con el código real del Matching | Listo |
 
 ### Requisitos mínimos del reto
 
@@ -174,8 +173,16 @@ el Canal son trazos simplificados. Los tiempos y costos de viaje salen de la tab
 - **Datos de demostración** (`scripts/demo/datos_demo.json`): **ilustrativos**. Tiempos y
   tarifas de traslado aproximados entre 8 corregimientos; cursos inspirados en la oferta de
   INADEH; personas y empresas ficticias.
-- **Datos reales** *(en desarrollo)* en `datos/`: ofertas de portales panameños, catálogo de
-  cursos de INADEH y tarifas de transporte, cada uno con su fuente y fecha de consulta.
+- **Datos reales** en `datos/`, cada registro con su fuente, URL y fecha de consulta
+  (16/10/2026):
+  - **30 ofertas de empleo** de portales panameños (EstasContratado, Computrabajo, CazVid,
+    Canal de Panamá, Bolsa de Trabajo de la UTP, Hiringroom): 22 verificadas y 8 parciales
+    (`ofertas_empleo.csv`, `FUENTES_OFERTAS.md`).
+  - **28 cursos** gratuitos o de bajo costo: INADEH (18), Cisco Networking Academy (6) y
+    Oracle (4) (`cursos.csv`, `FUENTES.md`).
+  - **Transporte:** 1104 filas de tiempo y costo entre 24 corregimientos (`transporte.csv`,
+    `FUENTES_TRANSPORTE.md`) y coordenadas para el mapa (`corregimientos.csv`,
+    `FUENTES_CORREGIMIENTOS.md`).
 
 ## Instalación y ejecución
 
@@ -194,7 +201,7 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env            # opcional: claves de Groq y Telegram
 
-# Datos de demostración (10 vacantes, 10 jóvenes, 8 cursos) y primera corrida del matching
+# Datos de demostración (12 vacantes, 11 jóvenes, 8 cursos) y primera corrida del matching
 .venv/bin/python scripts/semilla_demo.py --reiniciar --matching
 
 # API en http://localhost:8010 (documentación interactiva en /docs)
@@ -298,7 +305,7 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-275 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+454 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
