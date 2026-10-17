@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { nombreEmpresa } from "../nombres.js";
 
 // Logo generado: iniciales del nombre de la empresa sobre un color que sale siempre igual de su
@@ -15,8 +16,16 @@ function tono(id) {
   return 168 + (h % 44);   // entre aqua y azul: combina con la paleta de la página
 }
 
+// Si la empresa tiene logo en public/logos/<id>.svg (ejemplos ilustrados de la demo), se usa ese;
+// si no, las iniciales.
 export default function LogoEmpresa({ empresaId, tamano = 44 }) {
   const nombre = nombreEmpresa(empresaId);
+  const [sinImagen, setSinImagen] = useState(false);
+  if (!sinImagen)
+    return (
+      <img className="logo-empresa imagen" src={`/logos/${empresaId}.svg`} alt="" aria-hidden="true"
+           width={tamano} height={tamano} onError={() => setSinImagen(true)} />
+    );
   return (
     <span className="logo-empresa" title={nombre} aria-hidden="true"
           style={{ width: tamano, height: tamano, fontSize: tamano * 0.38,

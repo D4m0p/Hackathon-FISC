@@ -547,3 +547,5 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
 .reiniciar-demo { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: -6px 0 6px; font-size: .9rem; }
 .reiniciar-confirmar { display: grid; gap: 8px; margin-bottom: 12px; }
 .reiniciar-confirmar .acciones { margin: 0; }
+
+.logo-empresa.imagen { border-radius: 24%; object-fit: cover; background: none; }
