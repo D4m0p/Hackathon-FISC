@@ -6,6 +6,7 @@ import VistaJoven from "./vistas/joven/VistaJoven.jsx";
 import Registro from "./vistas/joven/Registro.jsx";
 import VistaEmpresa from "./vistas/empresa/VistaEmpresa.jsx";
 import VistaOrientador from "./vistas/orientador/VistaOrientador.jsx";
+import VistaCentro from "./vistas/centro/VistaCentro.jsx";
 
 export default function App() {
   const [yo, setYo] = useState(null);         // {rol, sujeto}
@@ -50,6 +51,7 @@ export default function App() {
   else if (!yo) contenido = <Entrada onEntrar={entrar} onNuevo={() => setRegistrando(true)} error={error} />;
   else if (yo.rol === "joven") contenido = <VistaJoven key={token} jovenId={yo.sujeto} />;
   else if (yo.rol === "empresa") contenido = <VistaEmpresa key={token} empresaId={yo.sujeto} />;
+  else if (yo.rol === "centro") contenido = <VistaCentro key={token} centro={yo.sujeto} />;
   else contenido = <VistaOrientador key={token} />;
 
   return (
@@ -73,4 +75,4 @@ export default function App() {
   );
 }
 
-const ROLES = { joven: "Joven", empresa: "Empresa", orientador: "Orientador" };
+const ROLES = { joven: "Joven", empresa: "Empresa", orientador: "Orientador", centro: "Centro de formación" };

@@ -202,13 +202,34 @@ function CasiCalifica({ jovenId, cursos, nombres }) {
   );
 }
 
+// Cupos que un centro de formación le reservó (vienen en la historia, si la API los envía).
+function Reservas({ jovenId, cursos }) {
+  const [reservas, setReservas] = useState([]);
+  useEffect(() => { api.historia(jovenId).then((h) => setReservas(h.reservas || [])).catch(() => {}); }, [jovenId]);
+  if (!reservas.length) return null;
+  return (
+    <div className="reservas-joven">
+      {reservas.map((r) => {
+        const c = cursos[r.curso_id];
+        return (
+          <p key={r.curso_id} className="aviso ok">
+            ✓ <b>Tiene un cupo reservado</b> en «{c?.nombre || r.curso_id}»
+            {c && <> · {c.centro}, {corregimiento(c.corregimiento)}</>}. El centro le contactará para empezar.
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 function Plan({ jovenId, cursos, nombres }) {
   const { datos, error, cargando, estado } = useCarga(() => api.plan(jovenId), [jovenId]);
   if (cargando) return <p className="centro">Cargando…</p>;
-  if (estado === 404) return <p className="vacio">No necesita cursos por ahora: ya tiene vacantes a su alcance.</p>;
+  if (estado === 404) return <><Reservas jovenId={jovenId} cursos={cursos} /><p className="vacio">No necesita cursos por ahora: ya tiene vacantes a su alcance.</p></>;
   if (error) return <p className="error">{error}</p>;
   return (
     <section className="panel">
+      <Reservas jovenId={jovenId} cursos={cursos} />
       <h2>Cursos para usted</h2>
       <p className="suave">Con estos cursos podría postularse a más vacantes. Duran {datos.semanas_total} semanas en total y cuestan {dinero(datos.costo_total)} contando el pasaje.</p>
       <ol className="ruta">

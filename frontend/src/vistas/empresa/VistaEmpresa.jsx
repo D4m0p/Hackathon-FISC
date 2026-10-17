@@ -124,6 +124,30 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
   const [texto, setTexto] = useState("");
   const [error, setError] = useState(null);   // {mensaje, sinMercado}
   const [enviando, setEnviando] = useState(false);
+  const [leyendo, setLeyendo] = useState(false);
+  const [deFoto, setDeFoto] = useState(false);
+
+  // Foto del volante → texto que la empresa revisa antes de publicar (Mercado lo estructura después).
+  async function leerFoto(archivo) {
+    if (!archivo) return;
+    if (archivo.size > 4 * 1024 * 1024) return setError({ mensaje: "La foto supera 4 MB." });
+    setLeyendo(true);
+    setError(null);
+    try {
+      const b64 = await new Promise((ok, falla) => {
+        const r = new FileReader();
+        r.onload = () => ok(String(r.result).split(",")[1]);
+        r.onerror = () => falla(new Error("No se pudo leer la foto"));
+        r.readAsDataURL(archivo);
+      });
+      const r = await api.transcribir("imagen", b64, archivo.type, "oferta");
+      setTexto(r.texto.slice(0, 5000));
+      setDeFoto(true);
+    } catch (err) {
+      setError({ mensaje: err.message });
+    }
+    setLeyendo(false);
+  }
 
   async function enviar(e) {
     e.preventDefault();
@@ -143,9 +167,15 @@ function OfertaTexto({ empresaId, onPublicada, onCancelar, onFormulario }) {
   return (
     <form className="panel" onSubmit={enviar}>
       <h2>Pegar una oferta</h2>
-      <p className="suave">Pegue la oferta como la publicaría en redes o en un volante. El sistema saca el puesto, el horario, el salario y las habilidades.</p>
+      <p className="suave">Pegue el anuncio, el mensaje de WhatsApp o suba una foto del volante. El sistema saca el puesto, el horario, el salario y las habilidades.</p>
+      <label className={"boton secundario subir-foto" + (leyendo ? " deshabilitado" : "")}>
+        <input type="file" accept="image/jpeg,image/png,image/webp" disabled={leyendo}
+               onChange={(e) => { const f = e.target.files[0]; e.target.value = ""; leerFoto(f); }} />
+        📷 {leyendo ? "Leyendo la foto…" : "Subir foto del volante"}
+      </label>
       <textarea rows="8" maxLength="5000" value={texto} onChange={(e) => setTexto(e.target.value)}
                 placeholder="Ej.: Se busca cajero/a para supermercado en Arraiján, turno de mañana, B/. 650 al mes…" />
+      {deFoto && <p className="nota">Este es el texto que leímos de la foto. Revíselo y corrija lo que haga falta antes de publicar.</p>}
       {error && (faltan?.length ? (
         <div className="aviso alerta">
           <p><b>A la oferta le falta información para publicarla:</b> {faltan.join(", ")}.</p>

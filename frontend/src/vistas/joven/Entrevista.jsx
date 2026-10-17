@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../api.js";
+import GrabarVoz from "../../componentes/GrabarVoz.jsx";
 
 export default function Entrevista({ onResultado, onVolver }) {
   const [preguntas, setPreguntas] = useState(null);
@@ -7,6 +8,7 @@ export default function Entrevista({ onResultado, onVolver }) {
   const [respuestas, setRespuestas] = useState({});
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [deVoz, setDeVoz] = useState(false);
 
   useEffect(() => {
     api.preguntas().then(setPreguntas).catch((e) =>
@@ -40,7 +42,15 @@ export default function Entrevista({ onResultado, onVolver }) {
       <textarea rows="4" maxLength="600" value={respuestas[p.id] || ""}
                 onChange={(e) => setRespuestas({ ...respuestas, [p.id]: e.target.value })}
                 placeholder={`Por ejemplo: ${p.ejemplo}`} />
-      <p className="nota">Si no aplica, déjelo en blanco y siga.</p>
+      <GrabarVoz key={p.id} onTexto={(t) => {
+        const antes = respuestas[p.id] ? respuestas[p.id] + " " : "";
+        setRespuestas({ ...respuestas, [p.id]: (antes + t).slice(0, 600) });
+        setDeVoz(true);
+      }} />
+      <p className="nota">
+        {deVoz ? "Revise lo que escribimos de su nota de voz: puede corregirlo antes de seguir."
+          : "Puede escribir o hablar. Si no aplica, déjelo en blanco y siga."}
+      </p>
       <div className="acciones">
         <button className="enlace" onClick={() => (i ? setI(i - 1) : onVolver())}>Atrás</button>
         {ultima

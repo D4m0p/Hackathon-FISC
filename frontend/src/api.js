@@ -67,6 +67,9 @@ export const api = {
   preguntas: () => pedir("GET", "/perfil/preguntas"),
   perfilDesdeCv: (cuerpo) => pedir("POST", "/perfil/cv", cuerpo),
   perfilDesdeEntrevista: (respuestas) => pedir("POST", "/perfil/entrevista", { respuestas }),
+  // Nota de voz o foto → texto para revisar (no decide nada)
+  transcribir: (tipo, contenido_base64, tipo_mime, documento = "cv") =>
+    pedir("POST", "/perfil/transcribir", { tipo, contenido_base64, tipo_mime, documento }),
 
   // Joven
   registrarJoven: (joven, datos) => pedir("POST", "/jovenes", { joven, datos }),
@@ -100,6 +103,10 @@ export const api = {
   planes: () => pedir("GET", "/planes"),
   trazas: (agente) => pedir("GET", `/trazas?limite=300${agente ? `&agente=${agente}` : ""}`),
   mensajes: () => pedir("GET", "/mensajes"),
+  // Centro de formación
+  demandaCentro: (centro) => pedir("GET", `/centros/${encodeURIComponent(centro)}/demanda`),
+  reservarCupo: (curso_id, joven_id, motivo) => pedir("POST", `/cursos/${curso_id}/reservas`, { joven_id, motivo }),
+
   contrafactual: (joven_id) => pedir("GET", `/auditoria/contrafactual/${joven_id}`),
   tendencias: (top = 5) => pedir("GET", `/mercado/tendencias?top=${top}`),
   pesos: () => pedir("GET", "/pesos"),

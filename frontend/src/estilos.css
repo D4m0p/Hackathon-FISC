@@ -272,3 +272,31 @@ legend { padding: 0 6px; font-weight: 600; }
 .ve-no-ve .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
 .pestanas button { flex: 1 0 auto; padding-left: 10px; padding-right: 10px; }
 @media (min-width: 421px) { .pestanas { flex-wrap: wrap; overflow-x: visible; } }
+
+/* Centro de formación */
+.barra-ayuda h2 { margin: 0; }
+.resumen-centro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.resumen-centro div { background: var(--superficie); border-radius: var(--radio); padding: 10px; text-align: center; box-shadow: var(--sombra); display: grid; }
+.resumen-centro b { font-size: 1.6rem; color: var(--primario); }
+.resumen-centro span { font-size: .8rem; color: var(--suave); }
+.interesados { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 8px; counter-reset: orden; }
+.interesados li { counter-increment: orden; position: relative; border: 1px solid var(--borde); border-radius: 12px; padding: 10px 12px 10px 44px; }
+.interesados li::before { content: counter(orden); position: absolute; left: 12px; top: 10px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .85rem; background: var(--borde); color: var(--texto); }
+.interesados li.primero { border-color: var(--primario); }
+.interesados li.primero::before { background: var(--primario); color: var(--sobre-primario); }
+.interesado-cabeza { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.interesados p { margin: 4px 0; }
+.interesados .boton { margin-top: 4px; padding: 8px 14px; }
+.nivel.aviso-chip { background: var(--aviso); color: var(--texto); }
+
+/* Nota de voz */
+.grabar-voz { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.grabar-voz .boton { padding: 9px 14px; }
+.boton.grabando { background: #b42318; color: #fff; animation: latido 1.2s ease-in-out infinite; }
+@keyframes latido { 50% { opacity: .75; } }
+.subir-audio { cursor: pointer; }
+.subir-audio input { display: none; }
+.subir-audio.deshabilitado { opacity: .5; pointer-events: none; }
+.subir-foto { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 10px; font-weight: 600; cursor: pointer; }
+.subir-foto input { display: none; }
+.subir-foto.deshabilitado { opacity: .6; pointer-events: none; }
