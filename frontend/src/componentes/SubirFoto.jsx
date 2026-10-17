@@ -31,7 +31,7 @@ export default function SubirFoto({ jovenId }) {
     try {
       await api.subirFoto(jovenId, await achicar(archivo), "image/jpeg");
       setVersion((v) => v + 1);
-      setEstado("Listo. La empresa solo la verá cuando su entrevista esté confirmada.");
+      setEstado("Listo. Una empresa solo la verá cuando le acepte y a usted también le interese la vacante.");
     } catch (err) { setEstado(err.message); }
   }
   async function quitar() {
@@ -47,7 +47,7 @@ export default function SubirFoto({ jovenId }) {
           <input type="file" accept="image/*" capture="user" onChange={elegir} hidden />
         </label>
         <button className="enlace" onClick={quitar}>Quitar</button>
-        <p className="nota">{estado || "Opcional. Las empresas no la ven al elegir candidatos: solo cuando su entrevista ya está confirmada."}</p>
+        <p className="nota">{estado || "Opcional. Las empresas no la ven al elegir candidatos: solo cuando una empresa le acepta y a usted también le interesa la vacante."}</p>
       </div>
     </div>
   );

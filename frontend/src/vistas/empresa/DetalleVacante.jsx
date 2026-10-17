@@ -105,7 +105,7 @@ function Candidatos({ vacante, nombres }) {
     setError("");
     try {
       const r = await api.deslizar("empresa", t.joven.id, vacante.id, leInteresa);
-      setMutuo(r.interes_mutuo);
+      setMutuo(r.interes_mutuo ? t.joven.id : false);   // con interés mutuo aparece su foto
       setVistas((n) => n + 1);
     } catch (e) {
       setError(e.message);
@@ -117,10 +117,11 @@ function Candidatos({ vacante, nombres }) {
   const restantes = tarjetas.slice(vistas);
   return (
     <>
-      <p className="nota centro">Los perfiles no muestran nombre, género, edad ni foto: solo lo que importa para el puesto.</p>
+      <p className="nota centro">Los perfiles no muestran nombre, género, edad ni foto: solo lo que importa para el puesto. La foto aparece cuando usted acepta y a la persona también le interesa.</p>
       {mutuo && (
         <div className="mutuo" role="status">
-          <b>¡Interés mutuo!</b> A esta persona también le interesa la vacante. Una orientadora revisará el match y coordinará la entrevista.
+          <FotoPersona jovenId={mutuo} tamano={72} revelar />
+          <span><b>¡Interés mutuo!</b> A esta persona también le interesa la vacante. Una orientadora revisará el match y coordinará la entrevista.</span>
           <button className="enlace" onClick={() => setMutuo(false)}>Cerrar</button>
         </div>
       )}
@@ -191,7 +192,7 @@ function EnProceso({ vacante }) {
           <li key={a.joven_id} className={"item entrevista " + estado}>
             <div className="entrevista-cabeza">
               <div className="persona-cabeza">
-                {estado === "aprobada" && <FotoPersona jovenId={a.joven_id} tamano={56} revelar />}
+                {(estado === "aprobada" || estado === "pendiente") && <FotoPersona jovenId={a.joven_id} tamano={56} revelar />}
                 <h3>Candidato/a {numeroCorto(a.joven_id)}</h3>
               </div>
               <span className={"estado-chip " + estado}>{ETIQUETAS[estado]}</span>

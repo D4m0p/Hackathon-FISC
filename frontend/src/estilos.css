@@ -540,3 +540,4 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
 /* Tema oscuro: la pestaña activa en aqua para que se distinga del fondo */
 @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); } }
 :root[data-tema="oscuro"] .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); }
+.mutuo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; } .mutuo > span { flex: 1; min-width: 200px; }
