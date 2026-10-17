@@ -5,17 +5,6 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para C (Diego) — 17/10/2026 — una línea en su Auditor (rendimiento)
-
-Con el matching automático, el Auditor corre en cada interés mutuo, y `desgloses_de_joven`
-armaba la explicación de rechazo de cada par imposible para después descartarla (el 97 % del
-tiempo del matching con 300 jóvenes). A agregó un filtro con `es_factible` antes de llamar a
-`evaluar`: mismo resultado, sus pruebas (`test_auditor_matching.py`, incluida la de
-`evaluar_tramposo`) y sus 40 evals siguen pasando. En la prueba de carga, la ráfaga bajó de
-35 s a 9 s. Haga `git pull` antes de seguir con `agentes/auditor/`.
-
----
-
 ## Para C (Diego) — 16/10/2026, 6 p. m. — sus dos pedidos ya están hechos
 
 **A. Pesos al Auditor (lo que pidió de `flujo.py`).** El orquestador ahora llama
