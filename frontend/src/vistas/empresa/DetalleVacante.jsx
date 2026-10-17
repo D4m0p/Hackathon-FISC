@@ -120,7 +120,7 @@ function Candidatos({ vacante, nombres }) {
       <p className="nota centro">Los perfiles no muestran nombre, género, edad ni foto: solo lo que importa para el puesto.</p>
       {mutuo && (
         <div className="mutuo" role="status">
-          <b>¡Interés mutuo!</b> A esta persona también le interesa la vacante. Un orientador revisará el match y coordinará la entrevista.
+          <b>¡Interés mutuo!</b> A esta persona también le interesa la vacante. Una orientadora revisará el match y coordinará la entrevista.
           <button className="enlace" onClick={() => setMutuo(false)}>Cerrar</button>
         </div>
       )}

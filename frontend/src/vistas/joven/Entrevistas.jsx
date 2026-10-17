@@ -66,7 +66,7 @@ export default function Entrevistas({ jovenId, asignaciones, onCambio }) {
               {estado === "aprobada" && (
                 <p>{a.entrevista ? <>Entrevista el <b>{fecha(a.entrevista)}</b></> : "El orientador aprobó; pronto le darán la fecha."}</p>
               )}
-              {estado === "pendiente" && <p className="suave">Un orientador está revisando este match. Le avisaremos cuando lo apruebe.</p>}
+              {estado === "pendiente" && <p className="suave">Una orientadora está revisando este match. Le avisaremos cuando lo apruebe.</p>}
               {estado === "rechazada" && <p className="suave">El orientador no lo aprobó{a.motivo_orientador ? `: ${a.motivo_orientador}` : "."}</p>}
               {estado === "cerrada" && (
                 <p className="suave">{CIERRES[a.tipo_cierre] || "Cerrada"}{a.motivo_cierre ? ` · ${a.motivo_cierre}` : ""}</p>
