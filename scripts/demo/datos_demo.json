@@ -1,5 +1,5 @@
 {
- "_nota": "Datos ILUSTRATIVOS para la demo. Tiempos y tarifas aproximados; cursos inspirados en la oferta de INADEH. Se reemplazan por los datos con fuentes de datos/ cuando estén listos.",
+ "_nota": "Datos ILUSTRATIVOS para la demo. Tiempos y tarifas aproximados; cursos inspirados en la oferta de INADEH. Se reemplazan por los datos con fuentes de datos/ cuando estén listos. j11 (Lucía) no desliza nada a propósito: es la joven para deslizar en vivo en la demo.",
  "habilidades": [
   {
    "codigo": "atencion_cliente",
@@ -603,6 +603,51 @@
    ],
    "cupos": 1,
    "texto_original": "Se busca recepcionista femenina de buena presencia, menor de 25 años, para hotel en Bella Vista."
+  },
+  {
+   "id": "v11",
+   "empresa_id": "e_tienda",
+   "titulo": "Vendedor/a de tienda de celulares",
+   "corregimiento": "arraijan",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 650,
+   "habilidades_requeridas": [
+    {
+     "codigo": "ventas",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 1,
+   "texto_original": "Tienda de celulares en Arraiján busca vendedor/a, turno de tarde."
+  },
+  {
+   "id": "v12",
+   "empresa_id": "e_resto",
+   "titulo": "Ayudante de cocina (turno mañana)",
+   "corregimiento": "la_chorrera",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 600,
+   "habilidades_requeridas": [
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 2,
+   "texto_original": "Fonda en La Chorrera busca ayudante de cocina, turno de mañana."
   }
  ],
  "jovenes": [
@@ -880,6 +925,53 @@
     "nombre": "Andrés Moreno",
     "genero": "masculino",
     "edad": 22
+   }
+  },
+  {
+   "joven": {
+    "id": "j11",
+    "corregimiento": "la_chorrera",
+    "disponibilidad": [
+     "manana",
+     "tarde",
+     "noche"
+    ],
+    "presupuesto_transporte_semanal": 20,
+    "salario_minimo": 550,
+    "max_minutos_traslado": 90,
+    "habilidades": [
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 2,
+      "evidencia": "Atiende la fonda de su mamá los fines de semana"
+     },
+     {
+      "codigo": "manejo_caja",
+      "nivel": 1,
+      "evidencia": "Cobra en la fonda"
+     },
+     {
+      "codigo": "ventas",
+      "nivel": 1,
+      "evidencia": "Vende postres por Instagram"
+     },
+     {
+      "codigo": "manipulacion_alimentos",
+      "nivel": 1,
+      "evidencia": "Prepara almuerzos en la fonda"
+     },
+     {
+      "codigo": "servicio_mesa",
+      "nivel": 1,
+      "evidencia": "Sirve mesas en eventos familiares"
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j11",
+    "nombre": "Lucía Vega",
+    "genero": "femenino",
+    "edad": 19
    }
   }
  ],

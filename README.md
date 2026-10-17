@@ -104,7 +104,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 | Explicabilidad | Cada asignación trae su desglose (habilidades, traslado, salario) y sus motivos en texto |
 | Trazabilidad | Tabla `trazas`, `GET /trazas?agente=` y la historia de cada joven de punta a punta (`GET /jovenes/{id}/historia`) |
 | Evals (≥15 casos) | *(en desarrollo)* en `evals/` |
-| Guardrails | Tokens por rol: cada actor solo toca lo suyo y las decisiones clave son del orientador; validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
+| Guardrails | Límites de forma y tamaño en todo el contrato (ids sin caracteres que rompan la URL, nombres, textos y listas con tope); tokens por rol: cada actor solo toca lo suyo y las decisiones clave son del orientador; validación estricta de toda entrada; textos de más de 5000 caracteres se rechazan antes del LLM; el texto de CVs y ofertas se trata como dato, nunca como instrucción; la empresa nunca recibe datos personales |
 
 ### Decisiones de diseño
 
@@ -163,7 +163,7 @@ demostración crea estos, **predecibles a propósito y solo para la demo**:
 | Rol | Token | Qué puede hacer |
 |---|---|---|
 | Orientador | `demo-orientador` (o el valor de `CLAVE_ORIENTADOR`) | Todo: matching, aprobar o rechazar, inasistencias, ofertas bloqueadas, trazas |
-| Joven | `demo-j01` … `demo-j10` | Solo lo suyo: perfil, tarjetas, plan, casi califica, deslizar, cancelar, reprogramar |
+| Joven | `demo-j01` … `demo-j11` (`demo-j11` = Lucía, sin deslizar nada: para la demo en vivo) | Solo lo suyo: perfil, tarjetas, plan, casi califica, deslizar, cancelar, reprogramar |
 | Empresa | `demo-e_super`, `demo-e_call`, `demo-e_logis`, `demo-e_resto`, `demo-e_tienda`, `demo-e_tec`, `demo-e_agencia`, `demo-e_hotel` | Solo sus vacantes: publicar, ver candidatos anonimizados, deslizar, retirar, cerrar |
 
 Un joven nuevo que se registra con `POST /jovenes` recibe su propio token aleatorio en la
@@ -208,6 +208,7 @@ ver `.env.example`):
 | `GET` | `/pesos` | Pesos actuales del puntaje (público) |
 | `POST` | `/pesos/simular` | Qué propuestas entrarían y saldrían con otros pesos, sin guardar nada (orientador) |
 | `PUT` | `/pesos` | El orientador cambia los pesos, con motivo |
+| `GET` | `/planes` | Todos los planes de formación de una vez (orientador) |
 | `GET` | `/trazas` | Qué agente decidió qué, filtrable por agente |
 | `GET` | `/mensajes` | Mensajes enviados o registrados |
 | `GET` | `/salud` | Qué agentes están conectados |
@@ -232,7 +233,7 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-202 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+275 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
 orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 

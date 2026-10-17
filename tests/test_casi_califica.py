@@ -136,11 +136,12 @@ def test_maria_en_la_demo():
     orq = Orquestador(Almacen())
     cargar(orq, json.loads(DATOS.read_text(encoding="utf-8")))
     r = orq.casi_califica("j01")
-    assert [c.vacante_id for c in r] == ["v05", "v10"]
+    assert [c.vacante_id for c in r] == ["v05", "v11", "v10", "v12"]   # con curso, luego pasaje, sin curso
     assert r[0].cursos == ["c01"] and "Técnicas de ventas" in r[0].sugerencia
     assert "Le falta Ventas" in r[0].sugerencia
+    assert r[0].incumplimiento.detalle == "Falta la habilidad obligatoria «Ventas» (nivel 1)"
 
     from conftest import cliente_orientador
     c = cliente_orientador(orq)
-    assert c.get("/jovenes/j01/casi-califica").json()[1]["incumplimiento"]["faltante"] == 1.0
+    assert c.get("/jovenes/j01/casi-califica").json()[2]["incumplimiento"]["faltante"] == 1.0
     assert c.get("/jovenes/nadie/casi-califica").status_code == 404

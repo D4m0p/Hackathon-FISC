@@ -290,6 +290,11 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None) -> FastAP
             raise HTTPException(status_code=404, detail="Este joven no tiene plan de formación")
         return plan
 
+    @app.get("/planes")
+    def listar_planes(_: Identidad = Depends(solo_orientador)) -> list[PlanFormacion]:
+        """Todos los planes de formación de una vez (para la pestaña «Sin match»)."""
+        return orq.almacen.listar(PlanFormacion)
+
     @app.get("/jovenes/{joven_id}/historia")
     def historia(joven_id: str, ident: Identidad = Depends(requerida)) -> HistoriaJoven:
         exigir_joven(ident, joven_id)

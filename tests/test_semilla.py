@@ -52,3 +52,23 @@ def test_los_datos_son_validos_y_marcados_como_ilustrativos():
     usados |= {h["codigo"] for j in datos["jovenes"] for h in j["joven"]["habilidades"]}
     usados |= {h["codigo"] for c in datos["cursos"] for h in c["habilidades_otorgadas"]}
     assert usados <= codigos, f"habilidades sin nombre en el catálogo: {usados - codigos}"
+
+
+def test_con_el_auditor_real_la_demo_sigue_en_pie_y_lucia_tiene_tarjetas():
+    from agentes.auditor import Auditor
+    orq = Orquestador(Almacen(), auditor=Auditor())
+    r = cargar(orq, datos, con_matching=True)
+    assert r["bloqueadas"] == ["v10"]
+    assert r["asignaciones"] == ["j01→v01", "j03→v02", "j04→v06", "j06→v03", "j10→v01"]
+    tarjetas = [v.id for v, _ in orq.tarjetas_joven("j11")]
+    assert len(tarjetas) >= 5 and "v10" not in tarjetas      # la bloqueada no aparece
+
+
+def test_planes_de_una_sola_vez_para_el_orientador():
+    from conftest import cliente_orientador
+    orq = Orquestador(Almacen())
+    cargar(orq, datos, con_matching=True)
+    c = cliente_orientador(orq)
+    assert sorted(p["joven_id"] for p in c.get("/planes").json()) == ["j07", "j08"]
+    c.headers["Authorization"] = "Bearer nada"
+    assert c.get("/planes").status_code == 401

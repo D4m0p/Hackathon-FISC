@@ -67,8 +67,13 @@ def casi_califica(joven: Joven, vacantes: list[Vacante], cursos: list[Curso],
         fallas = incumplimientos(joven, v, matriz)
         if len(fallas) != 1 or fallas[0].tipo == TipoIncumplimiento.sin_datos:
             continue
-        sugerencia, ids = _sugerencia(joven, v, fallas[0], cursos, matriz, nombres or {})
-        resultado.append(CasiCalifica(vacante_id=v.id, titulo=v.titulo, incumplimiento=fallas[0],
+        falla = fallas[0]
+        sugerencia, ids = _sugerencia(joven, v, falla, cursos, matriz, nombres or {})
+        if falla.tipo == TipoIncumplimiento.habilidad and nombres and falla.codigo in nombres:
+            # el texto que ve el joven, con el nombre legible y no el código interno
+            falla = falla.model_copy(update={"detalle": falla.detalle.replace(
+                f"obligatoria {falla.codigo} ", f"obligatoria «{nombres[falla.codigo]}» ")})
+        resultado.append(CasiCalifica(vacante_id=v.id, titulo=v.titulo, incumplimiento=falla,
                                       sugerencia=sugerencia, cursos=ids))
     resultado.sort(key=lambda c: (_prioridad(c), c.incumplimiento.faltante or 0, c.vacante_id))
     return resultado
