@@ -5,6 +5,25 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para C (Diego) — 17/10/2026 — recordatorio de B: ubicaciones exactas de los corregimientos
+
+La página ahora tiene un **mapa** (tablero del orientador y mapa del joven) con una burbuja por
+corregimiento. Hoy usa **posiciones aproximadas** que puso B a mano (`frontend/src/geo.js`) y el
+mapa lo dice ("esquemático"). Para la nota de "información verificable", ¿puede tratar de conseguir
+las **ubicaciones reales con fuente**?
+
+- Qué: un punto por corregimiento (centroide o cabecera), para los 21 de `datos/transporte.csv`
+  más los de la demo (`san_miguelito`, `la_chorrera`).
+- Dónde buscar (ideas): cartografía o datos abiertos del INEC / datosabiertos.gob.pa, IGN Tommy
+  Guardia, o OpenStreetMap (Nominatim da el centroide de cada corregimiento con su relación OSM).
+- Formato sugerido, `datos/corregimientos.csv`:
+  `codigo,nombre,distrito,lat,lon,tipo_punto,fuente_url,fecha_consulta`
+  (`codigo` igual al de `transporte.csv`; `tipo_punto` = centroide o cabecera).
+- Con eso B cambia el mapa por las coordenadas reales y le quita el rótulo de aproximado.
+  Si de algún corregimiento no hay fuente, déjelo fuera: mejor que inventarlo.
+
+---
+
 ## Para C (Diego) — 17/10/2026 — una línea en su Auditor (rendimiento)
 
 Con el matching automático, el Auditor corre en cada interés mutuo, y `desgloses_de_joven`
