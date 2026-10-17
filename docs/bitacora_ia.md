@@ -10,7 +10,7 @@ estado verificable del proyecto. Se apoya en la evidencia del repositorio: histo
 pruebas automáticas, evaluaciones y los documentos de `datos/` y `evals/`. Al final se enumeran los
 datos que solo el equipo puede confirmar; no se incluyen suposiciones.
 
-> **Estado:** documento en desarrollo, sujeto a revisión del equipo antes de la entrega.
+> **Estado:** versión final de la entrega (17-10-2026), revisada por el equipo.
 
 ---
 
@@ -52,6 +52,24 @@ entrega—:
 Esta bitácora no inventa sesiones, indicaciones dadas al asistente ni porcentajes de contribución.
 Describe lo que el repositorio permite comprobar; lo que solo el equipo conoce queda en la sección 11.
 
+## 2.1 Herramientas usadas y para qué
+
+| Quién | Herramienta | Para qué se usó |
+|---|---|---|
+| A (núcleo) | Asistente de programación de IA de línea de comandos | Diseñar y programar el contrato, el orquestador, Matching, Ruta de formación y la API; escribir pruebas (incluidas las de casos aleatorios) y la prueba de carga; revisar el trabajo de los demás y buscar errores. |
+| B (Perfil y frontend) | Asistente de programación de IA de línea de comandos | Agente Perfil (CV, entrevista, voz, foto), toda la página React, la app instalable para teléfonos y la revisión de los entregables contra el reglamento. |
+| C (Mercado, Auditor, datos) | OpenCode con modelos gratuitos | Detector de discriminación, agente de Mercado, contrafactuales, evaluaciones (`evals/`), búsqueda y documentación de fuentes de datos, y documentos. |
+| El producto (en ejecución) | Groq, modelo `openai/gpt-oss-120b` | Solo extraer datos de CV, ofertas, voz e imágenes, y redactar. Nunca decide: si falla o no hay clave, hay un respaldo por reglas. |
+
+**Cómo se validó lo que propuso cada asistente.** Nada se aceptó sin pruebas: cada cambio se
+subió solo con la suite de `pytest` en verde. Los errores que los asistentes no vieron los
+encontraron las pruebas de casos aleatorios (Hypothesis), la prueba de carga y la revisión cruzada
+entre integrantes, que quedó por escrito en un canal interno de avisos. Ejemplos de propuestas
+corregidas o descartadas: el solver CP-SAT del matching (se reemplazó por flujo de costo mínimo
+cuando falló con miles de pares), la evidencia textual del CV que llegaba a la empresa (fuga de
+privacidad, se corrigió con pruebas) y una prueba de carga que fallaba por una carrera de conexiones
+del cliente, no del servidor.
+
 ## 3. Reparto de áreas de trabajo
 
 La responsabilidad se repartió por carpetas para que cada integrante pudiera avanzar sin pisar el
@@ -68,7 +86,7 @@ atribuye a una sola persona el trabajo colectivo.
 
 ## 4. Etapas de desarrollo y actividades documentadas
 
-La reconstrucción se basa en las fechas y los mensajes de los 74 commits del repositorio.
+La reconstrucción se basa en las fechas y los mensajes de los commits del repositorio (127 al cierre).
 
 **Día 2026-10-16 — base y núcleo decisorio**
 
@@ -210,80 +228,51 @@ arriba.
 
 ## 8. Pruebas y evaluaciones ejecutadas
 
-**Pruebas automáticas (pytest).** En el estado actual del repositorio (commit `e5fe6df`) se
-recolectan y pasan **451 pruebas** (`python3 -m pytest`; Python 3.14.4). El README documenta una cifra
-anterior (275) que quedó desactualizada al sumarse nuevas pruebas durante el evento. La suite incluye:
-contrato, matching, ruta de formación, orquestador, perfil, mercado, auditor, pesos, reacomodo, «casi
-califica», historia por joven, permisos por rol, API, transporte, datos de demo y muestra sintética.
+**Pruebas automáticas (pytest).** Al cierre se recolectan y pasan **487 pruebas**
+(`python -m pytest`; Python 3.14). Cubren contrato, matching, ruta de formación, orquestador,
+perfil, mercado, auditor, pesos, reacomodo, «casi califica», historia por joven, permisos por rol,
+API, fotos, ubicaciones, transporte, datos de demo y muestra sintética.
 
 **Casos aleatorios (Hypothesis).** `tests/test_propiedades.py` y `tests/test_estados.py` generan
 miles de mercados y recorridos al azar; en instancias pequeñas se comparan contra búsqueda
-exhaustiva. El README documenta que estas pruebas encontraron 6 errores que los ejemplos fijos no
-veían, cada uno corregido y fijado en `tests/test_regresiones.py`.
+exhaustiva. Encontraron errores que los ejemplos fijos no veían; cada uno quedó corregido y fijado
+en `tests/test_regresiones.py`.
 
-**Evaluaciones (`evals/`).** El reporte `evals/resultados.md` registra una corrida **satisfactoria**
-con **40 casos**, generada el **2026-10-17 03:23:18 UTC** en el commit `081419d`, sin red y sin
-clave de modelo. Las métricas agregadas reportadas son: factibilidad de asignaciones 100 %, 0
-violaciones de cupos, 0 asignaciones incompatibles con habilidades, precisión y exhaustividad del
-detector 100 %, y contrafactuales y guardrails cumplidos. Los casos cubren contrafactuales, detector,
-guardrails, entradas malformadas, matching, mercado, restricciones y rutas sin asignación. (Nota: el
-reporte corresponde al commit `081419d`; conviene regenerarlo en el commit final.)
+**Evaluaciones (`evals/`).** 40 casos, corrida **SATISFACTORIA** sin red y sin clave de modelo:
+factibilidad de asignaciones 100 %, 0 violaciones de cupos, precisión y exhaustividad del detector
+100 %, contrafactuales y guardrails cumplidos.
 
-**Script de verificación de entrega.** `scripts/verificar_entrega.sh` revisa pruebas, evaluaciones,
-compilación del frontend, marcas de IA, higiene del repositorio y entregables del reglamento. En la
-última corrida (2026-10-17) el resultado fue **8 correctos, 4 por corregir y 4 avisos**. Los cuatro
-«por corregir» son: (1 y 2) no existía el entorno virtual `.venv` en la máquina donde se corrió, de
-modo que pruebas y evaluaciones no pudieron ejecutarse desde el script; (3) falta la Bitácora de IA
-en `docs/` (este documento); y (4) falta `docs/metodologia.md`. Los avisos incluyen que el tag
-`final-24h` aún no existe y que hay secciones sin atender en `AVISOS.md`. El chequeo de marcas de IA
-no encontró marcas en los 74 commits ni en los archivos versionados.
+**Carga y concurrencia.** `scripts/prueba_carga.py`: más de 1000 peticiones en ráfagas de cientos de
+simultáneas, con 0 errores 5xx, todas las acciones sin token rechazadas, ninguna vacante por encima
+de sus cupos y ninguna decisión aplicada dos veces.
 
-**Carga y concurrencia.** El README documenta `scripts/prueba_carga.py`: más de 1000 peticiones en
-ráfagas de hasta 378 simultáneas, con 0 errores 5xx, todas las acciones sin token rechazadas y sin
-que ninguna vacante supere sus cupos ni ninguna decisión se aplique dos veces.
-
-## 9. Estado actual del proyecto
+## 9. Estado final del proyecto
 
 | Componente | Estado |
 |---|---|
-| Contrato de datos | Implementado; congelado con ampliaciones solo opcionales |
-| Matching (factibilidad, puntaje, cupos) | Implementado y probado |
-| Ruta de formación | Implementado y probado |
+| Contrato de datos | Implementado; ampliaciones solo opcionales |
+| Matching (factibilidad, puntaje, cupos, viajes estimados por distancia) | Implementado y probado |
+| Ruta de formación y centros de formación con reservas | Implementado y probado |
 | Orquestador, trazas, reacomodo, matching automático | Implementado y probado |
-| API y permisos por rol | Implementada y probada |
+| API, permisos por rol y límites para anónimos | Implementada y probada |
 | Agente Perfil (texto, PDF, voz, foto) | Implementado y probado |
 | Agente de Mercado y tendencias | Implementado y probado |
 | Auditor (detector y contrafactuales) | Implementado y probado |
-| Frontend por rol | Implementado |
+| Frontend por rol, app instalable para teléfonos, fotos y logos | Implementado |
 | Datos con fuentes (`datos/`) | Preparados y documentados |
 | Evaluaciones (`evals/`) | 40 casos; reporte satisfactorio |
-| Documentos de entrega (`docs/`) | En desarrollo (esta bitácora y `docs/metodologia.md`) |
+| Documentos de entrega (`README.md`, `docs/`) | Terminados |
+| Video demostrativo | Grabado de la aplicación real, sin voz (`docs/video_demo.webm`) |
 | Integración directa de los CSV de investigación con los agentes | **No realizada** (ver sección 6) |
 
-## 10. Pendientes y próximos pasos antes de la entrega
+## 10. Lo que queda fuera de esta entrega
 
-1. Terminar `docs/metodologia.md` (hoy el chequeo de entregables lo marca como faltante).
-2. Revisar y cerrar esta bitácora con la información de la sección 11.
-3. Crear y publicar el tag `final-24h` (lo hace el responsable del núcleo).
-4. Regenerar las evaluaciones en el commit final y confirmar de nuevo el estado `SATISFACTORIA`.
-5. Correr `scripts/verificar_entrega.sh` con el entorno virtual instalado para que pruebas y
-   evaluaciones sí se ejecuten, y dejar el resumen en verde.
-6. Atender o cerrar las secciones pendientes de `AVISOS.md`.
-7. Decidir, con el equipo, si se amplía la fuente de ofertas y cursos para que incluyan los campos
-   obligatorios y permitan una conversión real (hoy no es posible sin inventar datos).
+1. Convertir las ofertas y cursos reales a los agentes requiere fuentes con los campos obligatorios
+   (corregimiento, turnos, salario mensual, cupos); hoy no es posible sin inventar datos.
+2. Medir la calidad de la extracción del LLM con más casos reales (hoy se evalúa sobre todo la parte
+   determinística, que es la que decide).
 
-## 11. Datos pendientes de confirmar por el equipo
+## 11. Límites de esta bitácora
 
-La siguiente información **no** puede deducirse del repositorio y, por lo tanto, no se rellenó con
-suposiciones; debe confirmarla el equipo:
-
-- Detalle de las sesiones de trabajo con los asistentes: fechas exactas, tareas concretas en que se
-  usaron y cómo se validó cada resultado.
-- Criterio para decidir si en este documento se nombran a los integrantes por su nombre o se mantiene
-  la descripción por áreas que se usó aquí.
-- Autoría del commit del área de Auditor que aparece en el historial bajo una **identidad genérica de
-  máquina** (`root`); debe confirmarse a quién corresponde.
-- Qué porcentaje del código escribió cada integrante con apoyo del asistente y cuánto se reescribió o
-  descartó; aquí no se estima ningún porcentaje.
-- Confirmación de si el producto final (entrega) usará exactamente este documento o una versión
-  resumida.
+No se estiman porcentajes de código escrito con o sin asistente ni se reconstruyen indicaciones
+concretas: el historial de Git conserva, commit por commit, quién subió cada cambio.

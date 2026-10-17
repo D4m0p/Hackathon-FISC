@@ -356,6 +356,14 @@ RUTA_BASE_DATOS=carga.db .venv/bin/uvicorn api.main:app --port 8010 --timeout-ke
 .venv/bin/python scripts/prueba_carga.py --url http://localhost:8010 --jovenes 300
 ```
 
+## Video demo
+
+[`docs/video_demo.webm`](docs/video_demo.webm) (unos 2 minutos, sin voz, con rótulos): recorrido de la
+aplicación real por los cinco agentes. Muestra la oferta bloqueada por el Auditor, las tarjetas del
+joven con traslado y pasaje, la empresa que elige sin nombre ni foto, la foto que aparece con el
+interés mutuo, la aprobación de la orientadora, el «Casi califica» con su ruta de cursos, el centro
+de formación, la auditoría contrafactual y el historial de trazas.
+
 ## Equipo
 
 **LarpeoIntenso**
