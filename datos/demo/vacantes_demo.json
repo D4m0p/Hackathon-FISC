@@ -1,0 +1,13 @@
+{
+ "_nota": "Muestras de investigación, NO oportunidades activas confirmadas. Cada registro proviene de un portal público (ver 'origen') y se conserva solo como ejemplo.",
+ "_advertencia": "Los registros de 'registros' validan contra contrato.modelos.Vacante.",
+ "fecha_datos": "2026-10-16",
+ "origen": {
+  "archivo": "datos/ofertas_empleo.csv",
+  "sha256": "f7df95330e204b2e3fce16d4e9344b391a56c22cd6071951441bb7a1de09a5e7"
+ },
+ "total_origen": 30,
+ "total_convertidos": 0,
+ "total_excluidos": 30,
+ "registros": []
+}

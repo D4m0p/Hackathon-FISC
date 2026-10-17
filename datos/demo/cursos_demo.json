@@ -1,0 +1,13 @@
+{
+ "_nota": "Muestras de investigación, NO oportunidades activas confirmadas. Cada registro proviene de un portal público (ver 'origen') y se conserva solo como ejemplo.",
+ "_advertencia": "Los registros de 'registros' validan contra contrato.modelos.Curso.",
+ "fecha_datos": "2026-10-16",
+ "origen": {
+  "archivo": "datos/cursos.csv",
+  "sha256": "7ea3d0c73d3e08810fc7d0600ac3046aeda23774bbcccd06523ff3e310db15b9"
+ },
+ "total_origen": 28,
+ "total_convertidos": 0,
+ "total_excluidos": 28,
+ "registros": []
+}

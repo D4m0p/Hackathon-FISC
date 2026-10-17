@@ -43,5 +43,34 @@
     },
     "esperado": {"tipo": "vacante", "codigos": ["manejo_caja"], "corregimiento": "arraijan",
                  "turnos": ["manana"]}
+  },
+  {
+    "id": "mercado_turno_invalido_01",
+    "asunto": "mercado",
+    "categoria": "mercado",
+    "naturaleza": "revision_humana",
+    "descripcion": "Un turno fuera del enum se descarta y la oferta queda incompleta por turnos.",
+    "entrada": {
+      "texto": "Se busca personal de limpieza.",
+      "llm": {"titulo": "Limpieza", "corregimiento": "Arraijan", "turnos": ["tiempo_completo"],
+              "dias_por_semana": 5, "salario_mensual": 650, "cupos": 1,
+              "habilidades": [{"codigo": "manejo_caja", "nivel_minimo": 1, "obligatoria": true}]}
+    },
+    "esperado": {"tipo": "error_controlado", "campos": ["turnos"]}
+  },
+  {
+    "id": "mercado_corregimiento_acento_01",
+    "asunto": "mercado",
+    "categoria": "mercado",
+    "naturaleza": "determinista",
+    "descripcion": "El corregimiento con mayusculas y acento se normaliza al catalogo del proyecto.",
+    "entrada": {
+      "texto": "Se busca cajero.",
+      "llm": {"titulo": "Cajero/a", "corregimiento": "ARRAIJÁN", "turnos": ["manana"],
+              "dias_por_semana": 5, "salario_mensual": 650, "cupos": 1,
+              "habilidades": [{"codigo": "manejo_caja", "nivel_minimo": 1, "obligatoria": true}]}
+    },
+    "esperado": {"tipo": "vacante", "codigos": ["manejo_caja"], "corregimiento": "arraijan",
+                 "turnos": ["manana"]}
   }
 ]

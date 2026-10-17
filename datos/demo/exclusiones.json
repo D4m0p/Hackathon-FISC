@@ -1,0 +1,1252 @@
+{
+ "_nota": "Trazabilidad: cada registro excluido enlaza con su origen y explica qué campos obligatorios del modelo faltan y por qué no se tomaron de la fuente.",
+ "fecha_datos": "2026-10-16",
+ "ofertas": [
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-001",
+    "url": "https://www.estascontratado.com/1117643/soporte-tecnico.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-002",
+    "url": "https://www.estascontratado.com/1114583/soporte-tecnico.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-003",
+    "url": "https://www.estascontratado.com/1116957/auxiliar-de-bodega.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-004",
+    "url": "https://www.estascontratado.com/1114142/auxiliar-de-bodega.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-005",
+    "url": "https://www.estascontratado.com/1112484/asistente-de-operaciones.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-006",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-helpdesk-asistente-de-it-en-panama-E81B33B54C2C53F061373E686DCF3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-007",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-soporte-tecnico-incidencias-tecnicas-y-redes-en-panama-cf1efa22190fe53e61373e686dcf3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-008",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-auxiliar-contable-en-panama-22a21ad0fb1a88e861373e686dcf3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-009",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-contable-en-panama-725F43E6F14B6B2861373E686DCF3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-010",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-asistente-de-contabilidad-y-compras-contabilidad-en-arraijan-d678531dc8d8263661373e686dcf3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-011",
+    "url": "https://pa.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-visual-merchandising-en-panama-63b6d2df6c32804461373e686dcf3405"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-012",
+    "url": "https://empleos.pancanal.com/job/especialista-en-ciberseguridad-in-panama-jid-182"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-013",
+    "url": "https://cazvid.com/es/empleo/arquitecto-de-ciberseguridad-it-df685c3c"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-014",
+    "url": "https://cazvid.com/es/empleo/desarrollador-de-software-jr-747954"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-015",
+    "url": "https://bolsadetrabajo.utp.ac.pa/desarrollador-full-stack-0"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-016",
+    "url": "https://banconacionaldepanama.hiringroom.com/jobs/get_vacancy/6ac958d82f40380e69690eb8"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-017",
+    "url": "https://www.estascontratado.com/1109855/jefe-de-informatica-sistemas.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-018",
+    "url": "https://www.estascontratado.com/1111531/ingeniero-en-sistemas.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-019",
+    "url": "https://www.estascontratado.com/1117645/operador-de-sistemas.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-020",
+    "url": "https://www.estascontratado.com/1113055/vendedor-de-mostrador-interno.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-021",
+    "url": "https://www.estascontratado.com/1114018/supervisor-de-ventas.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-022",
+    "url": "https://www.estascontratado.com/1112477/vendedor.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-023",
+    "url": "https://www.estascontratado.com/1114902/ejecutivo-de-call-center.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-024",
+    "url": "https://www.estascontratado.com/1113784/agente-de-servicio.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-025",
+    "url": "https://www.estascontratado.com/1108143/asistente-de-cocina.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-026",
+    "url": "https://www.estascontratado.com/1111453/jefe-de-alimentos-y-bebidas.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-027",
+    "url": "https://www.estascontratado.com/1112929/cocinero.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-028",
+    "url": "https://www.estascontratado.com/1117624/electricista.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-029",
+    "url": "https://www.estascontratado.com/1117474/mecanico-automotriz.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  },
+  {
+   "tipo": "oferta",
+   "origen": {
+    "archivo": "datos/ofertas_empleo.csv",
+    "id_origen": "OF-030",
+    "url": "https://www.estascontratado.com/1111451/tecnico-en-electronica.aspx"
+   },
+   "campos_mapeados": [
+    "id",
+    "titulo",
+    "texto_original"
+   ],
+   "campos_faltantes": [
+    "empresa_id",
+    "corregimiento",
+    "turnos",
+    "salario_mensual"
+   ],
+   "motivo": "No se convierte a Vacante: faltan campos obligatorios -> empresa_id (la fuente da el nombre de la empresa, no un identificador); corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); salario_mensual (la fuente da texto o un rango, no un monto mensual numérico)."
+  }
+ ],
+ "cursos": [
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_ingles_it",
+    "url": "https://www.netacad.com/courses/english-for-it1"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_intro_ciberseguridad",
+    "url": "https://www.netacad.com/courses/introduction-to-cybersecurity"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_javascript_1",
+    "url": "https://www.netacad.com/courses/javascript-essentials-1"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_python_1",
+    "url": "https://www.netacad.com/courses/python-essentials-1"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_python_2",
+    "url": "https://www.netacad.com/courses/python-essentials-2"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "cisco_redes_basicas",
+    "url": "https://www.netacad.com/courses/networking-basics"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_electromecanica_instalaciones",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/electromecanica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_electromecanica_refrigeracion",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/electromecanica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gastronomia_manipulacion",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gastronomia/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gastronomia_servicio_salon",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gastronomia/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gestion_atencion_cliente",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gestion-empresarial/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gestion_contabilidad",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gestion-empresarial/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gestion_mercadeo_ventas",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gestion-empresarial/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_gestion_oficinista",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/gestion-empresarial/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_idiomas_beginner_a",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/idiomas/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_idiomas_intermediate",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/idiomas/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_logistica_almacenamiento",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/logistica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_logistica_inventario",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/logistica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_logistica_montacarga",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/logistica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_logistica_wms",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/logistica/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_tic_fundamentos_programacion",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/tecnologia-de-informacion-y-comunicacion/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_tic_hoja_calculo_basica",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/tecnologia-de-informacion-y-comunicacion/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_tic_linux_basico",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/tecnologia-de-informacion-y-comunicacion/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "inadeh_tic_sql_oracle",
+    "url": "https://www.inadeh.edu.pa/plantransformacionintegral/tecnologia-de-informacion-y-comunicacion/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "oracle_database_explorer",
+    "url": "https://learn.oracle.com/ols/learning-path/oracle-database-explorer/132718/79873"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "oracle_devgym_foundations",
+    "url": "https://devgym.oracle.com/pls/apex/dg/class/databases-for-developers-foundations.html"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "oracle_freesql",
+    "url": "https://www.oracle.com/database/technologies/oracle-free-sql/"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  },
+  {
+   "tipo": "curso",
+   "origen": {
+    "archivo": "datos/cursos.csv",
+    "id_origen": "oracle_sql_explorer",
+    "url": "https://learn.oracle.com/ols/learning-path/oracle-sql-explorer/132718/79918"
+   },
+   "campos_mapeados": [
+    "id",
+    "centro",
+    "nombre",
+    "costo"
+   ],
+   "campos_faltantes": [
+    "corregimiento",
+    "turnos",
+    "sesiones_por_semana",
+    "semanas",
+    "cupos_disponibles",
+    "habilidades_otorgadas"
+   ],
+   "motivo": "No se convierte a Curso: faltan campos obligatorios -> corregimiento (la fuente da provincia/ubicación textual, no un corregimiento); turnos (la fuente da jornada textual ('Tiempo completo'), no los turnos del enum); sesiones_por_semana (vacío en la fuente); semanas (vacío en la fuente); cupos_disponibles (vacío en la fuente); habilidades_otorgadas (la fuente lista códigos sin nivel y el modelo exige nivel 1-3)."
+  }
+ ]
+}

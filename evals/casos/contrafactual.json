@@ -59,5 +59,91 @@
       "mutacion": "par_infactible"
     },
     "esperado": {"tipo": "hallazgo", "reglas": ["contrafactual_desglose"]}
+  },
+  {
+    "id": "contrafactual_asignacion_cupos_01",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "revision_humana",
+    "descripcion": "Un resultado que asigna mas jovenes que los cupos de la vacante debe detectarse.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "san_francisco", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]},
+                  {"id": "j2", "corregimiento": "san_francisco", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "san_francisco",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "pesos": {"habilidades": 0.6, "traslado": 0.25, "salario": 0.15},
+      "resultado": {
+        "asignaciones": [
+          {"joven_id": "j1", "vacante_id": "v1",
+           "desglose": {"habilidades": 1.0, "traslado": 0.8, "salario": 0.7222, "total": 0.9083,
+                        "pesos": {"habilidades": 0.6, "traslado": 0.25, "salario": 0.15}}},
+          {"joven_id": "j2", "vacante_id": "v1",
+           "desglose": {"habilidades": 1.0, "traslado": 0.8, "salario": 0.7222, "total": 0.9083,
+                        "pesos": {"habilidades": 0.6, "traslado": 0.25, "salario": 0.15}}}],
+        "sin_asignar": [],
+        "infactibles": []
+      }
+    },
+    "esperado": {"tipo": "hallazgo", "reglas": ["contrafactual_asignacion"]}
+  },
+  {
+    "id": "contrafactual_pesos_01",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "revision_humana",
+    "descripcion": "Un desglose que declara pesos distintos a los vigentes debe empujar a recalcular.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "san_francisco", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "san_francisco",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "pesos": {"habilidades": 0.6, "traslado": 0.25, "salario": 0.15},
+      "resultado": {
+        "asignaciones": [
+          {"joven_id": "j1", "vacante_id": "v1",
+           "desglose": {"habilidades": 1.0, "traslado": 0.8, "salario": 0.7222, "total": 0.8844,
+                        "pesos": {"habilidades": 0.5, "traslado": 0.3, "salario": 0.2}}}],
+        "sin_asignar": [],
+        "infactibles": []
+      }
+    },
+    "esperado": {"tipo": "hallazgo", "reglas": ["contrafactual_pesos"]}
+  },
+  {
+    "id": "contrafactual_identidad_02",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "determinista",
+    "descripcion": "Cambiar solo nombre y genero no altera la asignacion ni los hallazgos (equidad, multi-par).",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0},
+                    {"origen": "la_chorrera", "destino": "bella_vista", "minutos": 70, "costo": 1.6}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "ventas", "nivel": 2}]},
+                  {"id": "j2", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Ventas", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "ventas", "nivel_minimo": 1, "obligatoria": true}]},
+                   {"id": "v2", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "bella_vista",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "datos": {"j1": {"joven_id": "j1", "nombre": "Ana", "genero": "femenino"},
+                "j2": {"joven_id": "j2", "nombre": "Luis", "genero": "masculino"}},
+      "datos_alternativo": {"j1": {"joven_id": "j1", "nombre": "Zulay", "genero": "masculino"},
+                            "j2": {"joven_id": "j2", "nombre": "Marta", "genero": "femenino"}}
+    },
+    "esperado": {"tipo": "sin_hallazgo"}
   }
 ]

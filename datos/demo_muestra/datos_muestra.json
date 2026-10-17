@@ -1,0 +1,538 @@
+{
+ "_nota": "MUESTRA SINTÉTICA (ficticia): datos inventados para pruebas y demostraciones. Todos los jóvenes, vacantes, cursos, cupos, empresas, salarios, turnos y deslizamientos son FICTICIOS y NO representan personas, empresas, ofertas laborales ni cursos reales ni vigentes. Aunque algunas academias o fuentes de investigación citadas en datos/ puedan ser reales, eso no significa que estos registros sean cursos u ofertas actualmente disponibles. NO debe usarse como fuente de verdad del mercado (cifras de empleo, salarios, cupos ni demanda): sirve solo para probar el recorrido (publicar, deslizar, matching, plan de formación). Los datos de investigación con fuentes viven en datos/ofertas_empleo.csv, datos/cursos.csv y datos/FUENTES*.md y se conservan intactos; ver datos/demo_muestra/LEEME.md.",
+ "habilidades": [
+  {
+   "codigo": "atencion_cliente",
+   "nombre": "Atención al cliente"
+  },
+  {
+   "codigo": "manejo_caja",
+   "nombre": "Manejo de caja"
+  },
+  {
+   "codigo": "ventas",
+   "nombre": "Ventas"
+  },
+  {
+   "codigo": "excel_basico",
+   "nombre": "Excel básico"
+  },
+  {
+   "codigo": "ingles_conversacional",
+   "nombre": "Inglés conversacional"
+  },
+  {
+   "codigo": "reposicion_inventario",
+   "nombre": "Reposición e inventario"
+  },
+  {
+   "codigo": "manipulacion_alimentos",
+   "nombre": "Manipulación de alimentos"
+  },
+  {
+   "codigo": "soporte_tecnico",
+   "nombre": "Soporte técnico"
+  },
+  {
+   "codigo": "redes_sociales",
+   "nombre": "Redes sociales"
+  },
+  {
+   "codigo": "logistica_bodega",
+   "nombre": "Logística de bodega"
+  },
+  {
+   "codigo": "servicio_mesa",
+   "nombre": "Servicio de mesa"
+  }
+ ],
+ "traslados": [
+  {
+   "origen": "bella_vista",
+   "destino": "san_francisco",
+   "minutos": 15,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "san_miguelito",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "juan_diaz",
+   "minutos": 35,
+   "costo": 0.35
+  },
+  {
+   "origen": "bella_vista",
+   "destino": "betania",
+   "minutos": 20,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "san_miguelito",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "juan_diaz",
+   "minutos": 25,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_francisco",
+   "destino": "betania",
+   "minutos": 25,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_miguelito",
+   "destino": "juan_diaz",
+   "minutos": 30,
+   "costo": 0.35
+  },
+  {
+   "origen": "san_miguelito",
+   "destino": "betania",
+   "minutos": 20,
+   "costo": 0.35
+  },
+  {
+   "origen": "juan_diaz",
+   "destino": "betania",
+   "minutos": 35,
+   "costo": 0.35
+  }
+ ],
+ "cursos": [
+  {
+   "id": "c_sint_ingles",
+   "centro": "Centro Demo de Formación",
+   "nombre": "Inglés conversacional básico (muestra)",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "manana"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 12,
+   "costo": 0,
+   "cupos_disponibles": 18,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "ingles_conversacional",
+     "nivel": 2
+    }
+   ]
+  },
+  {
+   "id": "c_sint_atencion",
+   "centro": "Centro Demo de Formación",
+   "nombre": "Atención al cliente (muestra)",
+   "corregimiento": "betania",
+   "turnos": [
+    "tarde"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 4,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "atencion_cliente",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c_sint_soporte",
+   "centro": "Centro Demo de Formación",
+   "nombre": "Soporte técnico inicial (muestra)",
+   "corregimiento": "san_miguelito",
+   "turnos": [
+    "manana",
+    "tarde"
+   ],
+   "sesiones_por_semana": 3,
+   "semanas": 10,
+   "costo": 0,
+   "cupos_disponibles": 15,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "soporte_tecnico",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c_sint_bodega",
+   "centro": "Centro Demo de Formación",
+   "nombre": "Operación de bodega (muestra)",
+   "corregimiento": "juan_diaz",
+   "turnos": [
+    "noche"
+   ],
+   "sesiones_por_semana": 2,
+   "semanas": 6,
+   "costo": 0,
+   "cupos_disponibles": 20,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "logistica_bodega",
+     "nivel": 1
+    },
+    {
+     "codigo": "reposicion_inventario",
+     "nivel": 1
+    }
+   ]
+  },
+  {
+   "id": "c_sint_gastro",
+   "centro": "Centro Demo de Formación",
+   "nombre": "Servicio de mesa y alimentos (muestra)",
+   "corregimiento": "bella_vista",
+   "turnos": [
+    "tarde"
+   ],
+   "sesiones_por_semana": 5,
+   "semanas": 1,
+   "costo": 10,
+   "cupos_disponibles": 25,
+   "habilidades_otorgadas": [
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel": 1
+    },
+    {
+     "codigo": "servicio_mesa",
+     "nivel": 1
+    }
+   ]
+  }
+ ],
+ "vacantes": [
+  {
+   "id": "v_sint_seguridad",
+   "empresa_id": "e_sint_tec",
+   "titulo": "Analista de seguridad informática (muestra)",
+   "corregimiento": "san_francisco",
+   "turnos": [
+    "manana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 1200,
+   "habilidades_requeridas": [
+    {
+     "codigo": "soporte_tecnico",
+     "nivel_minimo": 2,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 1,
+   "texto_original": null
+  },
+  {
+   "id": "v_sint_desarrollo",
+   "empresa_id": "e_sint_tec",
+   "titulo": "Desarrollador/a junior (muestra)",
+   "corregimiento": "bella_vista",
+   "turnos": [
+    "manana",
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 1500,
+   "habilidades_requeridas": [
+    {
+     "codigo": "soporte_tecnico",
+     "nivel_minimo": 3,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 1,
+   "texto_original": null
+  },
+  {
+   "id": "v_sint_ventas",
+   "empresa_id": "e_sint_comercio",
+   "titulo": "Asesor/a de ventas (muestra)",
+   "corregimiento": "juan_diaz",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 700,
+   "habilidades_requeridas": [
+    {
+     "codigo": "ventas",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v_sint_callcenter",
+   "empresa_id": "e_sint_comercio",
+   "titulo": "Agente de atención telefónica (muestra)",
+   "corregimiento": "betania",
+   "turnos": [
+    "tarde"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 780,
+   "habilidades_requeridas": [
+    {
+     "codigo": "atencion_cliente",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "ingles_conversacional",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    }
+   ],
+   "cupos": 3,
+   "texto_original": null
+  },
+  {
+   "id": "v_sint_salonero",
+   "empresa_id": "e_sint_gastro",
+   "titulo": "Salonero/a (muestra)",
+   "corregimiento": "san_miguelito",
+   "turnos": [
+    "tarde",
+    "fin_de_semana"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 640,
+   "habilidades_requeridas": [
+    {
+     "codigo": "servicio_mesa",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "manipulacion_alimentos",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  },
+  {
+   "id": "v_sint_bodega",
+   "empresa_id": "e_sint_logistica",
+   "titulo": "Auxiliar de bodega (muestra)",
+   "corregimiento": "juan_diaz",
+   "turnos": [
+    "noche"
+   ],
+   "dias_por_semana": 5,
+   "salario_mensual": 700,
+   "habilidades_requeridas": [
+    {
+     "codigo": "logistica_bodega",
+     "nivel_minimo": 1,
+     "obligatoria": true
+    },
+    {
+     "codigo": "reposicion_inventario",
+     "nivel_minimo": 1,
+     "obligatoria": false
+    }
+   ],
+   "cupos": 2,
+   "texto_original": null
+  }
+ ],
+ "jovenes": [
+  {
+   "joven": {
+    "id": "j_sint_maria",
+    "corregimiento": "san_francisco",
+    "disponibilidad": [
+     "manana"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "soporte_tecnico",
+      "nivel": 2,
+      "evidencia": "Ejemplo sintético para la muestra"
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j_sint_maria",
+    "nombre": "María Ejemplo",
+    "genero": "femenino",
+    "edad": 20
+   }
+  },
+  {
+   "joven": {
+    "id": "j_sint_ana",
+    "corregimiento": "bella_vista",
+    "disponibilidad": [
+     "tarde"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 620,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "atencion_cliente",
+      "nivel": 1
+     },
+     {
+      "codigo": "ingles_conversacional",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j_sint_ana",
+    "nombre": "Ana Ejemplo",
+    "genero": "femenino",
+    "edad": 22
+   }
+  },
+  {
+   "joven": {
+    "id": "j_sint_carlos",
+    "corregimiento": "juan_diaz",
+    "disponibilidad": [
+     "noche"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 640,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "logistica_bodega",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j_sint_carlos",
+    "nombre": "Carlos Ejemplo",
+    "genero": "masculino",
+    "edad": 21
+   }
+  },
+  {
+   "joven": {
+    "id": "j_sint_lucia",
+    "corregimiento": "betania",
+    "disponibilidad": [
+     "tarde",
+     "fin_de_semana"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": [
+     {
+      "codigo": "manipulacion_alimentos",
+      "nivel": 1
+     },
+     {
+      "codigo": "servicio_mesa",
+      "nivel": 1
+     }
+    ]
+   },
+   "datos": {
+    "joven_id": "j_sint_lucia",
+    "nombre": "Lucía Ejemplo",
+    "genero": "femenino",
+    "edad": 19
+   }
+  },
+  {
+   "joven": {
+    "id": "j_sint_jose",
+    "corregimiento": "san_miguelito",
+    "disponibilidad": [
+     "manana"
+    ],
+    "presupuesto_transporte_semanal": 10,
+    "salario_minimo": 600,
+    "max_minutos_traslado": 75,
+    "habilidades": []
+   },
+   "datos": {
+    "joven_id": "j_sint_jose",
+    "nombre": "José Ejemplo",
+    "genero": "masculino",
+    "edad": 18
+   }
+  }
+ ],
+ "deslizamientos": [
+  {
+   "actor": "joven",
+   "joven_id": "j_sint_maria",
+   "vacante_id": "v_sint_seguridad",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j_sint_maria",
+   "vacante_id": "v_sint_seguridad",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j_sint_ana",
+   "vacante_id": "v_sint_callcenter",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j_sint_ana",
+   "vacante_id": "v_sint_callcenter",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j_sint_carlos",
+   "vacante_id": "v_sint_bodega",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j_sint_carlos",
+   "vacante_id": "v_sint_bodega",
+   "le_interesa": true
+  },
+  {
+   "actor": "joven",
+   "joven_id": "j_sint_lucia",
+   "vacante_id": "v_sint_salonero",
+   "le_interesa": true
+  },
+  {
+   "actor": "empresa",
+   "joven_id": "j_sint_lucia",
+   "vacante_id": "v_sint_salonero",
+   "le_interesa": true
+  }
+ ]
+}

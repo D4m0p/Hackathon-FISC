@@ -86,5 +86,39 @@
                     "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
     },
     "esperado": {"tipo": "sin_asignacion"}
+  },
+  {
+    "id": "restriccion_turnos_parcial_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "El joven debe tener disponibles TODOS los turnos de la vacante, no algunos.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana", "tarde"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  },
+  {
+    "id": "restriccion_sin_datos_traslado_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "Sin datos de traslado para la pareja no hay asignacion posible.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "tocumen",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
   }
 ]

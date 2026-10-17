@@ -106,5 +106,41 @@
                             "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
                             "texto_original": "Vendedor para la seccion de ropa. No se exige buena presencia ni excelente presentacion."}},
     "esperado": {"tipo": "aprueba"}
+  },
+  {
+    "id": "detector_foto_negada_oculta_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Una negacion no debe ocultar un requisito real de foto mas adelante en el texto.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Asistente",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "No se requiere foto obligatoria. Enviar el CV con foto al correo."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["foto_obligatoria"]}
+  },
+  {
+    "id": "detector_edad_minima_21_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Exigir mas de la mayoria de edad (21) excluye sin justificacion del puesto.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Almacen",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Se busca mayor de 21 anos."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["edad"]}
+  },
+  {
+    "id": "detector_experiencia_anios_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "determinista",
+    "etiqueta": "limpia",
+    "descripcion": "Anos de experiencia no deben confundirse con un limite de edad.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Vendedor",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Se requieren de 2 a 4 anos de experiencia en ventas."}},
+    "esperado": {"tipo": "aprueba"}
   }
 ]
