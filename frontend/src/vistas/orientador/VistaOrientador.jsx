@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import { api } from "../../api.js";
 import Auditoria from "./Auditoria.jsx";
 import Bloqueadas from "./Bloqueadas.jsx";
+import Panorama from "./Panorama.jsx";
 import Matches from "./Matches.jsx";
 import Pesos from "./Pesos.jsx";
 import SinMatch from "./SinMatch.jsx";
 import Trazas from "./Trazas.jsx";
 
-const PESTANAS = [["matches", "Propuestas"], ["bloqueadas", "Bloqueadas"], ["sin", "Sin opciones"], ["pesos", "Prioridades"], ["auditoria", "Auditoría"], ["trazas", "Historial"]];
+const PESTANAS = [["panorama", "Panorama"], ["matches", "Propuestas"], ["bloqueadas", "Bloqueadas"], ["sin", "Sin opciones"], ["pesos", "Prioridades"], ["auditoria", "Auditoría"], ["trazas", "Historial"]];
 
 // Catálogos que usan varias pestañas: nombres de habilidades, vacantes y cursos.
 export default function VistaOrientador() {
-  const [pestana, setPestana] = useState("matches");
+  const [pestana, setPestana] = useState("panorama");
   const [cat, setCat] = useState({ habilidades: {}, vacantes: {}, cursos: {}, jovenes: {} });
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function VistaOrientador() {
           <button key={k} className={pestana === k ? "activa" : ""} onClick={() => setPestana(k)}>{t}</button>
         ))}
       </nav>
+      {pestana === "panorama" && <Panorama cat={cat} onIr={setPestana} />}
       {pestana === "matches" && <Matches cat={cat} />}
       {pestana === "bloqueadas" && <Bloqueadas />}
       {pestana === "sin" && <SinMatch cat={cat} />}

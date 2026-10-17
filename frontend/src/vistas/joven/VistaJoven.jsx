@@ -5,6 +5,7 @@ import Barras from "../../componentes/Barras.jsx";
 import Camino from "../../componentes/Camino.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
+import MapaPanama from "../../componentes/MapaPanama.jsx";
 import { AGENTES, NIVELES, TURNOS, conNombres, corregimiento, dinero, enPalabras } from "../../nombres.js";
 import Entrevistas from "./Entrevistas.jsx";
 
@@ -83,7 +84,7 @@ function Vacantes({ jovenId, nombres, onGuia }) {
         <span className="suave">{restantes.length ? `${restantes.length} vacante(s) para usted` : ""}</span>
         <button className="enlace" onClick={onGuia}>¿Cómo funciona?</button>
       </div>
-      <Ahorro jovenId={jovenId} />
+      <Ahorro jovenId={jovenId} tarjetas={datos} />
       {aviso?.tipo === "mutuo" && (
         <div className="mutuo" role="status">
           <b>¡A la empresa también le interesa!</b> «{aviso.titulo}» quiere conocerle.
@@ -123,28 +124,57 @@ const MOTIVOS_AHORRO = {
   sin_datos: (n) => `de ${n} no tenemos datos de cómo llegar`,
 };
 
-function Ahorro({ jovenId }) {
+const AMBAR = "#f2b84b", GRIS = "#94a9b9";
+
+function Ahorro({ jovenId, tarjetas }) {
   const [datos, setDatos] = useState(null);
-  useEffect(() => { api.impactoJoven(jovenId).then(setDatos).catch(() => setDatos(null)); }, [jovenId]);
+  useEffect(() => {
+    Promise.all([api.impactoJoven(jovenId), api.vacantes(), api.casiCalifica(jovenId), api.historia(jovenId)])
+      .then(([impacto, vacantes, casi, historia]) => setDatos({ impacto, vacantes, casi, historia }))
+      .catch(() => setDatos(null));
+  }, [jovenId]);
   if (!datos) return null;
-  const otras = datos.publicadas - datos.viables;
+  const i = datos.impacto;
+  const otras = i.publicadas - i.viables;
   if (otras <= 0) return null;
-  const motivos = Object.keys(MOTIVOS_AHORRO).filter((k) => datos.descartes[k] > 0);
+  const motivos = Object.keys(MOTIVOS_AHORRO).filter((k) => i.descartes[k] > 0);
+
+  // Una burbuja por corregimiento: aqua si alguna vacante le sirve, ámbar si le falta una sola cosa.
+  const minutos = Object.fromEntries(tarjetas.map((t) => [t.vacante.id, enPalabras(t.desglose).minutos]));
+  const sirve = new Set([...tarjetas.map((t) => t.vacante.id),
+    ...datos.historia.deslizamientos.filter((d) => d.actor === "joven").map((d) => d.vacante_id)]);
+  const casi = Object.fromEntries(datos.casi.map((c) => [c.vacante_id, c.incumplimiento.detalle]));
+  const zonas = {};
+  for (const v of datos.vacantes) {
+    const z = (zonas[v.corregimiento] ||= { sirve: 0, casi: 0, lineas: [] });
+    if (sirve.has(v.id)) { z.sirve++; z.lineas.push(`✓ ${v.titulo}${minutos[v.id] != null ? ` · ${minutos[v.id]} min` : ""}`); }
+    else if (casi[v.id]) { z.casi++; z.lineas.push(`◐ ${v.titulo}: ${casi[v.id]}`); }
+    else z.lineas.push(`✕ ${v.titulo}: no encaja en varias cosas`);
+  }
+  const puntos = Object.entries(zonas).map(([codigo, z]) => ({
+    codigo, radio: 6 + z.lineas.length * 3, color: z.sirve ? "var(--aqua)" : z.casi ? AMBAR : GRIS, lineas: z.lineas,
+  }));
+
   return (
     <details className="ahorro">
       <summary>
-        {datos.viables > 0 ? (
-          <>De <b>{datos.publicadas}</b> vacantes publicadas, <b>{datos.viables} le sirven</b>.
+        {i.viables > 0 ? (
+          <>De <b>{i.publicadas}</b> vacantes publicadas, <b>{i.viables} le sirven</b>.
             Le ahorramos <b>{otras}</b> postulaciones que no le convenían.</>
         ) : (
-          <>Ninguna de las <b>{datos.publicadas}</b> vacantes publicadas le sirve todavía.
+          <>Ninguna de las <b>{i.publicadas}</b> vacantes publicadas le sirve todavía.
             Mire «Le falta poco» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
         )}
+        <span className="ahorro-abrir">Ver en el mapa</span>
       </summary>
+      <div className="panel-oscuro mapa-joven">
+        <MapaPanama puntos={puntos} casa={datos.historia.joven.corregimiento}
+                    leyenda={<><i className="punto aqua" /> le sirve <i className="punto ambar" /> le falta una cosa <i className="punto lejos" /> no encaja · la casita es usted</>} />
+      </div>
       <ul>
-        {motivos.map((k) => <li key={k}>{MOTIVOS_AHORRO[k](datos.descartes[k])}</li>)}
+        {motivos.map((k) => <li key={k}>{MOTIVOS_AHORRO[k](i.descartes[k])}</li>)}
       </ul>
-      <p className="nota">Una vacante puede fallar en más de una cosa. Un portal común le mostraría las {datos.publicadas};
+      <p className="nota">Una vacante puede fallar en más de una cosa. Un portal común le mostraría las {i.publicadas};
         aquí solo le mostramos las que le quedan cerca, en su horario y le dejan dinero después del pasaje.</p>
     </details>
   );

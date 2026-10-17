@@ -14,6 +14,13 @@ export default function App() {
   const [cargando, setCargando] = useState(true);
   const [registrando, setRegistrando] = useState(false);
   const [error, setError] = useState("");
+  // Tema claro u oscuro elegido a mano (si no, sigue al sistema). Se recuerda en este navegador.
+  const [tema, setTema] = useState(() => { try { return localStorage.getItem("empleo_tema"); } catch { return null; } });
+  useEffect(() => {
+    if (tema) document.documentElement.dataset.tema = tema; else delete document.documentElement.dataset.tema;
+    try { tema ? localStorage.setItem("empleo_tema", tema) : localStorage.removeItem("empleo_tema"); } catch { /* sin almacenamiento */ }
+  }, [tema]);
+  const oscuro = tema ? tema === "oscuro" : window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 
   async function entrar(token) {
     setError("");
@@ -55,9 +62,13 @@ export default function App() {
   else contenido = <VistaOrientador key={token} />;
 
   return (
-    <div className="app">
+    <div className={"app" + (yo && yo.rol !== "joven" ? " ancho" : "")}>
       <header className="barra">
         <span className="marca">Empleo<b>Joven</b></span>
+        <button className="tema" onClick={() => setTema(oscuro ? "claro" : "oscuro")}
+                aria-label={oscuro ? "Usar tema claro" : "Usar tema oscuro"} title={oscuro ? "Tema claro" : "Tema oscuro"}>
+          {oscuro ? "☀️" : "🌙"}
+        </button>
         {yo && (
           <span className="sesion">
             {/* Cambiar de rol en un clic durante la demo */}
