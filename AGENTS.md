@@ -119,7 +119,7 @@ Agentes: **Inteligencia de mercado, Perfil, Matching, Ruta de formación, Audito
 ```bash
 python -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python scripts/semilla_demo.py --reiniciar --matching   # datos de demo (10 vacantes, 10 jóvenes)
-.venv/bin/uvicorn api.main:app --reload --port 8010   # documentación en http://localhost:8010/docs
+.venv/bin/uvicorn api.main:app --reload --port 8010 --timeout-keep-alive 30   # documentación en http://localhost:8010/docs
 .venv/bin/python -m pytest
 cd frontend && npm install && npm run dev
 ```

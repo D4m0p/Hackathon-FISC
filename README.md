@@ -63,7 +63,7 @@ flowchart LR
 
     P --> D{Deslizar}
     R --> D
-    D -->|interés mutuo| MA[Matching<br/>solver CP-SAT]
+    D -->|interés mutuo| MA[Matching<br/>flujo de costo mínimo]
     MA -->|asignaciones explicadas| AU2[Auditor<br/>contrafactuales]
     AU2 --> O[Orientador humano]
     O -->|aprueba| AC[Agenda entrevista<br/>y envía Telegram]
@@ -89,7 +89,7 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 |---|---|---|---|
 | **Inteligencia de mercado** | Normaliza ofertas a una taxonomía de habilidades y extrae tendencias | El LLM extrae; el código valida contra la taxonomía | *(en desarrollo)* |
 | **Perfil** | Lee el CV (PDF, foto o texto) y hace una entrevista corta para descubrir habilidades no declaradas | El LLM solo propone; el código acepta una habilidad solo si existe en la taxonomía y su cita aparece en el texto original; la experiencia informal llega como máximo a nivel 2; sin LLM funciona con palabras clave | Listo |
-| **Matching** | Filtra pares imposibles, puntúa y asigna con cupos | Reglas + OR-Tools CP-SAT | Listo |
+| **Matching** | Filtra pares imposibles, puntúa y asigna con cupos | Reglas + OR-Tools (flujo de costo mínimo: óptimo exacto en tiempo polinomial) | Listo |
 | **Ruta de formación** | Elige cursos que cierran la brecha de habilidades | OR-Tools CP-SAT con cupos, turnos, traslado y presupuesto | Listo |
 | **Auditor** | Bloquea ofertas discriminatorias y hace pruebas contrafactuales de sesgo | Reglas determinísticas; el LLM solo como segunda opinión | *(en desarrollo)* |
 
@@ -117,12 +117,17 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 - **Óptimo global, no voraz.** Asignar a cada joven su mejor opción en orden puede dejar a
   alguien sin trabajo; el solver maximiza el total respetando cupos (hay una prueba que lo
   demuestra: `test_optimo_global_gana_al_voraz`).
-- **Resultados reproducibles.** Los solvers corren con semilla fija y un solo hilo.
+- **Resultados reproducibles.** Los modelos se construyen siempre en el mismo orden y CP-SAT corre con semilla fija y un solo hilo.
+- **Rendimiento.** El Matching es un flujo de costo mínimo (exacto y polinomial; antes CP-SAT,
+  que con miles de pares agotaba su límite de tiempo sin solución). El solver trabaja solo con
+  el puntaje numérico y la explicación se arma únicamente para los pares elegidos. Con 2000
+  jóvenes y 200 vacantes, el ciclo completo de matching tarda unos 0,3 s, y la asignación
+  con todos los pares posibles (5000 × 300) unos 7 s.
 
 ## Tecnologías
 
 - **Backend:** Python 3.12+, FastAPI, Pydantic 2, SQLite.
-- **Optimización:** Google OR-Tools (CP-SAT).
+- **Optimización:** Google OR-Tools: flujo de costo mínimo para el Matching y CP-SAT para la Ruta de formación.
 - **Modelo de lenguaje:** Groq (`openai/gpt-oss-120b`), solo para extraer datos de texto e
   imágenes *(en desarrollo)*.
 - **Mensajería:** API de bots de Telegram.
@@ -149,7 +154,7 @@ cp .env.example .env            # opcional: claves de Groq y Telegram
 .venv/bin/python scripts/semilla_demo.py --reiniciar --matching
 
 # API en http://localhost:8010 (documentación interactiva en /docs)
-.venv/bin/uvicorn api.main:app --reload --port 8010
+.venv/bin/uvicorn api.main:app --reload --port 8010 --timeout-keep-alive 30
 
 # Pruebas
 .venv/bin/python -m pytest
@@ -256,7 +261,7 @@ asignaciones y ninguna decisión se aplica dos veces.
 
 ```bash
 .venv/bin/python scripts/semilla_demo.py --reiniciar --base carga.db
-RUTA_BASE_DATOS=carga.db .venv/bin/uvicorn api.main:app --port 8010
+RUTA_BASE_DATOS=carga.db .venv/bin/uvicorn api.main:app --port 8010 --timeout-keep-alive 30
 .venv/bin/python scripts/prueba_carga.py --url http://localhost:8010 --jovenes 300
 ```
 

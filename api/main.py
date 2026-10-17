@@ -1,6 +1,6 @@
 """API HTTP del sistema. El frontend solo habla con esto.
 
-Levantar:  .venv/bin/uvicorn api.main:app --reload --port 8010
+Levantar:  .venv/bin/uvicorn api.main:app --reload --port 8010 --timeout-keep-alive 30
 Documentación interactiva: http://localhost:8010/docs
 """
 from __future__ import annotations

@@ -67,44 +67,84 @@ def incumplimientos(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> 
     return fallas
 
 
+def es_factible(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> bool:
+    """Equivale a `not incumplimientos(...)`, sin construir objetos ni textos."""
+    viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
+    if viaje is None or viaje.minutos > joven.max_minutos_traslado:
+        return False
+    if costo_semanal(viaje, vacante.dias_por_semana) > joven.presupuesto_transporte_semanal:
+        return False
+    if not vacante.turnos <= joven.disponibilidad:
+        return False
+    if vacante.salario_mensual < joven.salario_minimo:
+        return False
+    obligatorias = [r for r in vacante.habilidades_requeridas if r.obligatoria]
+    if obligatorias:
+        niveles = _niveles(joven)
+        for r in obligatorias:
+            if niveles.get(r.codigo, 0) < r.nivel_minimo:
+                return False
+    return True
+
+
 def motivos_infactible(joven: Joven, vacante: Vacante, matriz: MatrizTraslados) -> list[str]:
     """Lista vacía = el par es factible."""
     return [f.detalle for f in incumplimientos(joven, vacante, matriz)]
 
 
-def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
-            pesos: Pesos | None = None) -> Desglose:
-    """Supone que el par es factible (llamar antes a `motivos_infactible`)."""
-    viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
-    assert viaje is not None, "puntaje() solo se usa con pares factibles"
-    niveles = _niveles(joven)
-    motivos: list[str] = []
-
+def _componentes(joven: Joven, vacante: Vacante, viaje, niveles: dict[str, int]) -> tuple[float, float, float, float]:
+    """(habilidades, traslado, salario, neto) sin redondear. Única fuente de la fórmula:
+    la usan `puntaje` (con explicación) y `total` (solo el número), así nunca difieren."""
     total_peso = cumplido = 0
     for r in vacante.habilidades_requeridas:
         peso = PESO_OBLIGATORIA if r.obligatoria else PESO_OPCIONAL
         total_peso += peso
         if niveles.get(r.codigo, 0) >= r.nivel_minimo:
             cumplido += peso
-            motivos.append(f"Tiene {r.codigo}")
     habilidades = 1.0 if total_peso == 0 else cumplido / total_peso
-
     traslado = max(0.0, 1 - viaje.minutos / joven.max_minutos_traslado)
-    motivos.append(f"Traslado de {viaje.minutos} min, B/.{costo_semanal(viaje, vacante.dias_por_semana):.2f} por semana")
-
     neto = vacante.salario_mensual - costo_mensual(viaje, vacante.dias_por_semana)
     salario = min(1.0, max(0.0, neto / SALARIO_REFERENCIA))
+    return habilidades, traslado, salario, neto
+
+
+def _ponderar(p: Pesos, habilidades: float, traslado: float, salario: float) -> float:
+    return round(p.habilidades * habilidades + p.traslado * traslado + p.salario * salario, 4)
+
+
+def total(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
+          pesos: Pesos | None = None, niveles: dict[str, int] | None = None) -> float:
+    """Igual a `puntaje(...).total`, sin armar la explicación (para el solver)."""
+    viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
+    h, t, s, _ = _componentes(joven, vacante, viaje, niveles if niveles is not None else _niveles(joven))
+    return _ponderar(pesos or PESOS, h, t, s)
+
+
+def puntaje(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
+            pesos: Pesos | None = None, niveles: dict[str, int] | None = None) -> Desglose:
+    """Supone que el par es factible (llamar antes a `motivos_infactible`)."""
+    viaje = matriz.viaje(joven.corregimiento, vacante.corregimiento)
+    assert viaje is not None, "puntaje() solo se usa con pares factibles"
+    if niveles is None:
+        niveles = _niveles(joven)
+    habilidades, traslado, salario, neto = _componentes(joven, vacante, viaje, niveles)
+
+    motivos = [f"Tiene {r.codigo}" for r in vacante.habilidades_requeridas
+               if niveles.get(r.codigo, 0) >= r.nivel_minimo]
+    motivos.append(f"Traslado de {viaje.minutos} min, B/.{costo_semanal(viaje, vacante.dias_por_semana):.2f} por semana")
     motivos.append(f"Salario neto de transporte: B/.{neto:.2f} al mes")
 
     p = pesos or PESOS
-    total = p.habilidades * habilidades + p.traslado * traslado + p.salario * salario
     return Desglose(habilidades=round(habilidades, 4), traslado=round(traslado, 4),
-                    salario=round(salario, 4), total=round(total, 4), motivos=motivos, pesos=p)
+                    salario=round(salario, 4), total=_ponderar(p, habilidades, traslado, salario),
+                    motivos=motivos, pesos=p)
 
 
 def evaluar(joven: Joven, vacante: Vacante, matriz: MatrizTraslados,
-            pesos: Pesos | None = None) -> Desglose | Infactible:
-    motivos = motivos_infactible(joven, vacante, matriz)
-    if motivos:
-        return Infactible(joven_id=joven.id, vacante_id=vacante.id, motivos=motivos)
-    return puntaje(joven, vacante, matriz, pesos)
+            pesos: Pesos | None = None, niveles: dict[str, int] | None = None) -> Desglose | Infactible:
+    if es_factible(joven, vacante, matriz):
+        if niveles is None:   # llamada sin niveles: misma forma que siempre
+            return puntaje(joven, vacante, matriz, pesos)
+        return puntaje(joven, vacante, matriz, pesos, niveles)
+    return Infactible(joven_id=joven.id, vacante_id=vacante.id,
+                      motivos=motivos_infactible(joven, vacante, matriz))

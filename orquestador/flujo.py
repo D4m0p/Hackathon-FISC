@@ -19,7 +19,8 @@ from pydantic import BaseModel
 
 from agentes.formacion import casi_califica, planificar_grupo
 from agentes.matching import (
-    MatrizTraslados, asignar, evaluar, motivos_infactible, ranking_para_joven, ranking_para_vacante,
+    MatrizTraslados, asignar, es_factible, motivos_infactible, ranking_para_joven, ranking_para_vacante,
+    tiene_alguna_factible,
 )
 from contrato.modelos import (
     Agente, Asignacion, CasiCalifica, Curso, DatosPersonales, Desglose, EstadoVacante, Habilidad,
@@ -139,17 +140,14 @@ class Orquestador:
         return self.publicar_vacante(vacante)
 
     def _aprobadas_vivas(self, vacante_id: str) -> list[Asignacion]:
-        return [a for a in self.almacen.listar(Asignacion)
-                if a.vacante_id == vacante_id and a.vigente and a.aprobada]
+        return [a for a in self.almacen.asignaciones(vacante_id=vacante_id) if a.vigente and a.aprobada]
 
     def _retirar_pendientes(self, motivo: str, joven_id: str | None = None,
                             vacante_id: str | None = None) -> None:
         """Una propuesta pendiente se basa en datos que acaban de cambiar: se retira y el
         próximo matching la recalcula con los datos nuevos."""
-        for a in self.almacen.listar(Asignacion):
-            if (a.vigente and a.aprobada is None
-                    and (joven_id is None or a.joven_id == joven_id)
-                    and (vacante_id is None or a.vacante_id == vacante_id)):
+        for a in self.almacen.asignaciones(joven_id=joven_id, vacante_id=vacante_id):
+            if a.vigente and a.aprobada is None:
                 self.almacen.borrar(Asignacion, clave_asignacion(a))
                 self._traza(Agente.orquestador, "retirar_propuesta", motivo,
                             entrada={"joven_id": a.joven_id, "vacante_id": a.vacante_id})
@@ -221,8 +219,8 @@ class Orquestador:
         if existia:
             self._retirar_pendientes("El perfil del joven cambió", joven_id=joven.id)
             matriz = self.matriz()
-            for a in self.almacen.listar(Asignacion):
-                if a.joven_id == joven.id and a.vigente and a.aprobada:
+            for a in self.almacen.asignaciones(joven_id=joven.id):
+                if a.vigente and a.aprobada:
                     motivos = motivos_infactible(joven, self._vacante(a.vacante_id), matriz)
                     if motivos:   # se permite editar, pero el orientador debe enterarse
                         self._traza(Agente.orquestador, "advertencia",
@@ -240,12 +238,14 @@ class Orquestador:
     def tarjetas_joven(self, joven_id: str) -> list[tuple[Vacante, Desglose]]:
         joven = self._joven(joven_id)
         tarjetas = ranking_para_joven(joven, self.almacen.listar(Vacante), self.matriz(), self.pesos())
-        return [(v, d) for v, d in tarjetas if not self.almacen.ya_deslizo("joven", joven_id, v.id)]
+        ya = self.almacen.deslizadas_por_joven(joven_id)
+        return [(v, d) for v, d in tarjetas if v.id not in ya]
 
     def tarjetas_vacante(self, vacante_id: str) -> list[tuple[Joven, Desglose]]:
         vacante = self._vacante(vacante_id)
         tarjetas = ranking_para_vacante(vacante, self.almacen.listar(Joven), self.matriz(), self.pesos())
-        return [(j, d) for j, d in tarjetas if not self.almacen.ya_deslizo("empresa", j.id, vacante_id)]
+        ya = self.almacen.deslizados_por_empresa(vacante_id)
+        return [(j, d) for j, d in tarjetas if j.id not in ya]
 
     @_exclusivo
     def deslizar(self, actor: str, joven_id: str, vacante_id: str, le_interesa: bool) -> bool:
@@ -255,7 +255,7 @@ class Orquestador:
         joven, vacante = self._joven(joven_id), self._vacante(vacante_id)
         if vacante.estado != EstadoVacante.publicada:
             raise ErrorDeFlujo("La vacante no está publicada")
-        if not isinstance(evaluar(joven, vacante, self.matriz()), Desglose):
+        if not es_factible(joven, vacante, self.matriz()):
             raise ErrorDeFlujo("Ese par no es factible; no aparece en las tarjetas")
         if any(a.joven_id == joven_id for a in self._aprobadas_vivas(vacante_id)):
             raise ErrorDeFlujo("Ya hay una entrevista aprobada para este par; para dejarla, cancélela")
@@ -263,7 +263,7 @@ class Orquestador:
         if not le_interesa:
             self._retirar_pendientes(f"{actor.capitalize()} cambió su respuesta a no",
                                      joven_id=joven_id, vacante_id=vacante_id)
-        mutuo = (joven_id, vacante_id) in self.almacen.interes_mutuo()
+        mutuo = self.almacen.hay_interes_mutuo(joven_id, vacante_id)
         if mutuo and le_interesa:
             self._traza(Agente.orquestador, "interes_mutuo", "El joven y la empresa dijeron que sí",
                         entrada={"joven_id": joven_id, "vacante_id": vacante_id})
@@ -326,10 +326,11 @@ class Orquestador:
 
         # Ruta de formación solo para quien no tiene NINGUNA vacante factible; quien sí
         # tiene pero aún no logró interés mutuo sigue deslizando.
-        sin_asignar = [j for j in jovenes if j.id in set(resultado.sin_asignar)
-                       and not ranking_para_joven(j, vacantes, matriz)]
+        libres = set(resultado.sin_asignar)
+        sin_asignar = [j for j in jovenes if j.id in libres and not tiene_alguna_factible(j, vacantes, matriz)]
+        con_plan = {x.id for x in sin_asignar}
         for j in jovenes:
-            if j.id not in {x.id for x in sin_asignar}:
+            if j.id not in con_plan:
                 self.almacen.borrar(PlanFormacion, j.id)
         cursos = self.almacen.listar(Curso)
         for plan in planificar_grupo(sin_asignar, vacantes, cursos, matriz):
@@ -378,8 +379,8 @@ class Orquestador:
 
     # ---------- reacomodo ----------
     def _ocupados(self, vacante_id: str) -> set[datetime]:
-        return {a.entrevista for a in self.almacen.listar(Asignacion)
-                if a.vacante_id == vacante_id and a.vigente and a.entrevista is not None}
+        return {a.entrevista for a in self.almacen.asignaciones(vacante_id=vacante_id)
+                if a.vigente and a.entrevista is not None}
 
     def _notificar(self, joven_id: str, cuerpo: str) -> bool:
         datos = self.almacen.obtener(DatosPersonales, joven_id)
@@ -452,8 +453,8 @@ class Orquestador:
         self.almacen.guardar(vacante)
         self._traza(Agente.orquestador, "cerrar_vacante", motivo, entrada={"vacante_id": vacante_id})
         afectadas = []
-        for a in self.almacen.listar(Asignacion):
-            if a.vacante_id == vacante_id and a.vigente and a.aprobada is not False:
+        for a in self.almacen.asignaciones(vacante_id=vacante_id):
+            if a.vigente and a.aprobada is not False:
                 afectadas.append(self._cerrar(a, TipoCierre.vacante_cerrada, motivo))
                 if a.aprobada:
                     self._notificar(a.joven_id, f"La vacante «{vacante.titulo}» se cerró. "
@@ -522,7 +523,7 @@ class Orquestador:
 
     def historia(self, joven_id: str) -> HistoriaJoven:
         joven = self._joven(joven_id)
-        asignaciones = [a for a in self.almacen.listar(Asignacion) if a.joven_id == joven_id]
+        asignaciones = self.almacen.asignaciones(joven_id=joven_id)
         plan = self.plan_de(joven_id)
         aprobada = next((a for a in asignaciones if a.vigente and a.aprobada), None)
         pendiente = next((a for a in asignaciones if a.vigente and a.aprobada is None), None)

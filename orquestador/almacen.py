@@ -70,7 +70,12 @@ class Almacen:
     def __init__(self, ruta: str = ":memory:"):
         self._con = sqlite3.connect(ruta, check_same_thread=False)
         self._lock = threading.Lock()
+        self._traslados: list[Traslado] | None = None   # caché; se invalida al guardar
         with self._lock:
+            if ruta != ":memory:":
+                # WAL: escrituras más rápidas y lecturas que no esperan a las escrituras
+                self._con.execute("PRAGMA journal_mode=WAL")
+                self._con.execute("PRAGMA synchronous=NORMAL")
             self._con.executescript(_ESQUEMA)
 
     # ---------- entidades ----------
@@ -103,6 +108,7 @@ class Almacen:
 
     # ---------- traslados (tabla de referencia) ----------
     def guardar_traslados(self, traslados: list[Traslado]) -> None:
+        self._traslados = None
         with self._lock, self._con:
             self._con.execute("DELETE FROM entidades WHERE tipo = 'traslado'")
             self._con.executemany(
@@ -110,10 +116,26 @@ class Almacen:
                 [(f"{t.origen}|{t.destino}", t.model_dump_json()) for t in traslados])
 
     def traslados(self) -> list[Traslado]:
+        if self._traslados is None:
+            with self._lock:
+                filas = self._con.execute(
+                    "SELECT datos FROM entidades WHERE tipo = 'traslado' ORDER BY id").fetchall()
+            self._traslados = [Traslado.model_validate_json(f[0]) for f in filas]
+        return list(self._traslados)
+
+    # ---------- asignaciones filtradas (id = "joven|vacante"; los ids no llevan "|") ----------
+    def asignaciones(self, joven_id: str | None = None, vacante_id: str | None = None) -> list[Asignacion]:
+        consulta = "SELECT datos FROM entidades WHERE tipo = 'asignacion'"
+        params: list[str] = []
+        if joven_id is not None:
+            consulta += " AND substr(id, 1, length(?) + 1) = ? || '|'"
+            params += [joven_id, joven_id]
+        if vacante_id is not None:
+            consulta += " AND substr(id, -length(?) - 1) = '|' || ?"
+            params += [vacante_id, vacante_id]
         with self._lock:
-            filas = self._con.execute(
-                "SELECT datos FROM entidades WHERE tipo = 'traslado' ORDER BY id").fetchall()
-        return [Traslado.model_validate_json(f[0]) for f in filas]
+            filas = self._con.execute(consulta + " ORDER BY id", params).fetchall()
+        return [Asignacion.model_validate_json(f[0]) for f in filas]
 
     # ---------- deslizamientos ----------
     def deslizar(self, actor: str, joven_id: str, vacante_id: str, le_interesa: bool) -> None:
@@ -132,6 +154,27 @@ class Almacen:
                 "WHERE j.actor = 'joven' AND e.actor = 'empresa' "
                 "AND j.le_interesa = 1 AND e.le_interesa = 1").fetchall()
         return {(a, b) for a, b in filas}
+
+    def hay_interes_mutuo(self, joven_id: str, vacante_id: str) -> bool:
+        with self._lock:
+            n = self._con.execute(
+                "SELECT COUNT(*) FROM deslizamientos WHERE joven_id = ? AND vacante_id = ? "
+                "AND le_interesa = 1 AND actor IN ('joven', 'empresa')", (joven_id, vacante_id)).fetchone()[0]
+        return n == 2
+
+    def deslizadas_por_joven(self, joven_id: str) -> set[str]:
+        """Vacantes que el joven ya deslizó (en una sola consulta)."""
+        with self._lock:
+            filas = self._con.execute("SELECT vacante_id FROM deslizamientos WHERE actor = 'joven' "
+                                      "AND joven_id = ?", (joven_id,)).fetchall()
+        return {f[0] for f in filas}
+
+    def deslizados_por_empresa(self, vacante_id: str) -> set[str]:
+        """Jóvenes que la empresa ya deslizó en esa vacante (en una sola consulta)."""
+        with self._lock:
+            filas = self._con.execute("SELECT joven_id FROM deslizamientos WHERE actor = 'empresa' "
+                                      "AND vacante_id = ?", (vacante_id,)).fetchall()
+        return {f[0] for f in filas}
 
     def ya_deslizo(self, actor: str, joven_id: str, vacante_id: str) -> bool:
         with self._lock:

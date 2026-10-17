@@ -97,7 +97,10 @@ def joven_aleatorio(rng: random.Random, i: int) -> dict:
 async def correr(url: str, n_jovenes: int, semilla: int, token: str) -> int:
     rng = random.Random(semilla)
     reg = Registro()
-    limites = httpx.Limits(max_connections=400, max_keepalive_connections=400)
+    # keepalive_expiry < keep-alive del servidor: el cliente descarta una conexión inactiva
+    # antes de que el servidor la cierre (si no, una petición puede salir por una conexión
+    # que se está cerrando y terminar en ReadError).
+    limites = httpx.Limits(max_connections=400, max_keepalive_connections=400, keepalive_expiry=3)
     cabecera = {"Authorization": f"Bearer {token}"}
     async with httpx.AsyncClient(base_url=url, timeout=60, limits=limites) as anonimo, \
             httpx.AsyncClient(base_url=url, timeout=60, limits=limites, headers=cabecera) as c:

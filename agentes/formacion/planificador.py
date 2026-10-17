@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
-from agentes.matching.puntaje import motivos_infactible
+from agentes.matching.puntaje import es_factible
 from agentes.matching.traslados import MatrizTraslados
 from contrato.modelos import (
     Curso, EstadoVacante, Joven, PlanFormacion, RequisitoHabilidad, Turno, Vacante,
@@ -52,7 +52,7 @@ def vacantes_alcanzables(joven: Joven, vacantes: list[Vacante],
         if not falta:
             continue
         sin_requisitos = v.model_copy(update={"habilidades_requeridas": []})
-        if not motivos_infactible(joven, sin_requisitos, matriz):
+        if es_factible(joven, sin_requisitos, matriz):
             alcanzables.append((v, falta))
     return alcanzables
 
@@ -112,8 +112,10 @@ def _resolver(joven: Joven, falta: list[RequisitoHabilidad],
 
 
 def planificar(joven: Joven, vacantes: list[Vacante], cursos: list[Curso],
-               matriz: MatrizTraslados) -> PlanFormacion:
-    alcanzables = vacantes_alcanzables(joven, vacantes, matriz)
+               matriz: MatrizTraslados,
+               alcanzables: list[tuple[Vacante, list[RequisitoHabilidad]]] | None = None) -> PlanFormacion:
+    if alcanzables is None:
+        alcanzables = vacantes_alcanzables(joven, vacantes, matriz)
     if not alcanzables:
         return PlanFormacion(
             joven_id=joven.id, vacantes_objetivo=[], cursos=[], habilidades_cubiertas=[],
@@ -179,11 +181,12 @@ def planificar_grupo(jovenes: list[Joven], vacantes: list[Vacante], cursos: list
     necesidad), luego por id. Así un cupo escaso va a quien más lo necesita.
     """
     cupos = {c.id: c.cupos_disponibles for c in cursos}
-    orden = sorted(jovenes, key=lambda j: (len(vacantes_alcanzables(j, vacantes, matriz)), j.id))
+    con_alcanzables = [(j, vacantes_alcanzables(j, vacantes, matriz)) for j in jovenes]
+    orden = sorted(con_alcanzables, key=lambda par: (len(par[1]), par[0].id))
     planes = []
-    for j in orden:
+    for j, alcanzables in orden:
         disponibles = [c.model_copy(update={"cupos_disponibles": cupos[c.id]}) for c in cursos]
-        plan = planificar(j, vacantes, disponibles, matriz)
+        plan = planificar(j, vacantes, disponibles, matriz, alcanzables)
         for cid in plan.cursos:
             cupos[cid] -= 1
         planes.append(plan)
