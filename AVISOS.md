@@ -5,6 +5,31 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para A (Damo) — 17/10/2026 — pedido de B: cifra de impacto y un límite
+
+**1. `GET /impacto` (orientador) — la cifra que muestra el problema de la geografía.**
+Por qué: el sistema descarta en silencio lo que no le conviene a cada joven y eso no se ve en
+ningún lado; para "Impacto" (30 %) conviene una línea tipo *"de 121 combinaciones joven–vacante,
+38 son viables; descartamos 31 por tiempo de viaje, 12 por pasaje…"*. Recalcularlo en el
+frontend sería duplicar una decisión, por eso se lo pedimos.
+```
+GET /impacto → {jovenes, vacantes_publicadas, pares, viables,
+                descartes: {traslado, presupuesto, horario, salario, habilidad, sin_datos},
+                pares_con_un_solo_motivo}
+```
+- Un par cuenta en cada motivo que incumple (los motivos pueden sumar más que los descartados).
+- Usar la misma función del Matching (`motivos_infactible` / los tipos de `Incumplimiento`).
+- Ideal además: `GET /jovenes/{id}/impacto` → `{publicadas, viables, descartes: {...}}`. Hoy la vista
+  del joven ya muestra "De 11 vacantes publicadas, 5 le sirven…" calculándolo con tarjetas,
+  deslizamientos y casi-califica; con este endpoint daría el motivo también de las que fallan en
+  varias cosas.
+
+**2. Límite para anónimos:** agregar `("POST", "/perfil/transcribir")` a `RUTAS_LIMITADAS` en
+`api/limites.py`. Es el endpoint nuevo de notas de voz y fotos (ya está en `main`); cada llamada
+gasta en Groq, igual que `/perfil/cv`.
+
+---
+
 ## Para A (Damo) — 17/10/2026 — pedido de B: centros de formación como tercer actor
 
 **Por qué.** Evaluamos el proyecto contra la rúbrica y el punto más flojo de "Impacto" es que el
