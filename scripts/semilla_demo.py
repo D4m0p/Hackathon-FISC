@@ -22,6 +22,7 @@ from orquestador import Orquestador  # noqa: E402
 from orquestador.arranque import orquestador_desde_entorno  # noqa: E402
 
 DATOS = RAIZ / "scripts" / "demo" / "datos_demo.json"
+FOTOS = RAIZ / "scripts" / "demo" / "fotos"   # <joven_id>.png: retratos ILUSTRADOS de ejemplo
 
 
 TOKEN_ORIENTADOR_DEMO = "demo-orientador"
@@ -58,6 +59,9 @@ def cargar(orq: Orquestador, datos: dict, con_matching: bool = False) -> dict:
             bloqueadas.append(vacante.id)
     for r in datos["jovenes"]:
         orq.registrar_joven(Joven(**r["joven"]), DatosPersonales(**r["datos"]))
+    for foto in sorted(FOTOS.glob("*.png")):
+        if orq.almacen.obtener(Joven, foto.stem) is not None:
+            orq.almacen.guardar_foto(foto.stem, "image/png", foto.read_bytes())
     mutuos = 0
     for d in datos["deslizamientos"]:
         if orq.deslizar(d["actor"], d["joven_id"], d["vacante_id"], d["le_interesa"]):
