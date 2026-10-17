@@ -1,4 +1,4 @@
-"""Foto del joven: la ven él y el orientador; la empresa SOLO con entrevista aprobada."""
+"""Foto del joven: la ven él y el orientador; la empresa SOLO con interés mutuo o entrevista aprobada."""
 import base64
 
 import pytest
@@ -56,15 +56,30 @@ def test_el_joven_sube_y_ve_su_foto(c):
     assert c.get("/jovenes/j1/foto", headers=h("to")).status_code == 200
 
 
-def test_la_empresa_no_ve_la_foto_antes_de_aprobar_la_entrevista(c):
+def test_la_empresa_ve_la_foto_solo_cuando_los_dos_dijeron_que_si(c):
     subir(c, c.tj)
-    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404     # ni siquiera hay match
-    aprobar(c)
-    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404     # match pendiente
-    c.post("/asignaciones/j1/v1/decision", headers=h("to"), json={"aprobar": True})
+    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404     # ni siquiera hay interés
+    c.post("/deslizar", headers=h(c.tj), json={"actor": "joven", "joven_id": "j1", "vacante_id": "v1", "le_interesa": True})
+    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404     # solo le interesa al joven
+    c.post("/deslizar", headers=h("te1"), json={"actor": "empresa", "joven_id": "j1", "vacante_id": "v1", "le_interesa": True})
     r = c.get("/jovenes/j1/foto", headers=h("te1"))
-    assert r.status_code == 200 and r.content == PNG                         # entrevista aprobada
+    assert r.status_code == 200 and r.content == PNG                         # la empresa la aceptó: interés mutuo
     assert c.get("/jovenes/j1/foto", headers=h("te2")).status_code == 404    # otra empresa, nunca
+
+
+def test_la_empresa_que_no_acepta_no_ve_la_foto(c):
+    subir(c, c.tj)
+    c.post("/deslizar", headers=h(c.tj), json={"actor": "joven", "joven_id": "j1", "vacante_id": "v1", "le_interesa": True})
+    c.post("/deslizar", headers=h("te1"), json={"actor": "empresa", "joven_id": "j1", "vacante_id": "v1", "le_interesa": False})
+    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404
+
+
+def test_si_el_orientador_rechaza_el_match_la_empresa_deja_de_verla(c):
+    subir(c, c.tj)
+    aprobar(c)
+    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 200
+    c.post("/asignaciones/j1/v1/decision", headers=h("to"), json={"aprobar": False, "motivo": "No cumple el horario real"})
+    assert c.get("/jovenes/j1/foto", headers=h("te1")).status_code == 404
 
 
 def test_si_la_entrevista_se_cancela_la_empresa_deja_de_verla(c):

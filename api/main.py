@@ -346,7 +346,7 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
         """Todos los planes de formación de una vez (para la pestaña «Sin match»)."""
         return orq.almacen.listar(PlanFormacion)
 
-    # ----- foto del joven: la ven él, el orientador y SOLO la empresa con entrevista aprobada -----
+    # ----- foto del joven: la ven él, el orientador y SOLO la empresa con interés mutuo -----
     @app.put("/jovenes/{joven_id}/foto", status_code=204)
     def subir_foto(joven_id: str, foto: FotoSubida, ident: Identidad = Depends(requerida)):
         exigir_joven(ident, joven_id)
@@ -368,15 +368,29 @@ def crear_app(orq: Orquestador, cliente_llm: ClienteLLM | None = None,
         exigir_joven(ident, joven_id)
         orq.almacen.borrar_foto(joven_id)
 
+    def _empresa_puede_ver_foto(empresa_id: str, joven_id: str) -> bool:
+        def es_suya(vacante_id: str) -> bool:
+            v = orq.almacen.obtener(Vacante, vacante_id)
+            return v is not None and v.empresa_id == empresa_id
+        asignaciones = {a.vacante_id: a for a in orq.almacen.asignaciones(joven_id=joven_id)}
+        if any(a.vigente and a.aprobada and es_suya(v) for v, a in asignaciones.items()):
+            return True
+        si = {(d["actor"], d["vacante_id"]) for d in orq.almacen.deslizamientos_de(joven_id) if d["le_interesa"]}
+        for actor, v in si:
+            a = asignaciones.get(v)
+            descartada = a is not None and (not a.vigente or a.aprobada is False)
+            if actor == "empresa" and ("joven", v) in si and es_suya(v) and not descartada:
+                return True
+        return False
+
     @app.get("/jovenes/{joven_id}/foto")
     def ver_foto(joven_id: str, ident: Identidad = Depends(requerida)):
-        """La empresa solo la ve si tiene una entrevista APROBADA y vigente con esa persona: decide
-        por habilidades y conoce a la persona para la cita. A los demás, 404 (no se revela nada)."""
+        """La empresa solo la ve cuando ya aceptó a la persona y a ella también le interesa la
+        vacante (interés mutuo), o con una entrevista aprobada: elige por habilidades, sin foto, y
+        la foto aparece después de decidir. Si el orientador rechaza el match o se cancela, deja
+        de verla. A los demás, 404 (no se revela nada)."""
         permitido = ident.es_joven(joven_id) or (
-            ident.rol == "empresa" and any(
-                a.vigente and a.aprobada and orq.almacen.obtener(Vacante, a.vacante_id) is not None
-                and orq.almacen.obtener(Vacante, a.vacante_id).empresa_id == ident.sujeto
-                for a in orq.almacen.asignaciones(joven_id=joven_id)))
+            ident.rol == "empresa" and _empresa_puede_ver_foto(ident.sujeto, joven_id))
         foto = orq.almacen.foto(joven_id) if permitido else None
         if foto is None:
             raise HTTPException(status_code=404, detail="Sin foto")
