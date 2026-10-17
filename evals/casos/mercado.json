@@ -6,7 +6,7 @@
     "naturaleza": "determinista",
     "descripcion": "Oferta con todos los datos produce una vacante con habilidades de la taxonomia.",
     "entrada": {
-      "texto": "Supermercado busca cajero.",
+      "texto": "Supermercado busca cajero. Salario B/. 650.",
       "llm": {"titulo": "Cajero/a", "corregimiento": "Arraijan", "turnos": ["manana"],
               "dias_por_semana": 5, "salario_mensual": 650, "cupos": 2,
               "habilidades": [{"codigo": "manejo_caja", "nivel_minimo": 1, "obligatoria": true}]}
@@ -35,7 +35,7 @@
     "naturaleza": "determinista",
     "descripcion": "Una habilidad fuera de la taxonomia se descarta; el resto se conserva.",
     "entrada": {
-      "texto": "Se busca personal.",
+      "texto": "Se busca personal. Salario B/. 650.",
       "llm": {"titulo": "Cajero/a", "corregimiento": "Arraijan", "turnos": ["manana"],
               "dias_por_semana": 5, "salario_mensual": 650, "cupos": 1,
               "habilidades": [{"codigo": "piloto_avion", "nivel_minimo": 3, "obligatoria": true},
@@ -65,7 +65,7 @@
     "naturaleza": "determinista",
     "descripcion": "El corregimiento con mayusculas y acento se normaliza al catalogo del proyecto.",
     "entrada": {
-      "texto": "Se busca cajero.",
+      "texto": "Se busca cajero. Salario B/. 650.",
       "llm": {"titulo": "Cajero/a", "corregimiento": "ARRAIJÁN", "turnos": ["manana"],
               "dias_por_semana": 5, "salario_mensual": 650, "cupos": 1,
               "habilidades": [{"codigo": "manejo_caja", "nivel_minimo": 1, "obligatoria": true}]}

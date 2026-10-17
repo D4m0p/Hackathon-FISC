@@ -16,12 +16,13 @@ import uuid
 from typing import Callable
 
 from agentes.perfil.llm import ErrorLLM, cliente_desde_entorno
+from agentes.perfil.texto import alertas_inyeccion
 from contrato.modelos import (
     EstadoVacante, Habilidad, RequisitoHabilidad, Turno, Vacante,
 )
 
 from .errores import OfertaIncompleta
-from .extraccion import extraer_con_llm, extraer_por_palabras, plano
+from .extraccion import extraer_con_llm, extraer_por_palabras, numero_en_texto, plano
 from .taxonomia import cargar_referencia
 
 # Campos que el contrato exige con un valor concreto: no admiten "desconocido".
@@ -69,15 +70,22 @@ class Mercado:
             estado=EstadoVacante.borrador, texto_original=texto)
 
     def _extraer(self, texto: str) -> dict:
-        """Base por palabras clave; encima, lo que devuelva el LLM si está disponible."""
+        """Base por palabras clave; encima, lo que devuelva el LLM si está disponible.
+
+        Guardrails: si el texto trae frases que parecen instrucciones al sistema, no se le
+        pasa al LLM (solo reglas, que no se pueden manipular). Y el salario del LLM solo se
+        acepta si ese número aparece en el texto: un salario inventado no se publica."""
         base = extraer_por_palabras(texto, self.corregimientos)
-        if self.cliente is None:
+        if self.cliente is None or alertas_inyeccion(texto):
             return base
         try:
             del_llm = extraer_con_llm(texto, self.cliente)
         except ErrorLLM:
             return base
-        return _combinar(base, del_llm)
+        salida = _combinar(base, del_llm)
+        if not numero_en_texto(_a_numero(salida.get("salario_mensual")), texto):
+            salida["salario_mensual"] = base.get("salario_mensual")
+        return salida
 
 
 def _combinar(base: dict, llm: dict) -> dict:
