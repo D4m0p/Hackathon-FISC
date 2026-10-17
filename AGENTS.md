@@ -174,7 +174,9 @@ cd frontend && npm install && npm run dev
 - **Perfil (B):** ya conectado. Flujo del joven nuevo en el frontend (sin token):
   `GET /perfil/preguntas` → `POST /perfil/cv` `{tipo: "pdf"|"imagen"|"texto", contenido_base64|texto}`
   y/o `POST /perfil/entrevista` `{respuestas: [{pregunta_id, texto}]}` → `{habilidades, descartadas,
-  alertas, metodo}` → el joven confirma → `POST /jovenes` con esas habilidades → guardar el `token`.
+  alertas, metodo}` (+ `texto_leido` si fue PDF o foto) → el joven revisa (puede quitar, bajar el nivel o
+  agregar con `POST /perfil/declarar` `{codigo, evidencia}` → nivel 1, evidencia "Según la persona: …")
+  → `POST /jovenes` con esas habilidades → guardar el `token`. `metodo` distinto de `llm` = modo básico.
   Entradas por voz o foto: `POST /perfil/transcribir` `{tipo: "audio"|"imagen", contenido_base64,
   tipo_mime, documento: "cv"|"oferta"}` → `{texto, alertas}`. No decide nada: el texto vuelve a la
   persona para revisarlo y luego sigue por `/perfil/entrevista`, `/perfil/cv` u `/ofertas` (volante).

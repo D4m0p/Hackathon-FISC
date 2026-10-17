@@ -250,8 +250,9 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | Método | Ruta | Qué hace |
 |---|---|---|
 | `GET` | `/perfil/preguntas` | Preguntas de la entrevista corta (público) |
-| `POST` | `/perfil/cv` | CV en PDF, foto o texto → habilidades con evidencia (público, no guarda nada) |
+| `POST` | `/perfil/cv` | CV en PDF, foto o texto → habilidades con evidencia; de un PDF o foto devuelve también `texto_leido` para mostrar de dónde salió cada una (público, no guarda nada) |
 | `POST` | `/perfil/entrevista` | Respuestas de la entrevista → habilidades con evidencia (público, no guarda nada) |
+| `POST` | `/perfil/declarar` | Habilidad que el joven agrega a mano `{codigo, evidencia}`: solo de la taxonomía, nivel básico y marcada «Según la persona» (público) |
 | `POST` | `/perfil/transcribir` | Nota de voz o foto (CV o volante) → texto para que la persona lo revise; no decide nada (público) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
