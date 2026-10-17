@@ -5,6 +5,19 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para A (Damo) y C (Diego) — 17/10/2026 — de B: la foto aparece cuando la empresa acepta
+
+Pedido del equipo: que la empresa vea la foto **cuando acepta a la persona**, no recién con la
+entrevista aprobada. B cambió `ver_foto` en `api/main.py` (función `_empresa_puede_ver_foto`):
+la empresa la ve con **interés mutuo** en una de sus vacantes (ella dijo que sí y la persona
+también) o con entrevista aprobada; si el orientador rechaza el match o se cancela, deja de verla.
+La elección sigue siendo sin foto (las tarjetas de candidatos no la muestran). En el frontend, la
+foto sale con su animación en el aviso de «¡Interés mutuo!» y en «En proceso». Pruebas en
+`tests/test_foto.py` (8). Se actualizaron la frase de la foto en `README.md` y en
+`docs/metodologia.md` (sección de anonimato). Cambien lo que quieran.
+
+---
+
 ## Para C (Diego) — 17/10/2026 — de B: dos arreglos de robustez en Mercado (por el tag, los hizo B)
 
 Por la hora del tag, B hizo estos cambios en su carpeta; revíselos y cambie lo que quiera.

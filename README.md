@@ -115,8 +115,8 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
   campos están en `DatosPersonales`. Los solvers reciben solo `Joven`, así que no pueden
   usarlos aunque quisieran. La empresa ve habilidades y niveles **sin la evidencia textual**
   del CV, que puede traer nombre, cédula o teléfono. La foto es opcional y la empresa solo la ve cuando
-  su entrevista con esa persona ya está aprobada (hasta entonces decide por habilidades; el Auditor
-  bloquea a quien exige foto) (hay una prueba que lo verifica con un
+  ya aceptó a esa persona y a ella también le interesa la vacante (interés mutuo): elige por
+  habilidades, sin foto; el Auditor bloquea a quien exige foto (hay una prueba que lo verifica con un
   CV real de ejemplo).
 - **El puntaje separa lo geográfico.** El corregimiento solo puede mover los componentes
   de traslado y salario neto; el de habilidades no depende del lugar. Así el Auditor puede
@@ -258,7 +258,7 @@ agregue `--proxy-headers` para que el límite use la IP real del cliente.
 | `POST` | `/perfil/transcribir` | Nota de voz o foto (CV o volante) → texto para que la persona lo revise; no decide nada (público) |
 | `POST` | `/jovenes` | Registra un joven y sus datos personales |
 | `PUT` / `DELETE` | `/jovenes/{id}/foto` | El joven sube (JPG, PNG o WebP, hasta 2 MB, validada por su contenido) o quita su foto |
-| `GET` | `/jovenes/{id}/foto` | La ven el propio joven, el orientador y **solo la empresa con una entrevista aprobada y vigente con esa persona**; para cualquier otro, 404 |
+| `GET` | `/jovenes/{id}/foto` | La ven el propio joven, el orientador y **solo la empresa que ya aceptó a esa persona con interés mutuo** (o con entrevista aprobada); si el orientador rechaza o se cancela, deja de verla; para cualquier otro, 404 |
 | `GET` | `/jovenes/{id}/tarjetas` | Vacantes factibles para deslizar, con explicación |
 | `GET` | `/jovenes/{id}/plan` | Ruta de formación |
 | `GET` | `/jovenes/{id}/historia` | Todo lo que el sistema hizo con el joven: estado actual y qué agente decidió qué, en orden |
