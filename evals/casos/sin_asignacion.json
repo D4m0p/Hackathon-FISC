@@ -1,0 +1,19 @@
+[
+  {
+    "id": "sin_asignacion_01",
+    "asunto": "matching",
+    "categoria": "sin_asignacion",
+    "naturaleza": "determinista",
+    "descripcion": "El joven no cumple una habilidad obligatoria: no hay asignacion posible.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Soporte", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "soporte_tecnico", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "malformada_matriz_01",
+    "asunto": "contrafactual",
+    "categoria": "malformadas",
+    "naturaleza": "determinista",
+    "descripcion": "Sin matriz de traslados y con vacantes, la auditoria devuelve error controlado.",
+    "entrada": {
+      "matriz": null,
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "error_controlado", "excepcion": "ValueError"}
+  },
+  {
+    "id": "malformada_vacante_01",
+    "asunto": "matching",
+    "categoria": "malformadas",
+    "naturaleza": "determinista",
+    "descripcion": "Una vacante sin turnos no cumple el contrato y falla la validacion.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": [], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "error_controlado", "excepcion": "ValidationError"}
+  }
+]

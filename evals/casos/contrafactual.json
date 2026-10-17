@@ -1,0 +1,63 @@
+[
+  {
+    "id": "contrafactual_identidad_01",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "determinista",
+    "descripcion": "Cambiar nombre y genero no altera la auditoria del matching (equidad).",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "datos": {"j1": {"joven_id": "j1", "nombre": "Ana", "genero": "femenino"}},
+      "datos_alternativo": {"j1": {"joven_id": "j1", "nombre": "Zulay", "genero": "masculino"}}
+    },
+    "esperado": {"tipo": "sin_hallazgo"}
+  },
+  {
+    "id": "contrafactual_corregimiento_01",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "determinista",
+    "descripcion": "El corregimiento no hace depender el componente de habilidades del lugar.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0},
+                    {"origen": "bella_vista", "destino": "arraijan", "minutos": 50, "costo": 1.25}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "datos": {"j1": {"joven_id": "j1", "nombre": "Ana", "genero": "femenino"}}
+    },
+    "esperado": {"tipo": "sin_hallazgo", "reglas": ["contrafactual_corregimiento"]}
+  },
+  {
+    "id": "contrafactual_manipulado_01",
+    "asunto": "contrafactual",
+    "categoria": "contrafactual",
+    "naturaleza": "revision_humana",
+    "descripcion": "Un resultado manipulado (par infactible) debe detectarse para revision.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0},
+                    {"origen": "la_chorrera", "destino": "tocumen", "minutos": 115, "costo": 2.1}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]},
+                   {"id": "vT", "empresa_id": "e1", "titulo": "Caja lejos", "corregimiento": "tocumen",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}],
+      "datos": {"j1": {"joven_id": "j1", "nombre": "Ana", "genero": "femenino"}},
+      "mutacion": "par_infactible"
+    },
+    "esperado": {"tipo": "hallazgo", "reglas": ["contrafactual_desglose"]}
+  }
+]

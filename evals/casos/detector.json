@@ -1,0 +1,110 @@
+[
+  {
+    "id": "detector_discrimina_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Oferta con 'buena presencia' y limite de edad debe bloquearse.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Recepcionista",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Buena presencia, menor de 25 anos."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["buena_presencia", "edad"]}
+  },
+  {
+    "id": "detector_genero_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Pedir un genero explicito en el puesto debe bloquearse.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Atencion al cliente",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Se busca dama para atencion al cliente."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["genero"]}
+  },
+  {
+    "id": "detector_estado_civil_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "El estado civil o la situacion familiar no son requisitos del puesto.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Asistente",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Requisito: mujer soltera y sin hijos."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["estado_civil"]}
+  },
+  {
+    "id": "detector_foto_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Exigir foto puede facilitar la discriminacion y no mide competencias.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Asistente",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Adjunte su CV con foto reciente para aplicar."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["foto_obligatoria"]}
+  },
+  {
+    "id": "detector_residir_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "revision_humana",
+    "etiqueta": "discriminatoria",
+    "descripcion": "Exigir residir en una zona puede excluir a quien puede trasladarse.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Cajero",
+                            "corregimiento": "san_miguelito", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Debe residir en San Miguelito."}},
+    "esperado": {"tipo": "bloquea", "reglas": ["residir_en"]}
+  },
+  {
+    "id": "detector_limpia_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "determinista",
+    "etiqueta": "limpia",
+    "descripcion": "Oferta sin requisitos discriminatorios se aprueba.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Cajero",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Experiencia en caja, turno de manana."}},
+    "esperado": {"tipo": "aprueba"}
+  },
+  {
+    "id": "detector_edad_legal_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "determinista",
+    "etiqueta": "limpia",
+    "descripcion": "Pedir la mayoria de edad (18) es un minimo legal, no se bloquea.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Almacen",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Se busca mayor de 18 anos."}},
+    "esperado": {"tipo": "aprueba"}
+  },
+  {
+    "id": "detector_menores_legal_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "determinista",
+    "etiqueta": "limpia",
+    "descripcion": "Excluir a menores de edad (menores de 18) es legal, no se bloquea.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Bodega",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "No se aceptan menores de 18 anos."}},
+    "esperado": {"tipo": "aprueba"}
+  },
+  {
+    "id": "detector_negacion_01",
+    "asunto": "detector",
+    "categoria": "detector",
+    "naturaleza": "determinista",
+    "etiqueta": "limpia",
+    "descripcion": "Una negacion explicita no debe ocultar ni disparar una regla.",
+    "entrada": {"vacante": {"id": "v1", "empresa_id": "e1", "titulo": "Vendedor",
+                            "corregimiento": "arraijan", "turnos": ["manana"], "salario_mensual": 650,
+                            "texto_original": "Vendedor para la seccion de ropa. No se exige buena presencia ni excelente presentacion."}},
+    "esperado": {"tipo": "aprueba"}
+  }
+]

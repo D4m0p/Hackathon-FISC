@@ -148,7 +148,7 @@ def test_la_oferta_v10_de_la_demo_se_bloquea():
     assert {"genero", "edad", "buena_presencia"} <= {h.regla for h in r.hallazgos}
 
 
-def test_auditar_matching_por_ahora_no_emite_resultados():
+def test_auditar_matching_sin_resultado_no_emite_nada():
     assert Auditor().auditar_matching(None, [], {}, [], None) == []
 
 

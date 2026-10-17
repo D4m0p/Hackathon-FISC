@@ -1,0 +1,67 @@
+[
+  {
+    "id": "matching_compatible_01",
+    "asunto": "matching",
+    "categoria": "matching",
+    "naturaleza": "determinista",
+    "descripcion": "Joven con la habilidad obligatoria y traslado factible dentro de su limite.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Cajero", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "asignacion_exacta", "asignaciones": [["j1", "v1"]], "sin_asignar": []}
+  },
+  {
+    "id": "matching_compatible_02",
+    "asunto": "matching",
+    "categoria": "matching",
+    "naturaleza": "determinista",
+    "descripcion": "Cada joven queda en la vacante que pide la habilidad que tiene.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0},
+                    {"origen": "la_chorrera", "destino": "bella_vista", "minutos": 70, "costo": 1.6}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "ventas", "nivel": 2}]},
+                  {"id": "j2", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Ventas", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "ventas", "nivel_minimo": 1, "obligatoria": true}]},
+                   {"id": "v2", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "bella_vista",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "asignacion_exacta", "asignaciones": [["j1", "v1"], ["j2", "v2"]], "sin_asignar": []}
+  },
+  {
+    "id": "matching_global_01",
+    "asunto": "matching",
+    "categoria": "matching",
+    "naturaleza": "determinista",
+    "descripcion": "El optimo global gana al voraz: 'a' toma ventas y deja caja para 'b'.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0},
+                    {"origen": "la_chorrera", "destino": "bella_vista", "minutos": 70, "costo": 1.6}],
+      "jovenes": [{"id": "a", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 1}, {"codigo": "ventas", "nivel": 1}]},
+                  {"id": "b", "corregimiento": "la_chorrera", "disponibilidad": ["manana", "tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 1}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]},
+                   {"id": "v2", "empresa_id": "e1", "titulo": "Ventas", "corregimiento": "bella_vista",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "ventas", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "asignacion_exacta", "asignaciones": [["a", "v2"], ["b", "v1"]], "sin_asignar": []}
+  }
+]

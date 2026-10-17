@@ -1,0 +1,90 @@
+[
+  {
+    "id": "restriccion_cupos_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "Una vacante con un cupo no recibe a dos jovenes compatibles.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]},
+                  {"id": "j2", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "propiedades", "asignaciones": 1, "sin_asignar_cantidad": 1}
+  },
+  {
+    "id": "restriccion_disponibilidad_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "El turno de la vacante no esta en la disponibilidad del joven.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["tarde"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  },
+  {
+    "id": "restriccion_traslado_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "El traslado supera el maximo de minutos del joven.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "tocumen", "minutos": 115, "costo": 2.1}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "tocumen",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  },
+  {
+    "id": "restriccion_presupuesto_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "El pasaje semanal supera el presupuesto de transporte del joven.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 5, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 650, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  },
+  {
+    "id": "restriccion_salario_01",
+    "asunto": "matching",
+    "categoria": "restricciones",
+    "naturaleza": "determinista",
+    "descripcion": "El salario ofrecido esta por debajo del minimo del joven.",
+    "entrada": {
+      "traslados": [{"origen": "la_chorrera", "destino": "arraijan", "minutos": 30, "costo": 1.0}],
+      "jovenes": [{"id": "j1", "corregimiento": "la_chorrera", "disponibilidad": ["manana"],
+                   "presupuesto_transporte_semanal": 20, "salario_minimo": 500,
+                   "habilidades": [{"codigo": "caja", "nivel": 2}]}],
+      "vacantes": [{"id": "v1", "empresa_id": "e1", "titulo": "Caja", "corregimiento": "arraijan",
+                    "turnos": ["manana"], "salario_mensual": 400, "cupos": 1,
+                    "habilidades_requeridas": [{"codigo": "caja", "nivel_minimo": 1, "obligatoria": true}]}]
+    },
+    "esperado": {"tipo": "sin_asignacion"}
+  }
+]
