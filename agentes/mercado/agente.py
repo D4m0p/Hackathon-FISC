@@ -12,6 +12,7 @@ incompleta.
 """
 from __future__ import annotations
 
+import re
 import uuid
 from typing import Callable
 
@@ -106,11 +107,24 @@ def _combinar(base: dict, llm: dict) -> dict:
 
 def _titulo(valor, texto: str) -> str:
     if isinstance(valor, str) and valor.strip():
-        return valor.strip()[:120]
+        return _titulo_de_linea(valor.strip())   # el respaldo por reglas trae la línea entera
     for linea in texto.splitlines():
         if linea.strip():
-            return linea.strip()[:120]
+            return _titulo_de_linea(linea.strip())
     return "Oferta sin título"
+
+
+def _titulo_de_linea(linea: str) -> str:
+    """Sin título del LLM: la primera frase de la oferta y, si es larga, hasta la primera coma
+    ("Se busca cajera en Arraiján, turno de mañana, …" → "Se busca cajera en Arraiján")."""
+    frase = re.split(r"(?<!B/)(?<=[.!?])\s", linea, maxsplit=1)[0]
+    if len(frase) > 60:
+        coma = frase.find(",")
+        if coma >= 15:
+            frase = frase[:coma]
+    if len(frase) > 80:
+        frase = frase[:80].rsplit(" ", 1)[0]
+    return frase.strip()
 
 
 def _normalizar_corregimiento(valor, conocidos: set[str]) -> str | None:

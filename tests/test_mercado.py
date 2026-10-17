@@ -265,3 +265,8 @@ def test_el_orquestador_publica_la_oferta_normalizada():
     v, auditoria = orq.publicar_oferta(TEXTO_CON_DATOS, "e1")
     assert auditoria.aprobado and v.estado.value == "publicada"
     assert v.texto_original == TEXTO_CON_DATOS and v.habilidades_requeridas
+
+def test_titulo_sin_llm_es_corto():
+    v = Mercado(cliente=None).normalizar_oferta(
+        "Se busca cajera para tienda en Arraiján, turno de mañana, 5 días, pago B/. 600 al mes. Más datos.", "e1")
+    assert v.titulo == "Se busca cajera para tienda en Arraiján"
