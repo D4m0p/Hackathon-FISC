@@ -9,6 +9,7 @@ from typing import Protocol
 
 MODELO_TEXTO = "openai/gpt-oss-120b"
 MODELO_VISION = "qwen/qwen3.8-27b"
+MODELO_AUDIO = "whisper-large-v3-turbo"
 
 
 class ErrorLLM(Exception):
@@ -22,10 +23,13 @@ class ClienteLLM(Protocol):
     def json_con_imagen(self, sistema: str, instruccion: str, imagen: bytes, tipo_mime: str) -> dict:
         """Igual, con una imagen adjunta."""
 
+    def transcribir(self, audio: bytes, nombre_archivo: str) -> str:
+        """Texto de una nota de voz en español (el formato lo deduce de la extensión)."""
+
 
 class ClienteGroq:
     def __init__(self, clave: str | None = None, modelo: str | None = None,
-                 modelo_vision: str | None = None):
+                 modelo_vision: str | None = None, modelo_audio: str | None = None):
         from groq import Groq   # import tardío: las pruebas no lo necesitan
 
         clave = clave or os.getenv("GROQ_API_KEY")
@@ -34,6 +38,16 @@ class ClienteGroq:
         self._cliente = Groq(api_key=clave, timeout=30)
         self.modelo = modelo or os.getenv("GROQ_MODELO") or MODELO_TEXTO
         self.modelo_vision = modelo_vision or os.getenv("GROQ_MODELO_VISION") or MODELO_VISION
+        self.modelo_audio = modelo_audio or os.getenv("GROQ_MODELO_AUDIO") or MODELO_AUDIO
+
+    def transcribir(self, audio: bytes, nombre_archivo: str) -> str:
+        try:
+            r = self._cliente.audio.transcriptions.create(
+                model=self.modelo_audio, file=(nombre_archivo, audio), language="es",
+                response_format="json", temperature=0)
+        except Exception as e:
+            raise ErrorLLM(str(e)) from e
+        return (getattr(r, "text", "") or "").strip()
 
     def _pedir(self, modelo: str, mensajes: list[dict]) -> dict:
         try:
