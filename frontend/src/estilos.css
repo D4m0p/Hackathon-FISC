@@ -423,3 +423,24 @@ legend { padding: 0 6px; font-weight: 600; }
 .mapa-pulso { transform-box: fill-box; transform-origin: center; }
 
 .mapa-aprox { font-size: .78rem; color: #8a5a00; }
+
+/* Barra superior en celular: que todo quepa sin desplazamiento horizontal */
+.barra { gap: 8px; }
+.sesion { min-width: 0; }
+@media (max-width: 420px) {
+  .marca { font-size: 1.1rem; }
+  .barra .tema { width: 30px; height: 30px; margin-right: 0; font-size: .9rem; }
+  .sesion { gap: 6px; }
+  .cambiar-rol { max-width: 118px; font-size: .78rem; padding: 4px 6px; }
+  .sesion .enlace { padding: 4px; font-size: .85rem; }
+}
+
+/* Celular: cifras en 3 columnas compactas y puntaje con su «?» en la misma línea */
+.puntaje { white-space: nowrap; }
+@media (max-width: 600px) {
+  .kpis.tres { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .kpis.tres .kpi { padding: 10px 10px 10px 12px; }
+  .kpis.tres .kpi-titulo { font-size: .68rem; }
+  .kpis.tres .kpi-valor { font-size: 1.5rem; }
+  .kpis.tres .kpi-sub { display: none; }
+}
