@@ -3,5 +3,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  server: { port: 5173 },
+  // ".." deja leer datos/corregimientos.csv (coordenadas con fuente) sin copiarlo al frontend.
+  server: { port: 5173, fs: { allow: [".."] } },
 });

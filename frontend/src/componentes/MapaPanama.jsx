@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ALTO, ANCHO, CANAL, POSICIONES, TIERRA, proyectar } from "../geo.js";
+import { ALTO, ANCHO, CANAL, POSICIONES, TIERRA, esAproximada, proyectar } from "../geo.js";
 import { corregimiento } from "../nombres.js";
 
-// Mapa esquemático (posiciones aproximadas). puntos: [{codigo, radio, color, anillo?, lineas: [texto], pulso?}]
+// Mapa con ubicaciones de OpenStreetMap (los distritos sin punto único van aproximados y marcados). puntos: [{codigo, radio, color, anillo?, lineas: [texto], pulso?}]
 // casa: codigo del corregimiento del joven (se marca y se trazan líneas hacia los puntos).
 export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, leyenda }) {
   const [encima, setEncima] = useState(null);
@@ -15,7 +15,7 @@ export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, le
 
   return (
     <div className="mapa">
-      <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img" aria-label="Mapa esquemático de Panamá y Panamá Oeste">
+      <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img" aria-label="Mapa de Panamá y Panamá Oeste">
         <defs>
           <radialGradient id="brillo"><stop offset="0%" stopColor="#fff" stopOpacity=".35" /><stop offset="100%" stopColor="#fff" stopOpacity="0" /></radialGradient>
           <pattern id="reticula" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -27,7 +27,7 @@ export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, le
         <path d={CANAL} className="mapa-canal" />
         <text x={proyectar([-79.585, 9.12])[0] + 6} y={18} className="mapa-rotulo">Canal</text>
         <text x={proyectar([-79.82, 8.9])[0]} y={proyectar([-79.82, 9.1])[1]} className="mapa-rotulo grande">Panamá Oeste</text>
-        <text x={proyectar([-79.46, 9.1])[0]} y={proyectar([-79.46, 9.12])[1]} className="mapa-rotulo grande">Ciudad de Panamá</text>
+        <text x={proyectar([-79.56, 9.1])[0] + 40} y={proyectar([-79.46, 9.145])[1]} className="mapa-rotulo grande">Ciudad de Panamá</text>
         <text x={ANCHO - 120} y={ALTO - 12} className="mapa-rotulo">Océano Pacífico</text>
 
         {pCasa && visibles.filter((p) => p.codigo !== casa).map((p) => {
@@ -47,7 +47,8 @@ export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, le
                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSeleccion?.(p.codigo === seleccionado ? null : p.codigo)}>
               {p.pulso && <circle r={p.radio} fill={p.color} className="mapa-pulso" />}
               {p.anillo && <circle r={p.radio + 5} fill="none" stroke={p.anillo} strokeWidth="2" strokeDasharray="3 3" />}
-              <circle r={p.radio} fill={p.color} fillOpacity=".85" />
+              <circle r={p.radio} fill={p.color} fillOpacity=".85"
+                      {...(esAproximada(p.codigo) ? { stroke: "#fff", strokeWidth: 1.5, strokeDasharray: "2 3" } : {})} />
               <circle r={p.radio} fill="url(#brillo)" />
             </g>
           );
@@ -65,11 +66,15 @@ export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, le
         <div className="mapa-globo" role="status">
           <b>{corregimiento(info.codigo)}</b>
           {info.lineas.map((l) => <span key={l}>{l}</span>)}
+          {esAproximada(info.codigo) && <span className="mapa-aprox">Ubicación aproximada: es un distrito, no un solo punto</span>}
         </div>
       )}
       <div className="mapa-pie">
         {leyenda && <span className="mapa-leyenda">{leyenda}</span>}
-        <span className="mapa-aviso">Mapa esquemático: posiciones aproximadas</span>
+        <span className="mapa-aviso">
+          Ubicaciones: © colaboradores de OpenStreetMap
+          {visibles.some((p) => esAproximada(p.codigo)) && " · borde punteado = aproximada"} · costa y Canal simplificados
+        </span>
       </div>
     </div>
   );

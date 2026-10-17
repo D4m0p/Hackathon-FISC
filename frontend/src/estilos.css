@@ -421,3 +421,5 @@ legend { padding: 0 6px; font-weight: 600; }
 .app.ancho .vista > .lista, .app.ancho .vista > .opciones { max-width: none; }
 
 .mapa-pulso { transform-box: fill-box; transform-origin: center; }
+
+.mapa-aprox { font-size: .78rem; color: #8a5a00; }
