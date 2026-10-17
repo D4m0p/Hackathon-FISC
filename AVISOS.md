@@ -7,6 +7,12 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ## Para B (Anna) — 16/10/2026, noche — revisión de la página para la demo de mañana
 
+**Atendido.** Los puntos 1, 2, 3 y los ids del 5 los hizo usted (`f8c1619`). A agregó lo que
+faltaba: pestañas del orientador sin pisarse en celular (`estilos.css`) y la API por defecto en
+la misma máquina desde donde se abre la página (`api.js`; en la laptop sigue siendo
+`localhost:8010`). Verificado en el navegador: todas las vistas sin errores. Puede borrar
+esta sección.
+
 La página funciona: sin errores de consola en ninguna vista, se ve muy bien y todo usa la
 API correctamente. Cinco ajustes, de más a menos importante:
 

@@ -90,7 +90,12 @@ legend { padding: 0 6px; font-weight: 600; }
 
 .pestanas { display: flex; gap: 4px; background: var(--superficie); border-radius: 12px; padding: 4px; margin-bottom: 14px; }
 .pestanas button { flex: 1 1 0; min-width: 0; background: none; border: 0; padding: 9px 6px; border-radius: 9px; color: var(--suave); line-height: 1.15; }
-@media (max-width: 420px) { .pestanas { gap: 2px; } .pestanas button { font-size: .8rem; padding: 8px 2px; } }
+/* En pantallas angostas las pestañas no se pisan: toman su ancho natural y, si no caben, se desliza la barra. */
+@media (max-width: 420px) {
+  .pestanas { gap: 2px; overflow-x: auto; scrollbar-width: none; }
+  .pestanas::-webkit-scrollbar { display: none; }
+  .pestanas button { flex: 1 0 auto; font-size: .8rem; padding: 8px 8px; white-space: nowrap; }
+}
 .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); font-weight: 600; }
 
 .soltar { display: grid; place-items: center; min-height: 130px; border: 2px dashed var(--borde); border-radius: var(--radio); cursor: pointer; text-align: center; padding: 16px; font-weight: 400; color: var(--suave); }

@@ -1,5 +1,7 @@
 // Único punto de contacto con la API. Guarda el token y traduce errores a mensajes.
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8010";
+// Por defecto, la API en la misma máquina desde donde se abrió la página (localhost en la
+// laptop; la IP de la laptop si se abre desde un celular en la misma red).
+const BASE = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:8010`;
 const CLAVE_TOKEN = "empleo_token";
 
 export function leerToken() {
