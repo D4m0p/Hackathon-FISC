@@ -3,7 +3,7 @@ const REGLAS = {
   residencia: "Lugar de residencia", foto: "Foto obligatoria",
 };
 
-function nombreRegla(r) {
+export function nombreRegla(r) {
   return REGLAS[r] || r.replace(/_/g, " ").replace(/^\w/, (l) => l.toUpperCase());
 }
 

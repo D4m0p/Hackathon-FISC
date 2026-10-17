@@ -1,0 +1,133 @@
+import { useCallback, useEffect, useState } from "react";
+import { api } from "../../api.js";
+import Barras from "../../componentes/Barras.jsx";
+import FormMotivo from "../../componentes/FormMotivo.jsx";
+import { conNombres, corregimiento } from "../../nombres.js";
+
+const FILTROS = [["pendiente", "Por aprobar"], ["aprobada", "Aprobadas"], ["rechazada", "Rechazadas"], ["cerrada", "Cerradas"]];
+const CIERRES = { cancelacion_joven: "El joven canceló", inasistencia: "No se presentó", retiro_empresa: "La empresa lo retiró", vacante_cerrada: "Vacante cerrada" };
+
+function fecha(iso) {
+  return new Date(iso).toLocaleString("es-PA", { weekday: "long", day: "numeric", month: "long",
+    hour: "2-digit", minute: "2-digit", timeZone: "America/Panama" });
+}
+
+export default function Matches({ cat }) {
+  const [filtro, setFiltro] = useState("pendiente");
+  const [lista, setLista] = useState(null);
+  const [aviso, setAviso] = useState("");
+  const [error, setError] = useState("");
+  const [corriendo, setCorriendo] = useState(false);
+  const [abierto, setAbierto] = useState(null);   // {clave, accion}
+
+  const cargar = useCallback(() => {
+    setLista(null);
+    api.asignacionesEstado(filtro).then(setLista).catch((e) => setError(e.message));
+  }, [filtro]);
+  useEffect(cargar, [cargar]);
+
+  async function correrMatching() {
+    setCorriendo(true);
+    setError("");
+    try {
+      const r = await api.matching();
+      setAviso(`Matching listo: ${r.asignaciones.length} propuesta(s), ${r.sin_asignar.length} joven(es) sin asignar` +
+        (r.infactibles.length ? `, ${r.infactibles.length} par(es) con interés mutuo que no son factibles.` : "."));
+      setFiltro("pendiente");
+      cargar();
+    } catch (e) {
+      setError(e.message);
+    }
+    setCorriendo(false);
+  }
+
+  async function aprobar(a) {
+    setError("");
+    try {
+      const r = await api.decidir(a.joven_id, a.vacante_id, true);
+      setAviso(`Aprobado. Entrevista el ${fecha(r.entrevista)}; se avisó al joven.`);
+      cargar();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  const titulo = (id) => cat.vacantes[id]?.titulo || id;
+
+  return (
+    <>
+      <div className="barra-acciones">
+        <button className="boton" disabled={corriendo} onClick={correrMatching}>
+          {corriendo ? "Calculando…" : "Correr matching"}
+        </button>
+        <span className="nota">Asigna con optimización respetando cupos, traslado, pasaje, horario y salario.</span>
+      </div>
+      <div className="chips filtros">
+        {FILTROS.map(([k, t]) => (
+          <button key={k} className={"chip" + (filtro === k ? " activo" : "")} onClick={() => { setAviso(""); setFiltro(k); }}>{t}</button>
+        ))}
+      </div>
+      {aviso && <p className="aviso" role="status">{aviso}</p>}
+      {error && <p className="error">{error}</p>}
+      {!lista ? <p className="centro">Cargando…</p> : lista.length === 0 ? (
+        <p className="vacio">{filtro === "pendiente" ? "No hay matches por aprobar. Corra el matching para generar propuestas." : "No hay nada aquí."}</p>
+      ) : (
+        <ul className="lista">
+          {lista.map((a) => {
+            const clave = `${a.joven_id}|${a.vacante_id}`;
+            const v = cat.vacantes[a.vacante_id];
+            return (
+              <li key={clave} className="item">
+                <div className="tarjeta-cabeza">
+                  <div>
+                    <h3>{a.joven_id} → {titulo(a.vacante_id)}</h3>
+                    {v && <p className="suave">{corregimiento(v.corregimiento)} · empresa {v.empresa_id}</p>}
+                  </div>
+                  <span className="puntaje">{Math.round(a.desglose.total * 100)}<small>/100</small></span>
+                </div>
+                <h4>Por qué el sistema lo propone</h4>
+                <ul className="motivos">{a.desglose.motivos.map((m) => <li key={m}>{conNombres(m, cat.habilidades)}</li>)}</ul>
+                <Barras desglose={a.desglose} />
+                {filtro === "aprobada" && a.entrevista && <p>Entrevista: <b>{fecha(a.entrevista)}</b></p>}
+                {a.motivo_orientador && <p className="suave">Motivo del orientador: {a.motivo_orientador}</p>}
+                {filtro === "cerrada" && <p className="suave">{CIERRES[a.tipo_cierre] || "Cerrada"}{a.motivo_cierre ? ` · ${a.motivo_cierre}` : ""}</p>}
+
+                {abierto?.clave === clave ? (
+                  abierto.accion === "rechazar" ? (
+                    <FormMotivo pregunta="¿Por qué rechaza este match?" peligro textoBoton="Rechazar"
+                                opciones={["El joven no podrá llegar a tiempo", "La empresa pidió otro perfil", "El joven pidió esperar"]}
+                                nota="El motivo queda registrado en la traza."
+                                onCancelar={() => setAbierto(null)}
+                                onConfirmar={async (m) => { await api.decidir(a.joven_id, a.vacante_id, false, m); setAbierto(null); setAviso("Rechazado; quedó registrado el motivo."); cargar(); }} />
+                  ) : (
+                    <FormMotivo pregunta="¿Qué pasó con la entrevista?" peligro textoBoton="Registrar inasistencia"
+                                opciones={["No se presentó y no avisó", "Llegó muy tarde"]}
+                                nota="El cupo se libera y el sistema propone un reemplazo de inmediato."
+                                onCancelar={() => setAbierto(null)}
+                                onConfirmar={async (m) => {
+                                  const r = await api.inasistencia(a.joven_id, a.vacante_id, m);
+                                  setAbierto(null);
+                                  setAviso(r.nuevas.length
+                                    ? `Cupo liberado. Nuevas propuestas: ${r.nuevas.map((n) => `${n.joven_id} → ${titulo(n.vacante_id)}`).join(", ")}.`
+                                    : "Cupo liberado. El matching no generó propuestas nuevas (revise «Por aprobar»).");
+                                  cargar();
+                                }} />
+                  )
+                ) : filtro === "pendiente" ? (
+                  <div className="acciones-item">
+                    <button className="boton" onClick={() => aprobar(a)}>Aprobar</button>
+                    <button className="enlace peligro" onClick={() => setAbierto({ clave, accion: "rechazar" })}>Rechazar</button>
+                  </div>
+                ) : filtro === "aprobada" ? (
+                  <div className="acciones-item">
+                    <button className="enlace peligro" onClick={() => setAbierto({ clave, accion: "inasistencia" })}>Registrar inasistencia</button>
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
+  );
+}

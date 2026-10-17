@@ -4,7 +4,7 @@ import Entrada from "./vistas/Entrada.jsx";
 import VistaJoven from "./vistas/joven/VistaJoven.jsx";
 import Registro from "./vistas/joven/Registro.jsx";
 import VistaEmpresa from "./vistas/empresa/VistaEmpresa.jsx";
-import VistaOrientador from "./vistas/VistaOrientador.jsx";
+import VistaOrientador from "./vistas/orientador/VistaOrientador.jsx";
 
 export default function App() {
   const [yo, setYo] = useState(null);         // {rol, sujeto}

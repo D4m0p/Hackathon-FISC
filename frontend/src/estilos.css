@@ -90,7 +90,7 @@ legend { padding: 0 6px; font-weight: 600; }
 
 .pestanas { display: flex; gap: 4px; background: var(--superficie); border-radius: 12px; padding: 4px; margin-bottom: 14px; }
 .pestanas button { flex: 1 1 0; min-width: 0; background: none; border: 0; padding: 9px 6px; border-radius: 9px; color: var(--suave); line-height: 1.15; }
-@media (max-width: 420px) { .pestanas button { font-size: .85rem; padding: 8px 3px; } }
+@media (max-width: 420px) { .pestanas { gap: 2px; } .pestanas button { font-size: .8rem; padding: 8px 2px; } }
 .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); font-weight: 600; }
 
 .soltar { display: grid; place-items: center; min-height: 130px; border: 2px dashed var(--borde); border-radius: var(--radio); cursor: pointer; text-align: center; padding: 16px; font-weight: 400; color: var(--suave); }
@@ -172,3 +172,13 @@ legend { padding: 0 6px; font-weight: 600; }
 .casilla input { width: auto; margin: 0; }
 .cita { border-left: 3px solid var(--borde); padding-left: 10px; white-space: pre-wrap; }
 @media (max-width: 420px) { .requisito { grid-template-columns: 1fr 1fr; } }
+
+/* Orientador */
+.barra-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+.filtros { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+.peso-fila { display: grid; grid-template-columns: 100px 1fr 52px; align-items: center; gap: 10px; margin: 10px 0; font-weight: 500; }
+.peso-fila input[type=range] { padding: 0; margin: 0; accent-color: var(--primario); }
+.peso-fila .nota { grid-column: 2 / 4; margin: 0; }
+.simulacion { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--borde); }
+.linea-tiempo.panel { padding-left: 36px; }
+.linea-tiempo .hora { color: var(--suave); font-size: .8rem; margin-right: 6px; }

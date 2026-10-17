@@ -77,6 +77,22 @@ export const api = {
   retirar: (joven_id, vacante_id, motivo) =>
     pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "retiro_empresa", motivo }),
   cerrarVacante: (vacante_id, motivo) => pedir("POST", `/vacantes/${vacante_id}/cerrar`, { motivo }),
+
+  // Orientador
+  matching: () => pedir("POST", "/matching"),
+  asignacionesEstado: (estado) => pedir("GET", `/asignaciones?estado=${estado}`),
+  decidir: (joven_id, vacante_id, aprobar, motivo = "") =>
+    pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/decision`, { aprobar, motivo }),
+  inasistencia: (joven_id, vacante_id, motivo) =>
+    pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "inasistencia", motivo }),
+  vacantesEstado: (estado) => pedir("GET", `/vacantes?estado=${estado}`),
+  publicarBloqueada: (vacante_id, motivo) => pedir("POST", `/vacantes/${vacante_id}/publicar-bloqueada`, { motivo }),
+  jovenes: () => pedir("GET", "/jovenes"),
+  trazas: (agente) => pedir("GET", `/trazas?limite=300${agente ? `&agente=${agente}` : ""}`),
+  mensajes: () => pedir("GET", "/mensajes"),
+  pesos: () => pedir("GET", "/pesos"),
+  simularPesos: (pesos) => pedir("POST", "/pesos/simular", pesos),
+  cambiarPesos: (pesos, motivo) => pedir("PUT", "/pesos", { pesos, motivo }),
   cancelar: (joven_id, vacante_id, motivo) =>
     pedir("POST", `/asignaciones/${joven_id}/${vacante_id}/liberar`, { tipo: "cancelacion_joven", motivo }),
   reprogramar: (joven_id, vacante_id, motivo) =>
