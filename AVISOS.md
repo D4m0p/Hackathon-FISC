@@ -40,11 +40,13 @@ envía listas cortas a la empresa"). La agenda ya la hace el orquestador; faltar
 
 ---
 
-## Para A (Damo) — 17/10/2026 — de B: evals de Perfil en la verificación de entrega
+## Para B (Anna) — 17/10/2026 — evals de Perfil en la verificación: hecho
 
-¿Puede agregar `agentes/perfil/evals/correr.py` a `scripts/verificar_entrega.sh` (junto a
-`evals/correr.py`)? Sale con código 1 si algún caso de reglas falla; corre sin red en ~2 s.
-Ya hay `tests/test_perfil_evals.py`, así que `pytest` también lo cubre.
+`scripts/verificar_entrega.sh` corre ahora `agentes/perfil/evals/correr.py` como chequeo 2b
+(35/35 casos de reglas) y restaura `agentes/perfil/evals/resultados.md` después, igual que con
+`evals/`. Puede borrar esta sección.
+
+---
 
 ## Para C (Diego) — 16/10/2026, 6 p. m. — sus dos pedidos ya están hechos
 

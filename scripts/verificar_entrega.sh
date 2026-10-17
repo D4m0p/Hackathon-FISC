@@ -215,6 +215,33 @@ chequeo_evals() {
   RES_NOTA=""
 }
 
+# ---------- 2b. Evals del agente Perfil ----------
+
+chequeo_evals_perfil() {
+  local nombre="2b. Evals de Perfil" salida="$TMP/evals_perfil.txt" estado linea
+  if [ "$RAPIDO" = 1 ]; then omitido "$nombre: omitidos (--rapido)"; return; fi
+  if [ ! -f agentes/perfil/evals/correr.py ]; then aviso "$nombre: no existe agentes/perfil/evals/correr.py"; return; fi
+  if [ ! -x .venv/bin/python ]; then mal "$nombre: no existe .venv/bin/python"; return; fi
+  # Esta corrida también reescribe su reporte: se usa la misma protección que con evals/.
+  local ruta_anterior="$RES_RUTA"
+  RES_RUTA=agentes/perfil/evals/resultados.md
+  guardar_resultados
+  trabajando "Corriendo los evals de Perfil"
+  .venv/bin/python -m agentes.perfil.evals.correr >"$salida" 2>&1 </dev/null
+  estado=$?
+  restaurar_resultados
+  linea=$(grep -i 'casos de reglas cumplen' "$salida" | head -n 1)
+  if [ "$estado" -eq 0 ] && [ -n "$linea" ]; then
+    ok "$nombre: $linea"
+  else
+    mal "$nombre: algún caso de reglas falló (código de salida $estado)"
+    cola "$salida" 15
+  fi
+  if [ -n "$RES_NOTA" ]; then nota "$RES_NOTA"; fi
+  RES_NOTA=""
+  RES_RUTA="$ruta_anterior"
+}
+
 # ---------- 3. Frontend ----------
 
 chequeo_frontend() {
@@ -519,6 +546,7 @@ printf '%sVerificación de entrega%s · %s · rama %s · %s\n\n' "$C_NEGRITA" "$
 
 chequeo_pruebas
 chequeo_evals
+chequeo_evals_perfil
 chequeo_frontend
 chequeo_marcas
 chequeo_higiene
