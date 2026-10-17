@@ -73,8 +73,13 @@ Nominal: máximo 1 petición por segundo y un User-Agent que identifique a quien
 
 ## Límites conocidos
 
-- El CSV cubre las **24 zonas de `datos/transporte.csv`**. Los ids de la demo que no son
-  corregimientos (`san_miguelito`, que es un distrito, y `la_chorrera`) no producen un punto
-  propio: un distrito de 9 corregimientos no tiene una ubicación única que no sea inventada.
+- El CSV cubre **21 de las 24 zonas de `datos/transporte.csv`**. Faltan tres corregimientos
+  de La Chorrera que sí están en la tabla de traslados: `barrio_colon`, `barrio_balboa` y
+  `guadalupe`. `datos/obtener_corregimientos.py` no escribió un punto para ellos (por las
+  causas de «Lo que queda fuera»). El mapa del frontend dibuja `barrio_colon` y `barrio_balboa`
+  en una posición aproximada, marcada como tal; `guadalupe` no tiene punto.
+- Los ids de la demo que no son corregimientos (`san_miguelito`, que es un distrito, y
+  `la_chorrera`) no producen un punto propio: un distrito de 9 corregimientos no tiene una
+  ubicación única que no sea inventada.
 - Cuando varias fronteras comparten el nombre del distrito, o el punto es un nodo "lugar", la
   elección se marca **REVISAR** para que una persona la confirme.

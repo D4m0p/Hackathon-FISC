@@ -6,7 +6,7 @@ pasan explícitamente para que la prueba no dependa de los datos de demostració
 import pytest
 
 from agentes.mercado import ErrorMercado, Mercado, OfertaIncompleta
-from agentes.mercado.extraccion import SISTEMA
+from agentes.mercado.extraccion import SISTEMA, extraer_por_palabras
 from agentes.perfil.llm import ErrorLLM
 from contrato.modelos import Habilidad, RequisitoHabilidad, Turno, Vacante
 
@@ -270,3 +270,24 @@ def test_titulo_sin_llm_es_corto():
     v = Mercado(cliente=None).normalizar_oferta(
         "Se busca cajera para tienda en Arraiján, turno de mañana, 5 días, pago B/. 600 al mes. Más datos.", "e1")
     assert v.titulo == "Se busca cajera para tienda en Arraiján"
+
+
+# ---------- regresiones (revisión: turnos por palabra completa y salario con separadores) ----------
+
+def test_turno_no_se_detecta_dentro_de_otra_palabra():
+    # "am" está dentro de "programa"/"ambiente"/"Panamá": no es un turno de mañana
+    assert extraer_por_palabras("Programa de reclamaciones en ambiente laboral.", set())["turnos"] == []
+    assert extraer_por_palabras("El llamado es para el examen de la campaña.", set())["turnos"] == []
+
+
+def test_turnos_se_reconocen_por_palabra_completa():
+    assert extraer_por_palabras("Turno de mañana, tarde y noche.", set())["turnos"] == \
+        ["manana", "tarde", "noche"]
+    assert extraer_por_palabras("Horario: turno AM y PM.", set())["turnos"] == ["manana", "tarde"]
+
+
+def test_salario_con_separador_de_miles_en_el_respaldo():
+    # B/. 1.200 son mil doscientos, no 1,2; el respaldo por reglas debe respetarlo
+    assert extraer_por_palabras("Salario B/. 1.200 mensual.", set())["salario_mensual"] == 1200
+    assert extraer_por_palabras("Pago de B/. 1,200.00 al mes.", set())["salario_mensual"] == 1200
+    assert extraer_por_palabras("Pago B/. 650,50.", set())["salario_mensual"] == 650.5

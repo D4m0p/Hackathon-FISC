@@ -186,3 +186,21 @@ def test_ni_continua_la_negacion():
 def test_la_negacion_se_reconoce_por_palabra_completa():
     # "mini" termina en "ni" y "Calvin" en "in": no son negaciones
     assert "foto_obligatoria" in _reglas_de("Tienda mini con foto obligatoria.")
+
+
+# ---------- regresiones: años de experiencia y nombres propios ----------
+
+def test_rango_de_anios_de_experiencia_no_es_edad():
+    assert _reglas_de("Se busca promotor con entre 1 y 2 años en el área de ventas.") == []
+    assert _reglas_de("De 1 a 2 años en atención al cliente.") == []
+
+
+def test_rango_de_edad_adulta_se_sigue_marcando():
+    assert _reglas_de("Entre 18 a 25 años.") == ["edad"]
+    assert _reglas_de("Edad: 20-30 años.") == ["edad"]
+
+
+def test_nombre_propio_en_mayuscula_no_es_estado_civil():
+    # la empresa se llama "Casado": no es un requisito de estado civil
+    assert _reglas_de("Empresa Casado busca vendedor con experiencia.") == []
+    assert _reglas_de("Requisito: soltera y sin hijos.") == ["estado_civil"]

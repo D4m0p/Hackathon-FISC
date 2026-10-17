@@ -124,7 +124,9 @@ tipados (`contrato/modelos.py`) y cada decisión queda registrada en la tabla `t
 - **Óptimo global, no voraz.** Asignar a cada joven su mejor opción en orden puede dejar a
   alguien sin trabajo; el solver maximiza el total respetando cupos (hay una prueba que lo
   demuestra: `test_optimo_global_gana_al_voraz`).
-- **Resultados reproducibles.** Los modelos se construyen siempre en el mismo orden y CP-SAT corre con semilla fija y un solo hilo.
+- **Resultados reproducibles.** Los modelos se construyen siempre en el mismo orden; el flujo
+  de costo mínimo del Matching es determinista, y CP-SAT, en la Ruta de formación, corre con
+  semilla fija y un solo hilo.
 - **Los avisos no frenan al sistema.** Los mensajes de Telegram se envían después de soltar
   el candado del orquestador; un canal lento o caído no bloquea las demás operaciones ni
   deshace la aprobación ya guardada.

@@ -28,7 +28,7 @@ from datetime import date
 from pathlib import Path
 
 URL_BUSQUEDA = "https://nominatim.openstreetmap.org/search"
-# Caja aproximada que debe contener a las 24 zonas (Panamá, San Miguelito, Arraiján, La Chorrera).
+# Caja aproximada de las zonas de datos/transporte.csv (Panamá, San Miguelito, Arraiján, La Chorrera).
 LAT = (8.75, 9.25)
 LON = (-79.95, -79.20)
 # "Panamá" es a la vez país, provincia y distrito: su nombre no identifica la ubicación.

@@ -58,7 +58,7 @@ _PALABRAS: dict[str, tuple[str, ...]] = {
     "servicio_mesa": ("mesa", "mesero", "mesera"),
 }
 
-_RE_SALARIO = re.compile(r"(?:b/\.?|balboas?|\$)\s*([\d][\d.,]*)", re.IGNORECASE)
+_RE_SALARIO = re.compile(r"(?:b/\.?|balboas?|\$)\s*(\d(?:[\d.,]*\d)?)", re.IGNORECASE)
 _RE_DIAS = re.compile(r"(\d+)\s*d[ií]as?", re.IGNORECASE)
 _RE_CUPOS = re.compile(r"(\d+)\s*(?:cupos?|vacantes?|posiciones?)", re.IGNORECASE)
 
@@ -77,6 +77,33 @@ def extraer_con_llm(texto: str, cliente: "ClienteLLM") -> dict[str, Any]:
     return datos if isinstance(datos, dict) else {}
 
 
+def _son_miles(crudo: str, separador: str) -> bool:
+    """True si el separador agrupa miles (grupos de tres dígitos), no decimales."""
+    partes = crudo.split(separador)
+    return len(partes) > 1 and partes[0].isdigit() and all(len(p) == 3 for p in partes[1:])
+
+
+def _interpretar_numero(crudo: str) -> float | None:
+    """Interpreta separadores de miles y de decimales: "1.200" y "1,200.00" son 1200;
+    "650,50" es 650.5. Decide por la forma (después del separador, grupos de tres = miles)."""
+    tiene_coma, tiene_punto = "," in crudo, "." in crudo
+    if tiene_coma and tiene_punto:
+        if crudo.rfind(",") > crudo.rfind("."):
+            normal = crudo.replace(".", "").replace(",", ".")
+        else:
+            normal = crudo.replace(",", "")
+    elif tiene_coma:
+        normal = crudo.replace(",", "") if _son_miles(crudo, ",") else crudo.replace(",", ".")
+    elif tiene_punto:
+        normal = crudo.replace(".", "") if _son_miles(crudo, ".") else crudo
+    else:
+        normal = crudo
+    try:
+        return float(normal)
+    except ValueError:
+        return None
+
+
 def numero_en_texto(valor: Any, texto: str) -> bool:
     """El número aparece escrito en el texto (B/. 650, 1,200.00 o 1.200). Si la oferta habla
     de quincena, también vale el doble (pago mensual)."""
@@ -84,14 +111,19 @@ def numero_en_texto(valor: Any, texto: str) -> bool:
         return False
     candidatos: set[float] = set()
     for crudo in re.findall(r"\d[\d.,]*\d|\d", texto):
-        for forma in (crudo.replace(",", ""), crudo.replace(".", "").replace(",", ".")):
-            try:
-                candidatos.add(float(forma))
-            except ValueError:
-                pass
+        interpretado = _interpretar_numero(crudo)
+        if interpretado is not None:
+            candidatos.add(interpretado)
     if "quincen" in plano(texto):
         candidatos |= {c * 2 for c in candidatos}
     return any(abs(c - float(valor)) < 0.01 for c in candidatos)
+
+
+def _contiene(texto_plano: str, palabra: str) -> bool:
+    """Coincidencia por palabra completa (con plural). Evita que "am" case dentro de
+    "programa", "ambiente" o "examen"."""
+    sufijo = "s?" if len(palabra) >= 3 else ""
+    return re.search(rf"(?<![a-z]){re.escape(palabra)}{sufijo}(?![a-z])", texto_plano) is not None
 
 
 def extraer_por_palabras(texto: str, corregimientos: set[str]) -> dict[str, Any]:
@@ -100,7 +132,7 @@ def extraer_por_palabras(texto: str, corregimientos: set[str]) -> dict[str, Any]
     corregimiento = next(
         (c for c in sorted(corregimientos) if plano(c.replace("_", " ")) in t), None)
     turnos = [turno.value for turno, palabras in _TURNOS.items()
-              if any(p in t for p in palabras)]
+              if any(_contiene(t, p) for p in palabras)]
     salario = _numero_de(_RE_SALARIO.search(texto))
     dias = _entero_de(_RE_DIAS.search(texto))
     cupos = _entero_de(_RE_CUPOS.search(texto))
@@ -115,11 +147,7 @@ def extraer_por_palabras(texto: str, corregimientos: set[str]) -> dict[str, Any]
 def _numero_de(coincidencia) -> float | None:
     if not coincidencia:
         return None
-    crudo = coincidencia.group(1).replace(",", "")
-    try:
-        return float(crudo)
-    except ValueError:
-        return None
+    return _interpretar_numero(coincidencia.group(1))
 
 
 def _entero_de(coincidencia) -> int | None:

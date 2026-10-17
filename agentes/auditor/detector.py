@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Callable
 
 from contrato.modelos import Hallazgo
 
@@ -30,6 +31,32 @@ _DETALLE_EDAD = ("Se pide una edad o un rango de edad, que no es un requisito "
                  "justificado para el puesto.")
 _SUGERENCIA_EDAD = ("Describa las funciones y competencias necesarias (incluida la "
                     "experiencia) en lugar de la edad.")
+
+_FLAGS = re.IGNORECASE | re.UNICODE
+
+# Adjetivos civiles aislados: en mayúscula suelen ser un nombre propio (la empresa "Casado").
+_ADJETIVOS_CIVILES = frozenset({
+    "soltero", "soltera", "solteros", "solteras",
+    "casado", "casada", "casados", "casadas",
+    "viudo", "viuda", "viudos", "viudas",
+    "divorciado", "divorciada", "divorciados", "divorciadas",
+})
+_CUE_REQUISITO = re.compile(
+    r"\b(?:sea|ser|debe|deber[áa]|solicit\w+|requer\w+|busc\w+|personal|"
+    r"preferiblemente|indispensable|solo|solamente|requisito|estado\s+civil)\b", _FLAGS)
+
+
+def _predicado_estado_civil(texto: str, coincidencia: re.Match[str]) -> bool:
+    """Un adjetivo civil aislado y en mayúscula suele ser un nombre propio (la empresa
+    "Casado"); solo lo tratamos como requisito si va en minúscula o tras una señal de
+    requisito. "estado civil", "con hijos" y "madres solteras" siempre valen."""
+    token = coincidencia.group(0)
+    if token.lower() not in _ADJETIVOS_CIVILES:
+        return True
+    if token[0].islower():
+        return True
+    antes = texto[max(0, coincidencia.start() - 40):coincidencia.start()]
+    return _CUE_REQUISITO.search(antes) is not None
 
 
 @dataclass(frozen=True)
@@ -41,6 +68,7 @@ class Regla:
     negacion: bool = False          # ¿descartar la coincidencia si está negada?
     negacion_interna: bool = True   # ¿buscar la negación también dentro de la coincidencia?
     contexto_producto: bool = False # ¿descartar si el contexto es un producto, no un puesto?
+    predicado: "Callable[[str, re.Match[str]], bool] | None" = None  # filtro de la coincidencia
 
 
 _REGLAS: tuple[Regla, ...] = (
@@ -82,6 +110,7 @@ _REGLAS: tuple[Regla, ...] = (
                    "competencias.",
         negacion=True,
         negacion_interna=False,   # "sin hijos" es en sí un requisito que debe marcarse
+        predicado=_predicado_estado_civil,
     ),
     Regla(
         nombre="foto_obligatoria",
@@ -154,8 +183,6 @@ _EDAD_PATRONES: tuple[tuple[str, str], ...] = (
     (r"(\d{2})\s*[-\u2013]\s*(\d{2})\s+a(?:ñ|n)os(?!\s*,?\s*de\s+experiencia)", "rango"),
 )
 
-_FLAGS = re.IGNORECASE | re.UNICODE
-
 _COMPILADAS: tuple[tuple[Regla, tuple[re.Pattern[str], ...]], ...] = tuple(
     (regla, tuple(re.compile(p, _FLAGS) for p in regla.patrones)) for regla in _REGLAS
 )
@@ -227,10 +254,22 @@ def _es_experiencia(texto: str, coincidencia: re.Match[str]) -> bool:
     return re.match(r"\s*,?\s*de\s+experiencia", siguiente) is not None
 
 
+def _es_rango_de_experiencia(texto: str, coincidencia: re.Match[str]) -> bool:
+    """Un rango de años que arranca por debajo de la mayoría de edad y sigue con contexto
+    laboral ("entre 1 y 2 años en ventas") habla de experiencia, no de edad."""
+    inferior = coincidencia.group(1)
+    if not inferior or int(inferior) >= EDAD_MINIMA_LEGAL:
+        return False
+    siguiente = texto[coincidencia.end():coincidencia.end() + 20].lower()
+    return re.match(r"\s*,?\s*(?:de\s+)?(?:experiencia|en\b)", siguiente) is not None
+
+
 def _hallazgo_edad(texto: str) -> Hallazgo | None:
     for patron, tipo in _EDAD_COMPILADAS:
         for coincidencia in patron.finditer(texto):
             if _es_experiencia(texto, coincidencia):
+                continue
+            if tipo == "rango" and _es_rango_de_experiencia(texto, coincidencia):
                 continue
             if tipo in ("minimo", "menor"):
                 numero = coincidencia.group(1)
@@ -268,6 +307,8 @@ def _primera_coincidencia_valida(texto: str, regla: Regla,
                                           regla.negacion_interna):
                 continue
             if regla.contexto_producto and _contexto_producto(texto, coincidencia.start()):
+                continue
+            if regla.predicado is not None and not regla.predicado(texto, coincidencia):
                 continue
             return Hallazgo(
                 regla=regla.nombre,
