@@ -83,6 +83,7 @@ function Vacantes({ jovenId, nombres, onGuia }) {
         <span className="suave">{restantes.length ? `${restantes.length} vacante(s) para usted` : ""}</span>
         <button className="enlace" onClick={onGuia}>¿Cómo funciona?</button>
       </div>
+      <Ahorro jovenId={jovenId} disponibles={datos.length} />
       {aviso?.tipo === "mutuo" && (
         <div className="mutuo" role="status">
           <b>¡A la empresa también le interesa!</b> «{aviso.titulo}» quiere conocerle.
@@ -108,6 +109,57 @@ function Vacantes({ jovenId, nombres, onGuia }) {
         </Deslizable>
       )}
     </>
+  );
+}
+
+// Cuánto trabajo le ahorra el sistema: de todas las vacantes publicadas, cuántas le sirven y
+// por qué no le mostramos las demás. Solo cuenta; las decisiones ya las tomó el Matching.
+const MOTIVOS_AHORRO = {
+  traslado: (n) => `${n} le quedaría${n > 1 ? "n" : ""} demasiado lejos de su casa`,
+  presupuesto: (n) => `en ${n} el pasaje pasaría lo que puede gastar por semana`,
+  horario: (n) => `${n} ${n > 1 ? "son" : "es"} en horarios que usted no tiene libres`,
+  salario: (n) => `${n} paga${n > 1 ? "n" : ""} menos de lo que usted pide`,
+  habilidad: (n) => `${n} pide${n > 1 ? "n" : ""} algo que puede aprender en un curso (mire «Le falta poco»)`,
+  sin_datos: (n) => `de ${n} no tenemos datos de cómo llegar`,
+};
+
+function Ahorro({ jovenId, disponibles }) {
+  const [datos, setDatos] = useState(null);
+  useEffect(() => {
+    Promise.all([api.vacantes(), api.casiCalifica(jovenId), api.historia(jovenId)])
+      .then(([pub, casi, h]) => setDatos({ pub, casi, h })).catch(() => setDatos(null));
+  }, [jovenId]);
+  if (!datos) return null;
+
+  const publicadas = new Set(datos.pub.map((v) => v.id));
+  const deslizadas = new Set(datos.h.deslizamientos.filter((d) => d.actor === "joven" && publicadas.has(d.vacante_id)).map((d) => d.vacante_id));
+  const sirven = disponibles + deslizadas.size;
+  const otras = publicadas.size - sirven;
+  if (otras <= 0) return null;
+
+  const porMotivo = {};
+  for (const c of datos.casi) porMotivo[c.incumplimiento.tipo] = (porMotivo[c.incumplimiento.tipo] || 0) + 1;
+  const variasCosas = otras - datos.casi.length;
+  const lejos = datos.casi.filter((c) => c.incumplimiento.tipo === "traslado")
+    .map((c) => Number(c.incumplimiento.detalle.match(/(\d+) min/)?.[1])).filter(Boolean);
+
+  return (
+    <details className="ahorro">
+      <summary>
+        De <b>{publicadas.size}</b> vacantes publicadas, <b>{sirven} le sirven</b>.
+        Le ahorramos <b>{otras}</b> postulaciones que no le convenían.
+      </summary>
+      <ul>
+        {Object.entries(porMotivo).sort(([a], [b]) => Object.keys(MOTIVOS_AHORRO).indexOf(a) - Object.keys(MOTIVOS_AHORRO).indexOf(b)).map(([tipo, n]) => (
+          <li key={tipo}>
+            {(MOTIVOS_AHORRO[tipo] || ((k) => `${k} por otra razón`))(n)}
+            {tipo === "traslado" && lejos.length > 0 && ` (hasta ${Math.max(...lejos)} min de ida)`}
+          </li>
+        ))}
+        {variasCosas > 0 && <li>{variasCosas} no encaja{variasCosas > 1 ? "n" : ""} con su perfil en varias cosas a la vez</li>}
+      </ul>
+      <p className="nota">Un portal común le mostraría las {publicadas.size}. Aquí solo le mostramos las que le quedan cerca, en su horario y le dejan dinero después del pasaje.</p>
+    </details>
   );
 }
 

@@ -300,3 +300,9 @@ legend { padding: 0 6px; font-weight: 600; }
 .subir-foto { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 10px; font-weight: 600; cursor: pointer; }
 .subir-foto input { display: none; }
 .subir-foto.deshabilitado { opacity: .6; pointer-events: none; }
+
+/* Cuánto le ahorra el sistema al joven */
+.ahorro { background: var(--primario-claro); border-radius: var(--radio); padding: 10px 14px; margin-bottom: 12px; }
+.ahorro summary { cursor: pointer; line-height: 1.45; }
+.ahorro ul { margin: 8px 0 4px; padding-left: 20px; }
+.ahorro li { margin: 3px 0; }
