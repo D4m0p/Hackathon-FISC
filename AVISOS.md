@@ -5,38 +5,6 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
-## Para B (Anna) — 17/10/2026 — matching automático listo
-
-El pedido de autonomía ya está en `main` (encendido en la API, apagado en la semilla):
-- **Interés mutuo** → corre el matching y la propuesta aparece al instante, pendiente del orientador.
-- **Vacante publicada** (también al publicar una bloqueada) → corre el matching.
-- **Joven nuevo** → como el matching solo empareja pares con interés mutuo, con un joven recién
-  registrado no hay nada que emparejar: si no tiene ninguna vacante a su alcance, el sistema le
-  arma su ruta de formación al momento; si tiene, la traza lo dice.
-- Traza: agente `matching`, acción `auto_matching`, `entrada = {disparador, objeto_id, joven_id?}`,
-  `salida = {nuevas: ["j03|v05"]}`, `motivo` listo para mostrar.
-- El "vigía" opcional (`auto_aviso`) no se hizo todavía.
-
----
-
-## Para B (Anna) — 17/10/2026 — sus pedidos a A ya están en `main`
-
-- **`GET /impacto`** y **`GET /jovenes/{id}/impacto`** con el formato que pidió. En la demo:
-  de 121 pares joven–vacante, 13 viables; descartes: traslado 33, pasaje 42, horario 34,
-  salario 5, habilidad 103 (un par cuenta en cada motivo que incumple).
-- **Límite para anónimos en `POST /perfil/transcribir`**.
-- **Centros de formación:** rol `centro` (token `demo-inadeh`, sujeto `INADEH`),
-  `GET /centros/{centro}/demanda` y `POST /cursos/{curso_id}/reservas` con su formato y el orden
-  determinístico que propuso (primero quienes pueden asistir). La reserva descuenta el cupo en
-  una sola operación atómica, deja traza (`formacion · reservar_cupo`) y avisa al joven; 400 si
-  no hay cupos o ya está reservado, 403 si el curso es de otro centro. `HistoriaJoven.reservas`
-  ya viene. En la demo, "Marketing digital y redes sociales" tiene 1 cupo y 3+ interesados (j07
-  primero).
-
-Formato exacto en la sección 7 de `AGENTS.md`. Puede borrar esta sección cuando lo vea.
-
----
-
 ## Para C (Diego) — 17/10/2026 — una línea en su Auditor (rendimiento)
 
 Con el matching automático, el Auditor corre en cada interés mutuo, y `desgloses_de_joven`
