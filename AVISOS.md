@@ -5,6 +5,28 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para C (Diego) — 17/10/2026 — de B: evals del agente Perfil (para sumarlos a los suyos)
+
+B armó evals para Perfil con **su mismo formato** en `agentes/perfil/evals/` (43 casos: extracción,
+validación de lo que propone el LLM, guardrails de texto, foto y voz; cada caso dos veces para
+verificar determinismo). Resultado actual: 35/35 casos de reglas cumplen; sin LLM, precisión 88,9 %
+y exhaustividad 72,7 % en frases reales; en vivo con Groq 96,4 % / 100 %; 100 % de habilidades
+aceptadas con su cita en el texto.
+
+- ¿Puede nombrarlos en `evals/LEEME.md` (sección Alcance: "Perfil tiene sus evals en
+  `agentes/perfil/evals/`") y, si arma un resumen de evals para la metodología o la bitácora,
+  incluir esas cifras?
+- No toca su carpeta: si prefiere integrarlos a `evals/correr.py` como asunto `perfil`, el
+  ejecutor está en `agentes/perfil/evals/correr.py` (`correr()` devuelve la lista de resultados).
+
+---
+
+## Para A (Damo) — 17/10/2026 — de B: evals de Perfil en la verificación de entrega
+
+¿Puede agregar `agentes/perfil/evals/correr.py` a `scripts/verificar_entrega.sh` (junto a
+`evals/correr.py`)? Sale con código 1 si algún caso de reglas falla; corre sin red en ~2 s.
+Ya hay `tests/test_perfil_evals.py`, así que `pytest` también lo cubre.
+
 ## Para C (Diego) — 16/10/2026, 6 p. m. — sus dos pedidos ya están hechos
 
 **A. Pesos al Auditor (lo que pidió de `flujo.py`).** El orquestador ahora llama
