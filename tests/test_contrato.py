@@ -54,3 +54,26 @@ def test_turnos_llegan_como_texto_desde_json():
         '{"id":"j1","corregimiento":"x","disponibilidad":["tarde","noche"],'
         '"presupuesto_transporte_semanal":10,"salario_minimo":0}')
     assert j.disponibilidad == {Turno.tarde, Turno.noche}
+
+
+# ---------- guardrails de tamaño y forma ----------
+
+@pytest.mark.parametrize("id_malo", ["a/b", "con espacio", "x?y=1", "", "x" * 65, "'; DROP TABLE entidades; --"])
+def test_ids_que_romperian_la_url_o_la_base_se_rechazan(id_malo):
+    with pytest.raises(ValidationError):
+        joven(id=id_malo)
+
+
+def test_ids_reales_se_aceptan():
+    for bueno in ("j01", "j-1a2b3c4d", "carga_0001", "v.2026"):
+        assert joven(id=bueno).id == bueno
+
+
+def test_textos_y_listas_tienen_tope():
+    with pytest.raises(ValidationError):
+        DatosPersonales(joven_id="j1", nombre="N" * 121)
+    with pytest.raises(ValidationError):
+        joven(habilidades=[HabilidadNivel(codigo=f"h{i}", nivel=1) for i in range(51)])
+    with pytest.raises(ValidationError):
+        Vacante(id="v1", empresa_id="e1", titulo="T", corregimiento="a", turnos={Turno.manana},
+                salario_mensual=600, texto_original="x" * 5001)
