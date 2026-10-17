@@ -7,6 +7,7 @@ import { corregimiento } from "../nombres.js";
 export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, leyenda }) {
   const [encima, setEncima] = useState(null);
   const visibles = puntos.filter((p) => POSICIONES[p.codigo]);
+  const sinPunto = puntos.filter((p) => !POSICIONES[p.codigo]);
   // La casa se corre un poco si en su corregimiento también hay una burbuja, para no taparla.
   const pCasa = casa && POSICIONES[casa]
     ? proyectar(POSICIONES[casa]).map((v, k) => v + (visibles.some((p) => p.codigo === casa) ? (k ? 18 : -18) : 0))
@@ -68,6 +69,12 @@ export default function MapaPanama({ puntos, casa, seleccionado, onSeleccion, le
           {info.lineas.map((l) => <span key={l}>{l}</span>)}
           {esAproximada(info.codigo) && <span className="mapa-aprox">Ubicación aproximada: es un distrito, no un solo punto</span>}
         </div>
+      )}
+      {sinPunto.length > 0 && (
+        <p className="mapa-sin-punto">
+          Sin punto en el mapa (falta su ubicación de OpenStreetMap):{" "}
+          {sinPunto.map((p) => `${corregimiento(p.codigo)}${p.lineas?.[0] ? ` (${p.lineas[0]})` : ""}`).join(" · ")}
+        </p>
       )}
       <div className="mapa-pie">
         {leyenda && <span className="mapa-leyenda">{leyenda}</span>}

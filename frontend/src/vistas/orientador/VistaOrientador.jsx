@@ -26,6 +26,7 @@ export default function VistaOrientador() {
 
   return (
     <div className="vista">
+      <ReiniciarSimulacion />
       <nav className="pestanas">
         {PESTANAS.map(([k, t]) => (
           <button key={k} className={pestana === k ? "activa" : ""} onClick={() => setPestana(k)}>{t}</button>
@@ -38,6 +39,42 @@ export default function VistaOrientador() {
       {pestana === "pesos" && <Pesos cat={cat} />}
       {pestana === "auditoria" && <Auditoria cat={cat} />}
       {pestana === "trazas" && <Trazas cat={cat} />}
+    </div>
+  );
+}
+
+// Vuelve a los datos de demostración (vacantes, jóvenes, cursos y matching inicial).
+function ReiniciarSimulacion() {
+  const [paso, setPaso] = useState("boton");   // boton | confirmar | trabajando
+  const [error, setError] = useState("");
+  async function reiniciar() {
+    setPaso("trabajando");
+    setError("");
+    try {
+      await api.reiniciarDemo();
+      window.location.reload();
+    } catch (e) {
+      setError(e.message);
+      setPaso("boton");
+    }
+  }
+  if (paso === "boton")
+    return (
+      <div className="reiniciar-demo">
+        {error && <span className="error">{error}</span>}
+        <button className="enlace" onClick={() => setPaso("confirmar")}>↺ Reiniciar simulación</button>
+      </div>
+    );
+  return (
+    <div className="aviso alerta reiniciar-confirmar" role="alertdialog" aria-label="Reiniciar simulación">
+      <span>Se borra todo lo hecho (deslizamientos, aprobaciones, reservas, ofertas nuevas y registros) y se
+        vuelve a los datos de demostración. ¿Seguir?</span>
+      <div className="acciones">
+        <button className="enlace" disabled={paso === "trabajando"} onClick={() => setPaso("boton")}>Cancelar</button>
+        <button className="boton" disabled={paso === "trabajando"} onClick={reiniciar}>
+          {paso === "trabajando" ? "Reiniciando…" : "Sí, reiniciar"}
+        </button>
+      </div>
     </div>
   );
 }

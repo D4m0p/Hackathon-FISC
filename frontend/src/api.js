@@ -115,6 +115,7 @@ export const api = {
   publicarBloqueada: (vacante_id, motivo) => pedir("POST", `/vacantes/${vacante_id}/publicar-bloqueada`, { motivo }),
   jovenes: () => pedir("GET", "/jovenes"),
   planes: () => pedir("GET", "/planes"),
+  reiniciarDemo: () => pedir("POST", "/demo/reiniciar"),
   trazas: (agente) => pedir("GET", `/trazas?limite=300${agente ? `&agente=${agente}` : ""}`),
   mensajes: () => pedir("GET", "/mensajes"),
   // Centro de formación

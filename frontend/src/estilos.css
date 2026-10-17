@@ -541,3 +541,9 @@ p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius:
 @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); } }
 :root[data-tema="oscuro"] .pestanas button.activa { background: var(--primario); color: var(--sobre-primario); }
 .mutuo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; } .mutuo > span { flex: 1; min-width: 200px; }
+
+/* Lugares sin punto de OpenStreetMap y botón de reinicio de la demo */
+.mapa-sin-punto { margin: 6px 0 0; font-size: .78rem; color: #f2b84b; }
+.reiniciar-demo { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: -6px 0 6px; font-size: .9rem; }
+.reiniciar-confirmar { display: grid; gap: 8px; margin-bottom: 12px; }
+.reiniciar-confirmar .acciones { margin: 0; }

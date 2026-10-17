@@ -79,6 +79,7 @@ export default function FormVacante({ empresaId, inicial, onPublicada, onCancela
             <option value="">Elija uno</option>
             {corregimientos.map((c) => <option key={c} value={c}>{corregimiento(c)}</option>)}
           </select>
+          <span className="nota">¿No aparece su lugar? Elija el corregimiento más cercano: con él calculamos el viaje.</span>
         </label>
         <div className="turnos">
           {Object.entries(TURNOS).map(([t, nombre]) => (
