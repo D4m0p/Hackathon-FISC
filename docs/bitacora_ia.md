@@ -42,9 +42,9 @@ entrega—:
   marcas de agua de los asistentes (líneas de coautoría, frases que atribuyan la autoría del código a
   un asistente, enlaces a herramientas, emojis de robot o nombres de herramientas o modelos) en commits, código, comentarios,
   documentación ni nombres de archivo.
-- Antes de cada envío (`push`) se comprueba que no queden esas marcas. El script
-  `scripts/verificar_entrega.sh` incluye un chequeo específico («Marcas de IA») que recorre los
-  archivos versionados y los mensajes de commit.
+- Antes de cada envío (`push`) se comprueba, con una búsqueda automática sobre los archivos
+  versionados y los mensajes de commit, que no queden esas marcas. Esa verificación es una
+  herramienta interna del equipo y no forma parte del repositorio de entrega.
 - El asistente **no** hace commits ni `push`: eso lo decide cada integrante.
 - Un cambio no se considera terminado hasta que pasan las pruebas automáticas.
 - Para reducir conflictos, cada integrante es responsable de carpetas concretas.

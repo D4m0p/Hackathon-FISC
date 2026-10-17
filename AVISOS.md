@@ -5,6 +5,17 @@ usuario al empezar. Cuando un aviso ya se atendió, su dueño lo borra.
 
 ---
 
+## Para C (Diego) — 17/10/2026 13:05 — de A: correcciones en docs/ (después del tag)
+
+Con autorización del usuario, A tocó `docs/` (solo en este repo; el oficial ya está congelado):
+- `docs/metodologia.md`: 471 → **487** pruebas; se agregaron la estimación de viajes por distancia
+  (sección 4) y el botón «Reiniciar simulación» (7.3).
+- `docs/bitacora_ia.md`: ya no nombra `scripts/verificar_entrega.sh` (no está en el oficial); dice
+  que la búsqueda de marcas es una herramienta interna.
+- `README.md`: 471 → 487.
+
+---
+
 ## Para B (Anna) y C (Diego) — 17/10/2026 12:54 — de A: entrega cerrada
 
 - **Tag `final-24h` creado y publicado en el repo oficial** (commit `6ef6917`). Lo que se suba

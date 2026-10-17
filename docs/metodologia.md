@@ -206,6 +206,13 @@ por qué un portal que ignora la geografía manda a los jóvenes a trabajos a lo
 - **Ubicaciones** (`datos/corregimientos.csv`): 21 corregimientos con su punto y su fuente en
   OpenStreetMap (19 fronteras administrativas y 2 nodos de lugar, más aproximados). Faltan los
   tres de La Chorrera porque OSM no tiene su frontera; no se inventaron coordenadas.
+- **Viajes que faltan en la tabla, estimados por distancia.** Si un par no está en la tabla de
+  transporte pero los dos corregimientos tienen su punto de OpenStreetMap, el Matching lo estima:
+  distancia en línea recta por el ritmo (minutos por km) de los viajes que sí están en la tabla,
+  en su percentil 75 (conservador), y la tarifa oficial del corredor de MiBus. El motivo de la
+  tarjeta dice "estimado por distancia". Sin coordenadas con fuente no se estima nada (y nunca
+  `san_miguelito`, que es un distrito). Un lugar desconocido no se acepta en silencio:
+  `POST /vacantes`, `/cursos` y `/jovenes` responden 400 y sugieren los nombres más parecidos.
 - **De demostración** (`scripts/demo/datos_demo.json`): ilustrativos. 12 vacantes, 11 jóvenes y
   8 cursos pensados para que cada escena de la demo ocurra; personas y empresas ficticias.
 
@@ -215,7 +222,7 @@ por qué un portal que ignora la geografía manda a los jóvenes a trabajos a lo
 
 | Qué | Resultado |
 |---|---|
-| Pruebas automáticas (pytest) | 471 |
+| Pruebas automáticas (pytest) | 487 |
 | Evals de Matching, Auditor y Mercado (`evals/`) | 40 casos en 8 categorías, todos cumplen |
 | Evals del agente Perfil (`agentes/perfil/evals/`) | 35 casos de reglas, todos cumplen |
 | Casos aleatorios (Hypothesis) | El Matching y la Ruta de formación se comparan contra búsqueda exhaustiva en instancias pequeñas, con cualquier combinación válida de pesos: el solver nunca pierde |
@@ -290,6 +297,10 @@ cd frontend && npm run dev
 Accesos de demostración: orientador `demo-orientador`, joven para deslizar en vivo `demo-j11`,
 empresa `demo-e_super`, centro de formación `demo-inadeh`. La documentación interactiva de la API
 está en `http://localhost:8010/docs`.
+
+**Reiniciar la simulación:** el orientador tiene el botón "↺ Reiniciar simulación" (arriba a la
+derecha), que vuelve a los datos de demostración en segundos (`POST /demo/reiniciar`, solo
+orientador; se desactiva con `PERMITIR_REINICIAR_DEMO=0`).
 
 ### 7.4 Variables de entorno
 

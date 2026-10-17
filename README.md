@@ -325,8 +325,8 @@ tests/          pruebas automáticas
 
 ## Pruebas
 
-471 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
-orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API y la historia de los datos de demostración. Además, cada restricción
+487 pruebas automáticas cubren el contrato, el Matching, la Ruta de formación, el
+orquestador, el agente Perfil, los pesos ajustables, el reacomodo, "casi califica", la historia por joven, los permisos por rol, la API, las fotos, las ubicaciones y la historia de los datos de demostración. Además, cada restricción
 de los solvers se verificó quitándola a propósito y comprobando que alguna prueba falla.
 
 **Casos aleatorios** (Hypothesis, `tests/test_propiedades.py` y `tests/test_estados.py`):
