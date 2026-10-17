@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Ayuda from "../../componentes/Ayuda.jsx";
+import Automaticas from "./Automaticas.jsx";
 import { api } from "../../api.js";
 import Barras from "../../componentes/Barras.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
@@ -87,6 +88,7 @@ export default function Matches({ cat }) {
           cálculo exacto (optimización), no lo decide una IA. Usted aprueba o rechaza cada propuesta.
         </Ayuda>
       </div>
+      <Automaticas cat={cat} refrescar={aviso} />
       <div className="chips filtros">
         {FILTROS.map(([k, t]) => (
           <button key={k} className={"chip" + (filtro === k ? " activo" : "")} onClick={() => { setAviso(""); setMensaje(null); setFiltro(k); }}>{t}</button>

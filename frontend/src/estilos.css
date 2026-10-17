@@ -306,3 +306,12 @@ legend { padding: 0 6px; font-weight: 600; }
 .ahorro summary { cursor: pointer; line-height: 1.45; }
 .ahorro ul { margin: 8px 0 4px; padding-left: 20px; }
 .ahorro li { margin: 3px 0; }
+
+/* Lo que el sistema hizo solo (orientador) */
+.automaticas { background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: 10px 14px; margin: 6px 0 12px; }
+.automaticas h4 { margin-top: 0; }
+.automaticas ul { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; }
+.automaticas li { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: start; font-size: .9rem; }
+.automaticas .icono { font-size: 1.05rem; line-height: 1.3; }
+.automaticas .hora { color: var(--suave); font-size: .78rem; white-space: nowrap; }
+@media (max-width: 420px) { .automaticas li { grid-template-columns: 22px 1fr; } .automaticas .hora { grid-column: 2; } }
