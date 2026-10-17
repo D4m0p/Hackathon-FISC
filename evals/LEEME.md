@@ -66,6 +66,7 @@ en `metricas.py`. Las métricas sin ejemplos suficientes se reportan como `N/A`.
 ## Alcance
 
 - Cubre los agentes directamente; la API y el frontend quedan fuera.
+- Perfil tiene sus evals en `agentes/perfil/evals/` (35 casos de reglas); este ejecutor no los incluye.
 - La ruta de formación no entra en esta primera entrega.
 - Mercado corre sin red: mide la validación determinística y el respaldo por palabras
   clave, no la calidad del modelo de lenguaje real.

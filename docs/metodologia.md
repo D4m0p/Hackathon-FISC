@@ -45,7 +45,7 @@ cada decisión queda trazada con el agente que la tomó y su motivo.
 | Agente | Entrada → salida | Cómo decide |
 |---|---|---|
 | **Perfil** | CV (PDF, foto o texto), entrevista corta o nota de voz → habilidades con evidencia | El modelo propone habilidades con una cita; el código acepta una habilidad solo si existe en la taxonomía y la cita aparece en el texto original. La experiencia informal llega como máximo a nivel 2. Sin modelo, funciona con palabras clave. |
-| **Inteligencia de mercado** | Oferta en texto libre o foto de volante → vacante normalizada; tendencias por zona | El modelo extrae campos con esquema estricto; el código valida contra la taxonomía y el contrato. Si faltan datos obligatorios, responde qué falta en lugar de inventarlo. |
+| **Inteligencia de mercado** | Oferta en texto libre o foto de volante → vacante normalizada; tendencias por zona | El modelo extrae campos con esquema estricto; el código valida contra la taxonomía y el contrato. La oferta va delimitada y, si trae instrucciones, no pasa al modelo (se extrae solo con reglas); el salario del modelo solo se acepta si ese número aparece en el texto. Si faltan datos obligatorios, responde qué falta en lugar de inventarlo. |
 | **Matching** | Jóvenes, vacantes, traslados, interés mutuo → asignaciones explicadas | Reglas de factibilidad, puntaje explicable y un **flujo de costo mínimo** (OR-Tools) que da la asignación de puntaje total máximo respetando cupos. |
 | **Ruta de formación** | Joven sin vacante a su alcance, cursos → plan de cursos | Modelo de optimización (OR-Tools CP-SAT) con cupos, turnos, traslado y presupuesto. |
 | **Auditor** | Vacante → aprobada o bloqueada; resultado del matching → revisión de sesgo | Solo reglas en código (sin modelo de lenguaje): patrones de discriminación con manejo de negaciones y contexto; pruebas contrafactuales recalculadas con el código real del Matching. |
@@ -200,7 +200,12 @@ por qué un portal que ignora la geografía manda a los jóvenes a trabajos a lo
 - **Reales** (`datos/`, consultados el 16/10/2026, cada registro con fuente, URL y fecha):
   30 ofertas de portales panameños (22 verificadas y 8 parciales), 28 cursos (INADEH, Cisco
   Networking Academy y Oracle) y una tabla de transporte de 1104 filas entre 24 corregimientos.
-  Las fuentes y los criterios de verificación están en `datos/FUENTES*.md`.
+  Las fuentes y los criterios de verificación están en `datos/FUENTES*.md`. Los **tiempos de
+  traslado son estimaciones del equipo** (462 pares); 90 pares no tienen dato y el Matching los
+  trata como `sin_datos`. Las tarifas salen de las oficiales de MiBus y del Metro.
+- **Ubicaciones** (`datos/corregimientos.csv`): 21 corregimientos con su punto y su fuente en
+  OpenStreetMap (19 fronteras administrativas y 2 nodos de lugar, más aproximados). Faltan los
+  tres de La Chorrera porque OSM no tiene su frontera; no se inventaron coordenadas.
 - **De demostración** (`scripts/demo/datos_demo.json`): ilustrativos. 12 vacantes, 11 jóvenes y
   8 cursos pensados para que cada escena de la demo ocurra; personas y empresas ficticias.
 
