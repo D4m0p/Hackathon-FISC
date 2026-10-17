@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
 import { corregimiento, dinero } from "../../nombres.js";
@@ -30,6 +31,11 @@ export default function Bloqueadas() {
   if (!vacantes) return <p className="centro">Cargando…</p>;
   return (
     <>
+      <p className="suave intro">
+        Ofertas que el Auditor no dejó publicar porque piden algo que puede discriminar (edad, género,
+        apariencia…). <Ayuda>El Auditor revisa cada oferta con reglas fijas, no con IA. Si se equivocó
+        (falso positivo), usted puede publicarla igual explicando por qué; queda registrado.</Ayuda>
+      </p>
       {aviso && <p className="aviso" role="status">{aviso}</p>}
       {vacantes.length === 0 ? <p className="vacio">No hay ofertas bloqueadas.</p> : (
         <ul className="lista">

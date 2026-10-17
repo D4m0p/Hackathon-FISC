@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
+import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import { TURNOS, corregimiento, dinero } from "../../nombres.js";
 import DetalleVacante from "./DetalleVacante.jsx";
 import FormVacante from "./FormVacante.jsx";
 import Hallazgos from "./Hallazgos.jsx";
 
 const ESTADOS = { publicada: "Publicada", bloqueada: "Bloqueada", cerrada: "Cerrada", borrador: "Borrador" };
+const PASOS_GUIA = [
+  ["📝", "Publique una vacante con el formulario o pegue la oferta como la escribiría en redes."],
+  ["🛡️", "Antes de publicarse, el sistema revisa que no pida edad, género, apariencia u otros requisitos que discriminen. Si encuentra algo, le dice qué cambiar."],
+  ["👉", "Vea candidatos que cumplen y que pueden llegar a tiempo. No verá su nombre, edad ni género: solo lo que saben hacer."],
+  ["🤝", "Si a usted y al candidato les interesa, una orientadora coordina la entrevista."],
+];
+
 const FALTANTES = {
   corregimiento: "dónde queda el trabajo", salario_mensual: "el salario mensual", turnos: "el horario (mañana, tarde…)",
   titulo: "el nombre del puesto", habilidades_requeridas: "qué debe saber hacer",
@@ -17,6 +25,7 @@ export default function VistaEmpresa({ empresaId }) {
   const [vacantes, setVacantes] = useState(null);
   const [nombres, setNombres] = useState({});
   const [error, setError] = useState("");
+  const [guia, setGuia] = useState(() => !guiaVista("empresa"));
 
   useEffect(() => {
     api.habilidades().then((hs) => setNombres(Object.fromEntries(hs.map((h) => [h.codigo, h.nombre])))).catch(() => {});
@@ -78,6 +87,12 @@ export default function VistaEmpresa({ empresaId }) {
   const orden = { bloqueada: 0, publicada: 1, borrador: 2, cerrada: 3 };
   return (
     <div className="vista">
+      {guia && <Guia titulo="Así funciona para su empresa" pasos={PASOS_GUIA}
+                     onCerrar={() => { marcarGuiaVista("empresa"); setGuia(false); }} />}
+      <div className="barra-ayuda">
+        <span />
+        <button className="enlace" onClick={() => setGuia(true)}>¿Cómo funciona?</button>
+      </div>
       <div className="opciones">
         <button className="opcion" onClick={() => setPantalla({ tipo: "nueva" })}>
           <b>Publicar vacante</b><span>Con un formulario</span>

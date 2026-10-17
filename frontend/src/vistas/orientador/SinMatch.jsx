@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import { conNombres, corregimiento, dinero } from "../../nombres.js";
 
@@ -18,6 +19,12 @@ export default function SinMatch({ cat }) {
   if (!planes) return <p className="centro">Cargando…</p>;
   if (!planes.length) return <p className="vacio">Todos los jóvenes tienen al menos una vacante a su alcance.</p>;
   return (
+    <>
+    <p className="suave intro">
+      Jóvenes que hoy no tienen ninguna vacante a su alcance, con los cursos que les abrirían opciones.
+      <Ayuda>La ruta la calcula el sistema: elige los cursos que cubren lo que les falta en menos tiempo
+      y dinero, que tengan cupo, que no choquen con su horario y a los que puedan llegar.</Ayuda>
+    </p>
     <ul className="lista">
       {planes.map(({ joven, plan }) => (
         <li key={joven.id} className="item">
@@ -36,5 +43,6 @@ export default function SinMatch({ cat }) {
         </li>
       ))}
     </ul>
+    </>
   );
 }

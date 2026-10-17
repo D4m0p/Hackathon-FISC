@@ -6,7 +6,7 @@ import Pesos from "./Pesos.jsx";
 import SinMatch from "./SinMatch.jsx";
 import Trazas from "./Trazas.jsx";
 
-const PESTANAS = [["matches", "Matches"], ["bloqueadas", "Bloqueadas"], ["sin", "Sin match"], ["pesos", "Pesos"], ["trazas", "Trazas"]];
+const PESTANAS = [["matches", "Propuestas"], ["bloqueadas", "Bloqueadas"], ["sin", "Sin opciones"], ["pesos", "Prioridades"], ["trazas", "Historial"]];
 
 // Catálogos que usan varias pestañas: nombres de habilidades, vacantes y cursos.
 export default function VistaOrientador() {

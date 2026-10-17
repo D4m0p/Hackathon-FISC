@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
+import Ayuda from "../../componentes/Ayuda.jsx";
 import Barras from "../../componentes/Barras.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
@@ -144,7 +145,9 @@ function TarjetaCandidato({ t, nombres }) {
     <article>
       <div className="tarjeta-cabeza">
         <h3>Candidato/a · {corregimiento(j.corregimiento)}</h3>
-        <span className="puntaje">{Math.round(d.total * 100)}<small>/100</small></span>
+        <span className="puntaje">{Math.round(d.total * 100)}<small>/100</small>
+          <Ayuda>Qué tan bien encaja, de 0 a 100: suma si sabe hacer lo que pide, qué tan fácil le queda
+          llegar y cuánto le rinde el salario. Lo calcula el sistema con reglas fijas, no una IA.</Ayuda></span>
       </div>
       <p className="lugar">Disponible: {[...j.disponibilidad].map((x) => TURNOS[x]).join(", ")}</p>
       <h4>Lo que sabe hacer</h4>

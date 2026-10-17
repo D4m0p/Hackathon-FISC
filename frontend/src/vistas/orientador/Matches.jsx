@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import Barras from "../../componentes/Barras.jsx";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
@@ -47,7 +48,7 @@ export default function Matches({ cat }) {
     setError("");
     try {
       const r = await api.matching();
-      setAviso(`Matching listo: ${r.asignaciones.length} propuesta(s), ${r.sin_asignar.length} joven(es) sin asignar` +
+      setAviso(`Listo: ${r.asignaciones.length} propuesta(s) para revisar; ${r.sin_asignar.length} joven(es) sin una opción por ahora` +
         (r.infactibles.length ? `, ${r.infactibles.length} par(es) con interés mutuo que no son factibles.` : "."));
       setFiltro("pendiente");
       cargar();
@@ -78,9 +79,13 @@ export default function Matches({ cat }) {
     <>
       <div className="barra-acciones">
         <button className="boton" disabled={corriendo} onClick={correrMatching}>
-          {corriendo ? "Calculando…" : "Correr matching"}
+          {corriendo ? "Calculando…" : "Buscar las mejores opciones"}
         </button>
-        <span className="nota">Asigna con optimización respetando cupos, traslado, pasaje, horario y salario.</span>
+        <Ayuda>
+          El sistema reparte las vacantes para que la mayor cantidad de jóvenes consiga una buena opción,
+          sin pasarse de los cupos y respetando tiempo de viaje, pasaje, horario y salario mínimo. Es un
+          cálculo exacto (optimización), no lo decide una IA. Usted aprueba o rechaza cada propuesta.
+        </Ayuda>
       </div>
       <div className="chips filtros">
         {FILTROS.map(([k, t]) => (
@@ -97,7 +102,7 @@ export default function Matches({ cat }) {
       )}
       {error && <p className="error">{error}</p>}
       {!lista ? <p className="centro">Cargando…</p> : lista.length === 0 ? (
-        <p className="vacio">{filtro === "pendiente" ? "No hay matches por aprobar. Corra el matching para generar propuestas." : "No hay nada aquí."}</p>
+        <p className="vacio">{filtro === "pendiente" ? "No hay propuestas por aprobar. Toque «Buscar las mejores opciones»." : "No hay nada aquí."}</p>
       ) : (
         <ul className="lista">
           {lista.map((a) => {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Ayuda from "../../componentes/Ayuda.jsx";
 import { api } from "../../api.js";
 import FormMotivo from "../../componentes/FormMotivo.jsx";
 
@@ -35,8 +36,12 @@ export default function Pesos({ cat }) {
   if (!actuales) return error ? <p className="error">{error}</p> : <p className="centro">Cargando…</p>;
   return (
     <section className="panel">
-      <h2>Pesos del puntaje</h2>
-      <p className="suave">Cuánto cuenta cada parte al ordenar candidatos. Ninguna puede bajar de 5 % ni pasar de 80 %.</p>
+      <h2>Qué importa más al elegir <Ayuda>
+        Cada propuesta tiene un puntaje que suma tres cosas: si sabe hacer el trabajo, qué tan fácil le
+        queda llegar y cuánto le queda del salario. Aquí decide cuánto pesa cada una. Antes de aplicar,
+        «Simular» le muestra qué propuestas cambiarían.
+      </Ayuda></h2>
+      <p className="suave">Ninguna parte puede bajar de 5 % ni pasar de 80 %, para que ninguna se ignore del todo.</p>
       <Deslizador nombre="Habilidades" valor={h} onCambio={(x) => { setH(x); setSim(null); }} />
       <Deslizador nombre="Traslado" valor={t} onCambio={(x) => { setT(x); setSim(null); }} />
       <div className="peso-fila">

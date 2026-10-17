@@ -89,7 +89,7 @@ legend { padding: 0 6px; font-weight: 600; }
 .turno.activo { background: var(--primario); border-color: var(--primario); color: var(--sobre-primario); }
 
 .pestanas { display: flex; gap: 4px; background: var(--superficie); border-radius: 12px; padding: 4px; margin-bottom: 14px; }
-.pestanas button { flex: 1 1 0; min-width: 0; background: none; border: 0; padding: 9px 6px; border-radius: 9px; color: var(--suave); line-height: 1.15; }
+.pestanas button { flex: 1 1 0; min-width: 0; white-space: nowrap; background: none; border: 0; padding: 9px 6px; border-radius: 9px; color: var(--suave); line-height: 1.15; }
 /* En pantallas angostas las pestañas no se pisan: toman su ancho natural y, si no caben, se desliza la barra. */
 @media (max-width: 420px) {
   .pestanas { gap: 2px; overflow-x: auto; scrollbar-width: none; }
@@ -201,3 +201,40 @@ legend { padding: 0 6px; font-weight: 600; }
 .burbuja { background: var(--primario-claro); border-radius: 14px 14px 14px 4px; padding: 10px 14px; margin: 6px 0; }
 .por-que { margin-top: 8px; }
 .por-que summary { cursor: pointer; color: var(--primario); font-weight: 600; font-size: .9rem; }
+
+/* ---------- Más fácil de entender ---------- */
+.intro { margin: 0 0 12px; }
+.barra-ayuda { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+
+/* «?» con explicación */
+.ayuda { position: relative; display: inline-block; margin-left: 6px; vertical-align: middle; }
+.ayuda-boton { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--primario); background: transparent; color: var(--primario); font: 700 .8rem/1 inherit; cursor: pointer; padding: 0; }
+.ayuda-texto { position: absolute; z-index: 20; top: 28px; right: -8px; width: min(280px, 80vw); background: var(--texto); color: var(--fondo); font-size: .85rem; font-weight: 400; line-height: 1.4; text-transform: none; letter-spacing: 0; padding: 10px 12px; border-radius: 10px; box-shadow: var(--sombra); text-align: left; }
+
+/* Guía de la primera vez */
+.guia-fondo { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .55); display: grid; place-items: center; padding: 16px; }
+.guia { background: var(--superficie); color: var(--texto); border-radius: 20px; padding: 22px; max-width: 440px; width: 100%; box-shadow: var(--sombra); }
+.guia-pasos { list-style: none; padding: 0; margin: 12px 0 18px; display: grid; gap: 12px; }
+.guia-pasos li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+.guia-icono { font-size: 1.5rem; line-height: 1; }
+
+/* Tarjeta de vacante en palabras */
+.etiqueta-opcion { display: inline-flex; align-items: center; font-size: .85rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; margin-bottom: 6px; }
+.etiqueta-opcion.alta { background: var(--primario); color: var(--sobre-primario); }
+.etiqueta-opcion.media { background: var(--primario-claro); color: var(--primario); }
+.etiqueta-opcion.baja { background: var(--borde); color: var(--texto); }
+.etiqueta-opcion .ayuda-boton { border-color: currentColor; color: inherit; width: 20px; height: 20px; }
+.titulo-vacante { font-size: 1.35rem; margin-top: 4px; }
+.datos-clave { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 10px; }
+.datos-clave li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: start; font-size: 1.02rem; }
+.datos-clave .icono { font-size: 1.2rem; line-height: 1.3; }
+
+/* Camino de pasos del joven */
+.camino { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; counter-reset: paso; }
+.camino li { display: grid; justify-items: center; text-align: center; gap: 6px; position: relative; font-size: .8rem; color: var(--suave); }
+.camino li:not(:last-child)::after { content: ""; position: absolute; top: 15px; left: calc(50% + 18px); right: calc(-50% + 18px); height: 3px; background: var(--borde); border-radius: 2px; }
+.camino li.hecho:not(:last-child)::after { background: var(--primario); }
+.camino-punto { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--borde); color: var(--suave); }
+.camino .hecho .camino-punto { background: var(--primario); color: var(--sobre-primario); }
+.camino .actual .camino-punto { background: var(--superficie); color: var(--primario); border: 3px solid var(--primario); }
+.camino .actual { color: var(--texto); font-weight: 600; }

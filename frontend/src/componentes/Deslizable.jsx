@@ -34,7 +34,12 @@ export default function Deslizable({ children, onDecidir, deshabilitado }) {
   return (
     <div className="deslizable">
       <div className="tarjeta" style={estilo}
-           onPointerDown={(e) => { inicio.current = e.clientX; e.currentTarget.setPointerCapture(e.pointerId); }}
+           onPointerDown={(e) => {
+             // Los botones y enlaces de adentro («?», «Ver cómo se calculó») no inician arrastre.
+             if (e.target.closest("button, summary, a, input, select, .ayuda-texto")) return;
+             inicio.current = e.clientX;
+             e.currentTarget.setPointerCapture(e.pointerId);
+           }}
            onPointerMove={(e) => { if (inicio.current !== null) setDx(e.clientX - inicio.current); }}
            onPointerUp={() => {
              inicio.current = null;
