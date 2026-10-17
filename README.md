@@ -150,7 +150,7 @@ arriba cambia de rol en un clic durante la demo y el botón ☀️/🌙 elige te
 - **Joven:** registro con CV (PDF, foto o texto) o entrevista escrita o por **nota de voz**;
   tarjetas para deslizar que dicen en palabras cuánto le queda después del pasaje y cuántos
   minutos tarda; "de 11 vacantes publicadas, 5 le sirven" con un **mapa** de su casa y cada
-  vacante; "Casi clasifica", "Cursos" (con cupo reservado por un centro) y "Mi proceso" con los
+  vacante; "Casi califica", "Cursos" (con cupo reservado por un centro) y "Mi proceso" con los
   pasos y sus entrevistas (cambiar fecha o cancelar).
 - **Empresa:** publicar con formulario, pegando el texto o el mensaje de WhatsApp, o con la
   **foto del volante**; ver y corregir lo que bloquea el Auditor; candidatos anónimos para
