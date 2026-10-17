@@ -466,3 +466,17 @@ legend { padding: 0 6px; font-weight: 600; }
 .cabeza-vacante { display: flex; align-items: center; gap: 12px; }
 .cabeza-vacante .titulo-vacante { margin: 0; }
 .nombre-empresa { margin: 2px 0 0; color: var(--suave); font-size: .9rem; }
+
+/* Vista del joven: tarjeta a la izquierda y panel tipo Panorama a la derecha (abajo en celular) */
+.joven-grilla { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.joven-principal { min-width: 0; position: sticky; top: 72px; }   /* la tarjeta queda a la vista al bajar por el panel */
+.joven-panel { display: grid; gap: 16px; min-width: 0; }
+.joven-panel .panel, .joven-panel .panel-oscuro { margin: 0; }
+.joven-kpis { grid-template-columns: repeat(2, 1fr); margin: 0; }
+.joven-angosta { max-width: 560px; margin: 0 auto; }
+p.ahorro { background: var(--primario-claro); padding: 12px 14px; border-radius: 12px; margin: 0 0 14px; }
+@media (max-width: 900px) {
+  .joven-grilla { grid-template-columns: 1fr; }
+  .joven-principal { max-width: 560px; width: 100%; margin: 0 auto; position: static; }
+  .joven-kpis { grid-template-columns: repeat(2, 1fr); }
+}

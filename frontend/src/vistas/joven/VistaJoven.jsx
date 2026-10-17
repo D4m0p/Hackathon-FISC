@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "../../api.js";
 import Ayuda from "../../componentes/Ayuda.jsx";
 import Barras from "../../componentes/Barras.jsx";
+import BarrasH from "../../componentes/BarrasH.jsx";
 import Camino from "../../componentes/Camino.jsx";
+import Contador from "../../componentes/Contador.jsx";
 import Deslizable from "../../componentes/Deslizable.jsx";
 import Guia, { guiaVista, marcarGuiaVista } from "../../componentes/Guia.jsx";
 import LogoEmpresa from "../../componentes/LogoEmpresa.jsx";
@@ -38,10 +40,14 @@ export default function VistaJoven({ jovenId }) {
           <button key={k} className={pestana === k ? "activa" : ""} onClick={() => setPestana(k)}>{t}</button>
         ))}
       </nav>
-      {pestana === "vacantes" && <Vacantes jovenId={jovenId} nombres={nombres} onGuia={() => setGuia(true)} />}
-      {pestana === "casi" && <CasiCalifica jovenId={jovenId} cursos={cursos} nombres={nombres} />}
-      {pestana === "plan" && <Plan jovenId={jovenId} cursos={cursos} nombres={nombres} />}
-      {pestana === "estado" && <Estado jovenId={jovenId} nombres={nombres} />}
+      {pestana === "vacantes" && <Vacantes jovenId={jovenId} nombres={nombres} onGuia={() => setGuia(true)} onIr={setPestana} />}
+      {pestana !== "vacantes" && (
+        <div className="joven-angosta">
+          {pestana === "casi" && <CasiCalifica jovenId={jovenId} cursos={cursos} nombres={nombres} />}
+          {pestana === "plan" && <Plan jovenId={jovenId} cursos={cursos} nombres={nombres} />}
+          {pestana === "estado" && <Estado jovenId={jovenId} nombres={nombres} />}
+        </div>
+      )}
     </div>
   );
 }
@@ -57,8 +63,9 @@ function useCarga(fn, deps) {
   return { ...estado, recargar };
 }
 
-function Vacantes({ jovenId, nombres, onGuia }) {
+function Vacantes({ jovenId, nombres, onGuia, onIr }) {
   const { datos, error, cargando, recargar } = useCarga(() => api.tarjetasJoven(jovenId), [jovenId]);
+  const resumen = useResumen(jovenId);
   const [vistas, setVistas] = useState(0);
   const [aviso, setAviso] = useState(null);   // {tipo: "mutuo" | "interes", titulo}
   const [errDeslizar, setErrDeslizar] = useState("");
@@ -80,12 +87,13 @@ function Vacantes({ jovenId, nombres, onGuia }) {
   const restantes = datos.slice(vistas);
 
   return (
-    <>
+    <div className="joven-grilla">
+    <div className="joven-principal">
       <div className="barra-ayuda">
         <span className="suave">{restantes.length ? `${restantes.length} vacante(s) para usted` : ""}</span>
         <button className="enlace" onClick={onGuia}>¿Cómo funciona?</button>
       </div>
-      <Ahorro jovenId={jovenId} tarjetas={datos} />
+      <Ahorro datos={resumen} />
       {aviso?.tipo === "mutuo" && (
         <div className="mutuo" role="status">
           <b>¡A la empresa también le interesa!</b> «{aviso.titulo}» quiere conocerle.
@@ -110,35 +118,57 @@ function Vacantes({ jovenId, nombres, onGuia }) {
           <TarjetaVacante t={restantes[0]} nombres={nombres} />
         </Deslizable>
       )}
-    </>
+    </div>
+    <PanelJoven jovenId={jovenId} datos={resumen} tarjetas={datos} nombres={nombres} onIr={onIr} />
+    </div>
   );
 }
 
-// Cuánto trabajo le ahorra el sistema: de todas las vacantes publicadas, cuántas le sirven y
-// por qué no le mostramos las demás. Solo cuenta; las decisiones ya las tomó el Matching.
-const MOTIVOS_AHORRO = {
-  traslado: (n) => `${n} le quedaría${n > 1 ? "n" : ""} demasiado lejos de su casa`,
-  presupuesto: (n) => `en ${n} el pasaje pasaría lo que puede gastar por semana`,
-  horario: (n) => `${n} ${n > 1 ? "son" : "es"} en horarios que usted no tiene libres`,
-  salario: (n) => `${n} paga${n > 1 ? "n" : ""} menos de lo que usted pide`,
-  habilidad: (n) => `${n} pide${n > 1 ? "n" : ""} algo que puede aprender en un curso (mire «Le falta poco»)`,
-  sin_datos: (n) => `de ${n} no tenemos datos de cómo llegar`,
-};
-
 const AMBAR = "#f2b84b", GRIS = "#94a9b9";
 
-function Ahorro({ jovenId, tarjetas }) {
+// Lo que el panel necesita, una sola vez para el resumen, el mapa y las cifras.
+function useResumen(jovenId) {
   const [datos, setDatos] = useState(null);
   useEffect(() => {
     Promise.all([api.impactoJoven(jovenId), api.vacantes(), api.casiCalifica(jovenId), api.historia(jovenId)])
       .then(([impacto, vacantes, casi, historia]) => setDatos({ impacto, vacantes, casi, historia }))
       .catch(() => setDatos(null));
   }, [jovenId]);
+  return datos;
+}
+
+function Ahorro({ datos }) {
   if (!datos) return null;
   const i = datos.impacto;
   const otras = i.publicadas - i.viables;
   if (otras <= 0) return null;
-  const motivos = Object.keys(MOTIVOS_AHORRO).filter((k) => i.descartes[k] > 0);
+  return (
+    <p className="ahorro">
+      {i.viables > 0 ? (
+        <>De <b>{i.publicadas}</b> vacantes publicadas, <b>{i.viables} le sirven</b>.
+          Le ahorramos <b>{otras}</b> postulaciones que no le convenían.</>
+      ) : (
+        <>Ninguna de las <b>{i.publicadas}</b> vacantes publicadas le sirve todavía.
+          Mire «Le falta poco» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
+      )}
+    </p>
+  );
+}
+
+// Panel al costado (abajo en celular), con el mismo estilo del Panorama del orientador:
+// cifras, mapa, por qué no le sirven las demás y lo que piden cerca. Solo muestra lo que ya
+// decidió el Matching.
+function PanelJoven({ jovenId, datos, tarjetas, nombres, onIr }) {
+  if (!datos) return <aside className="joven-panel" />;
+  const i = datos.impacto;
+  const enProceso = datos.historia.asignaciones.filter((a) => a.vigente && a.aprobada !== false).length;
+  const cursosQueAbren = new Set(datos.casi.flatMap((c) => c.cursos)).size;
+  const kpis = [
+    ["Le sirven", i.viables, "cerca, en su horario y le dejan dinero", "vacantes"],
+    ["Le falta poco", datos.casi.length, "les falta una sola cosa", "casi"],
+    ["Cursos útiles", cursosQueAbren, "gratuitos, para lo que le falta", "plan"],
+    ["En proceso", enProceso, "con interés mutuo o entrevista", "estado"],
+  ];
 
   // Una burbuja por corregimiento: aqua si alguna vacante le sirve, ámbar si le falta una sola cosa.
   const minutos = Object.fromEntries(tarjetas.map((t) => [t.vacante.id, enPalabras(t.desglose).minutos]));
@@ -149,37 +179,53 @@ function Ahorro({ jovenId, tarjetas }) {
   for (const v of datos.vacantes) {
     const z = (zonas[v.corregimiento] ||= { sirve: 0, casi: 0, lineas: [] });
     if (sirve.has(v.id)) { z.sirve++; z.lineas.push(`✓ ${v.titulo}${minutos[v.id] != null ? ` · ${minutos[v.id]} min` : ""}`); }
-    else if (casi[v.id]) { z.casi++; z.lineas.push(`◐ ${v.titulo}: ${casi[v.id]}`); }
+    else if (casi[v.id]) { z.casi++; z.lineas.push(`◐ ${v.titulo}: ${conNombres(casi[v.id], nombres)}`); }
     else z.lineas.push(`✕ ${v.titulo}: no encaja en varias cosas`);
   }
   const puntos = Object.entries(zonas).map(([codigo, z]) => ({
     codigo, radio: 6 + z.lineas.length * 3, color: z.sirve ? "var(--aqua)" : z.casi ? AMBAR : GRIS, lineas: z.lineas,
   }));
+  const motivos = MOTIVOS_PANEL.filter(([k]) => i.descartes[k] > 0);
 
   return (
-    <details className="ahorro">
-      <summary>
-        {i.viables > 0 ? (
-          <>De <b>{i.publicadas}</b> vacantes publicadas, <b>{i.viables} le sirven</b>.
-            Le ahorramos <b>{otras}</b> postulaciones que no le convenían.</>
-        ) : (
-          <>Ninguna de las <b>{i.publicadas}</b> vacantes publicadas le sirve todavía.
-            Mire «Le falta poco» y «Cursos»: le decimos qué le falta y cómo conseguirlo.</>
-        )}
-        <span className="ahorro-abrir">Ver en el mapa</span>
-      </summary>
-      <div className="panel-oscuro mapa-joven">
+    <aside className="joven-panel">
+      <div className="kpis joven-kpis">
+        {kpis.map(([titulo, valor, sub, ir]) => (
+          <button key={titulo} className="kpi enlazable" onClick={() => onIr(ir)}>
+            <span className="kpi-titulo">{titulo}</span>
+            <b className="kpi-valor"><Contador valor={valor} /></b>
+            <span className="kpi-sub">{sub}</span>
+          </button>
+        ))}
+      </div>
+
+      <section className="panel-oscuro mapa-joven">
+        <div className="panel-cabeza"><h3>Dónde están las vacantes</h3></div>
         <MapaPanama puntos={puntos} casa={datos.historia.joven.corregimiento}
                     leyenda={<><i className="punto aqua" /> le sirve <i className="punto ambar" /> le falta una cosa <i className="punto lejos" /> no encaja · la casita es usted</>} />
-      </div>
-      <ul>
-        {motivos.map((k) => <li key={k}>{MOTIVOS_AHORRO[k](i.descartes[k])}</li>)}
-      </ul>
-      <p className="nota">Una vacante puede fallar en más de una cosa. Un portal común le mostraría las {i.publicadas};
-        aquí solo le mostramos las que le quedan cerca, en su horario y le dejan dinero después del pasaje.</p>
-    </details>
+        <p className="nota">Toque una burbuja para ver qué vacantes hay ahí.</p>
+      </section>
+
+      {motivos.length > 0 && (
+        <section className="panel">
+          <h3>¿Por qué no le mostramos las otras {i.publicadas - i.viables}?
+            <Ayuda>Lo decide el Matching con reglas fijas: distancia, pasaje, horario, salario y
+            habilidades. Una vacante puede fallar en más de una cosa, por eso la suma puede ser mayor.</Ayuda></h3>
+          <BarrasH filas={motivos.map(([k, etiqueta]) => ({
+            clave: k, etiqueta, valor: i.descartes[k], color: k === "traslado" || k === "presupuesto" ? AMBAR : "var(--celeste)" }))} />
+          <p className="nota">Un portal común le mostraría las {i.publicadas}; aquí solo ve las que le convienen.</p>
+        </section>
+      )}
+
+      <LoQuePiden jovenId={jovenId} nombres={nombres} />
+    </aside>
   );
 }
+
+const MOTIVOS_PANEL = [
+  ["traslado", "Le queda muy lejos"], ["presupuesto", "El pasaje no le alcanza"], ["horario", "No coincide con su horario"],
+  ["salario", "Paga menos de lo que pide"], ["habilidad", "Le falta una habilidad"], ["sin_datos", "Sin datos de cómo llegar"],
+];
 
 function TarjetaVacante({ t, nombres }) {
   const v = t.vacante, d = t.desglose;

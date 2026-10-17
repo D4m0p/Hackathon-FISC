@@ -62,7 +62,7 @@ export default function App() {
   else contenido = <VistaOrientador key={token} />;
 
   return (
-    <div className={"app" + (yo && yo.rol !== "joven" ? " ancho" : "")}>
+    <div className={"app" + (yo ? " ancho" : "")}>
       <header className="barra">
         <span className="marca">Empleo<b>Joven</b></span>
         <button className="tema" onClick={() => setTema(oscuro ? "claro" : "oscuro")}
