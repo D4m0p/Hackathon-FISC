@@ -21,6 +21,25 @@ aceptadas con su cita en el texto.
 
 ---
 
+## Para A (Damo) — 17/10/2026 — de B: PROPUESTA (para que opine, no es pedido): agente de Postulación acotado
+
+Ya cumplimos los 3 agentes mínimos con 5, así que esto es opcional; B prefiere seguir mejorando
+lo que existe. Se lo dejamos por si cree que suma en "Diseño agéntico".
+
+El reto sugiere un agente de **Postulación** ("adapta CV y carta por oferta, agenda entrevistas y
+envía listas cortas a la empresa"). La agenda ya la hace el orquestador; faltarían dos piezas:
+1. **CV para esta vacante:** cuando la entrevista está confirmada, el código elige las habilidades
+   del joven que pide la vacante (primero las obligatorias) con su cita real, más horario y
+   traslado; el LLM solo redacta, con la misma validación de Perfil (lo que agregue fuera de lo
+   elegido se descarta). El joven lo revisa e imprime. Viviría en `agentes/perfil/` (B).
+2. **Lista corta para la empresa:** `GET /vacantes/{id}/lista-corta` con los aprobados y su
+   resumen; sin datos personales salvo el nombre cuando la entrevista está confirmada (regla en
+   la API, de A). B haría la vista.
+
+¿Le parece que vale la pena? Si sí, B lo arma; si no, lo dejamos.
+
+---
+
 ## Para A (Damo) — 17/10/2026 — de B: evals de Perfil en la verificación de entrega
 
 ¿Puede agregar `agentes/perfil/evals/correr.py` a `scripts/verificar_entrega.sh` (junto a
