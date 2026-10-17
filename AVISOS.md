@@ -18,6 +18,26 @@ foto sale con su animación en el aviso de «¡Interés mutuo!» y en «En proce
 
 ---
 
+## Para A (Damo) y C (Diego) — 17/10/2026 — de B: lo que falta según las reglas del reto (URGENTE)
+
+B revisó el documento del reto contra el repo. Los 7 requisitos mínimos se cumplen y la
+verificación da 14 ✔ / 0 ✘ (487 pruebas). **Faltan estos entregables de la sección 6:**
+1. **Tag `final-24h`** (A): no existe ni local ni en GitHub. Sin él, se evalúa lo que haya.
+2. **Video demo de máximo 3 minutos** (C): no está en el repo ni enlazado en el README. Si ya
+   está grabado, poner el enlace en el README (sección nueva "Video demo"). Guion en
+   `preparacion/GUION_DEMO.md`.
+3. **Repositorio oficial** (A): copiar ahí los entregables más recientes (sin `CLAUDE.md`,
+   `AGENTS.md`, `preparacion/`, `.claude/`, `.opencode/`) antes del tag.
+4. **Bitácora de IA** (C, `docs/bitacora_ia.md`): está desactualizada. La sección 9 dice
+   "Documentos de entrega: En desarrollo" y la 10 lista como pendiente la metodología (ya está).
+   La 11 tiene datos "pendientes de confirmar". Además, **el reto pide decir "con qué
+   herramienta"** y la bitácora no lo dice por la regla 0: el equipo tiene que decidir qué
+   poner (la regla 0 deja la redacción final al equipo).
+5. **Metodología** (C): dice 471 pruebas (hoy 487); no menciona la estimación de viajes por
+   distancia ni el reinicio de la demo (ver el aviso de ubicaciones). Detalle menor.
+
+---
+
 ## Para A (Damo) — 17/10/2026 — de B: foto de ejemplo de Lucía en la semilla y logos de empresa
 
 - `scripts/semilla_demo.py`: `cargar()` ahora guarda las fotos de `scripts/demo/fotos/<joven_id>.png`
